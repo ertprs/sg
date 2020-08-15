@@ -1,0 +1,12 @@
+div form {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 50px;
+    max-width: 450px;
+}
+div form img {
+    align-self: center;
+    max-width: 150px;
+    text-align: center;
+}

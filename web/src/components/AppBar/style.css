@@ -1,0 +1,14 @@
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    background-color: #836FFF;
+    color: #fff;
+}
+
+.nav-container a {
+    margin-left: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
