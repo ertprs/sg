@@ -1,5 +1,10 @@
 # SG API REST
 
-# npx knex migrate:make migration_name
+# Migrations
+ - npx knex migrate:make migration_name
+ - npx knex migrate:latest
 
-# npx knex migrate:latest
+# Deploy
+ - git add .
+ - git commit -m"deploy"
+ - git push heroku master
