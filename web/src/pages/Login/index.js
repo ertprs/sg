@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import './style.css';
+import api from '../../services/api';
 import imgLogin from '../../assets/login.png';
+
 
 export default function Login() {
     const history = useHistory();
@@ -12,22 +14,30 @@ export default function Login() {
 
     const handleLogin = async e => {
         e.preventDefault();
-        history.push('dashboard');
+        const res = await api.post('users/login', {
+            username: username,
+            password: password
+        });
+
+        if (!res.data)
+            console.log('Usuario e ou senha invalidos.')
+        else
+            history.push('dashboard');
     }
 
     return (
         <div>
             <form onSubmit={handleLogin}>
                 <img src={imgLogin} alt="Login" />
-                <label for="fname">Usuario</label>
-                <input 
+                <label htmlFor="fname">Usuario</label>
+                <input
                     type="text"
-                    value={username} 
+                    value={username}
                     onChange={e => setUsername(e.target.value)} />
-                <label for="lname">Senha</label>
-                <input 
+                <label htmlFor="lname">Senha</label>
+                <input
                     type="password"
-                    value={password} 
+                    value={password}
                     onChange={e => setPassword(e.target.value)} />
                 <input type="submit" />
             </form>
