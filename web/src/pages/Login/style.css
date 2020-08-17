@@ -1,10 +1,31 @@
+div {
+    padding: 10px;
+}
 div form {
     display: flex;
-    flex-direction: column;
     margin: auto;
+    flex-direction: column;
     margin-top: 50px;
     max-width: 450px;
+    background-color: #417b5b;
+    border-radius: 15px;
+    padding: 10px;
 }
+
+div form label {
+    color: #fff;
+}
+
+div form input[type="submit"] {
+    background-color: #363637;
+}
+
+div form input[type="submit"]:hover {
+    background-color: #363640;
+}
+
+
+
 div form img {
     align-self: center;
     max-width: 150px;
