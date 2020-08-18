@@ -1,1 +1,3 @@
-# sg
+# Deploy
+ - yarn build
+ - firebase deploy

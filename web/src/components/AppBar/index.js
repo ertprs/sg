@@ -7,8 +7,8 @@ export default function AppBar() {
     const history = useHistory();
 
     return (
-        <Navbar bg="light" expand="lg" className="navbar" >
-            <Navbar.Brand>Painel de controle</Navbar.Brand>
+        <Navbar expand="lg" className="navbar" >
+            <Navbar.Brand id="basic-nav-dropdown" onClick={() => history.push('dashboard')}>Dashboard</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
@@ -21,7 +21,7 @@ export default function AppBar() {
                 </Nav>
                 <Navbar.Collapse className="justify-content-end">
                     <Navbar.Text>
-                        <Nav.Link onClick={() => history.push('/')}>Sair</Nav.Link>
+                        <Nav.Link id="basic-nav-dropdown" onClick={() => history.push('/')}>Sair</Nav.Link>
                     </Navbar.Text>
                 </Navbar.Collapse>
             </Navbar.Collapse>
