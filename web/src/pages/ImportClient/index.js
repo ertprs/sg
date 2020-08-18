@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import * as XLSX from 'xlsx';
-import { Table } from 'react-bootstrap';
+import { Table, Form } from 'react-bootstrap';
 import './style.css';
 import AppBar from '../../components/AppBar';
 
@@ -13,8 +13,12 @@ export default function ImportClient() {
     const configStrTelephone = tel => {
         var telFormated = tel + '';
         telFormated = telFormated.toString();
-        telFormated = telFormated.replace(/[^\d]+/g,'');
+        telFormated = telFormated.replace(/[^\d]+/g, '');
         return telFormated;
+    }
+
+    const importToDatabase = async () => {
+        console.log('importa')
     }
 
     const upload = async sheet => {
@@ -55,8 +59,17 @@ export default function ImportClient() {
             <AppBar />
             <div className="import-client-container">
                 <div className="form">
-                    <input type="file" id="input-excel" ref={sheetFile} />
-                    <button onClick={() => upload(sheetFile)}> Click me </button>
+                    <label htmlFor="file-upload" className="custom-file-upload">
+                        Carregar arquivo
+                    </label>
+                    <input id="file-upload" type="file" ref={sheetFile} onChange={() => upload(sheetFile)}/>
+                    <div className="buttons-container">
+                        <button
+                            disabled={(!importedArray.length > 0)}
+                            className="import-button"
+                            onClick={importToDatabase}
+                        > Importar </button>
+                    </div>
                 </div>
                 <Table striped bordered hover className="importTable">
                     <thead>

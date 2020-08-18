@@ -13,7 +13,7 @@ export default function AppBar() {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
                     <NavDropdown title="Cadastro" id="basic-nav-dropdown">
-                        <NavDropdown.Item onClick={() => history.push('client')} >Cliente</NavDropdown.Item>
+                        <NavDropdown.Item id="color-item" onClick={() => history.push('client')} >Cliente</NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Importação" id="basic-nav-dropdown">
                         <NavDropdown.Item onClick={() => history.push('import-client')}>Planilha</NavDropdown.Item>
