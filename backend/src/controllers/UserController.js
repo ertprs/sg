@@ -4,18 +4,13 @@ const connection = require('../database/connection');
 module.exports = {
   async getAll(request, response) {
     const users = await connection('users').select('*');
-  
     return response.json(users);
   },
 
   async new(request, response) {
     const { name, username, password } = request.body;
 
-    const id = crypto.randomBytes(4).toString('HEX');
-    password = 
-    
     await connection('users').insert({
-      id,
       name,
       username,
       password,
@@ -36,7 +31,6 @@ module.exports = {
 
     return response.json(users[0]);
     
-  
     
   },
 };

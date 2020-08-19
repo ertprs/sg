@@ -19,9 +19,11 @@
 }
 
 .import-client-container .form  .import-button:disabled {
+    width: 160px;
     background: #dddddd;
 }
 .import-client-container .form  .import-button:enabled {
+    width: 160px;
     background: #417b5b;
 }
 

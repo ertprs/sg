@@ -8,7 +8,7 @@
     "start": "node src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Álvaro Ferreira",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",

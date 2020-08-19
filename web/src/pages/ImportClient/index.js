@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import * as XLSX from 'xlsx';
-import { Table, Form } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
+import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import api from '../../services/api';
 import './style.css';
 import AppBar from '../../components/AppBar';
 
@@ -9,6 +11,7 @@ export default function ImportClient() {
     const history = useHistory();
     const sheetFile = React.useRef()
     const [importedArray, setImportedArray] = useState([])
+    const [btnIsLoading, setBtnIsLoading] = useState(false)
 
     const configStrTelephone = tel => {
         var telFormated = tel + '';
@@ -18,10 +21,23 @@ export default function ImportClient() {
     }
 
     const importToDatabase = async () => {
-        console.log('importa')
+        setBtnIsLoading(true);
+        importedArray.filter(async client => {
+            try {
+                const res = await api.post('clients', {
+                    name: client.__EMPTY,
+                    cellphone: client.__EMPTY_1,
+                    phone: client.__EMPTY_2
+                });
+            } catch (error) {
+                console.log(error)
+            }
+        });
+        setBtnIsLoading(false);
     }
 
     const upload = async sheet => {
+        setBtnIsLoading(true)
         var f = sheet.current.files[0]
         var reader = new FileReader();
         reader.readAsArrayBuffer(f);
@@ -51,6 +67,7 @@ export default function ImportClient() {
             console.log(tempArray.length);
             console.log(count)
             setImportedArray(tempArray);
+            setBtnIsLoading(false)
         }
     }
 
@@ -62,24 +79,32 @@ export default function ImportClient() {
                     <label htmlFor="file-upload" className="custom-file-upload">
                         Carregar arquivo
                     </label>
-                    <input id="file-upload" type="file" ref={sheetFile} onChange={() => upload(sheetFile)}/>
+                    <input id="file-upload" type="file" ref={sheetFile} onChange={() => upload(sheetFile)} />
                     <div className="buttons-container">
                         <button
                             disabled={(!importedArray.length > 0)}
                             className="import-button"
-                            onClick={importToDatabase}
-                        > Importar </button>
+                            onClick={importToDatabase} >
+                            Importar
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                hidden={!btnIsLoading} />
+                        </button>
                     </div>
                 </div>
-                <Table striped bordered hover className="importTable">
-                    <thead>
+                <MDBTable responsive hover bordered>
+                    <MDBTableHead>
                         <tr>
                             <th>Nome</th>
                             <th>Celular</th>
                             <th>Fixo</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                    </MDBTableHead>
+                    <MDBTableBody>
                         {importedArray.map(client => (
                             <tr key={client.__rowNum__}>
                                 <td>{client.__EMPTY}</td>
@@ -87,9 +112,9 @@ export default function ImportClient() {
                                 <td>{client.__EMPTY_2}</td>
                             </tr>
                         ))}
-                    </tbody>
-                </Table>
+                    </MDBTableBody>
+                </MDBTable>
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,12 +1,29 @@
-div form {
-    display: flex;
-    flex-direction: column;
+.client-container .filters-client {
+    box-shadow: 1px 1px 10px -2px rgba(54,54,54,0.77);
     margin: auto;
-    margin-top: 50px;
-    max-width: 450px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    width: 450px;
+    max-width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
-div form img {
-    align-self: center;
-    max-width: 150px;
-    text-align: center;
+
+.client-container .client-filters .select-search  {
+    width: 10px;
 }
+
+.client-container .client-filters.field-search  {
+    width: 50px; 
+}
+
+.react-bootstrap-table table {
+    table-layout: auto;
+  }
+
+
