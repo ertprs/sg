@@ -3,34 +3,42 @@ const connection = require('../database/connection');
 
 module.exports = {
   async getAll(request, response) {
-    const users = await connection('users').select('*');
-    return response.json(users);
+    try {
+      const result = await connection('users').select('*');
+      return response.json(result);
+    } catch (error) {
+      return response.json({ error });
+    }
+
   },
 
   async new(request, response) {
     const { name, username, password } = request.body;
+    try {
+      await connection('users').insert({
+        name,
+        username,
+        password,
+      });
+      return response.json({ id });
+    } catch (error) {
+      return response.json({ error });
+    }
 
-    await connection('users').insert({
-      name,
-      username,
-      password,
-    })
-
-    return response.json({ id });
   },
 
   async login(request, response) {
     const { username, password } = request.body;
-    console.log(username, password)
-    const users = await connection('users')
-    .where({
-      username: username,
-      password: password
-    })  
-    .select('*');
-
-    return response.json(users[0]);
-    
-    
+    try {
+      const result = await connection('users')
+        .where({
+          username: username,
+          password: password
+        })
+        .select('*');
+      return response.json(result[0]);
+    } catch (error) {
+      return response.json({ error });
+    }
   },
 };

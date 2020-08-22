@@ -1,0 +1,46 @@
+.import-collet-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.import-collet-container .form {
+    margin: 20px auto;
+    width: 450px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    justify-content: space-around;
+    box-shadow: 1px 2px 5px 0px rgba(54,54,54,0.77);
+}
+
+.import-collet-container .form input[type="file"] {
+    display: none;
+}
+.import-collet-container .form .custom-file-upload {
+    color: #fff;
+    background-color: #417b5b;
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+
+
+.import-collet-container .form  .import-button:disabled {
+    background: #dddddd;
+    color: #fff;
+}
+.import-collet-container .form  .import-button:enabled {
+    background: #417b5b;
+    color: #fff;
+}
+
+.import-collet-container .form .custom-file-upload:hover {
+    box-shadow: 1px 2px 18px -2px rgba(54,54,54,0.77);
+}

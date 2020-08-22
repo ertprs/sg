@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
-import { Spinner } from 'react-bootstrap'
+import { connect } from 'react-redux';
 import './style.css';
+import * as loadingActions from '../../store/actions/loading';
 import api from '../../services/api';
 import imgLogin from '../../assets/login.png';
 
-
-export default function Login() {
+function Login(props) {
     const history = useHistory();
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
-    const [btnIsLoading, setBtnIsLoading] = useState(false);
 
 
 
     const handleLogin = async e => {
         e.preventDefault();
-        setBtnIsLoading(true);
+        props.dispatch(loadingActions.setLoading(true));
         const res = await api.post('users/login', {
             username: username,
             password: password
@@ -27,7 +26,7 @@ export default function Login() {
         else
             history.push('dashboard');
 
-        setBtnIsLoading(false);
+            props.dispatch(loadingActions.setLoading(false));
     }
 
     return (
@@ -44,19 +43,12 @@ export default function Login() {
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)} />
-                
-                <button type="submit">
-                    Login 
-                    <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                        hidden={!btnIsLoading} />
-                </button>
+
+                <button type="submit"> Login </button>
 
             </form>
         </div>
     );
 }
+
+export default connect(state => ({ state }))(Login);

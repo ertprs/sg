@@ -1,5 +1,5 @@
 exports.up = function(knex) {
-  return knex.schema.createTable('clients', function (table) {
+  return knex.schema.createTable('collects', function (table) {
     table.increments();
     table.string('name').notNullable();
     table.string('cellphone').notNullable();
@@ -8,5 +8,5 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('clients');
+  return knex.schema.dropTable('collects');
 };

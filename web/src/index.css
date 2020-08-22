@@ -18,7 +18,7 @@ body {
   color: #363636;
 }
 
-input[type=text], input[type=password], select {
+button, input[type=submit] {
   width: 100%;
   padding: 10px;
   margin: 8px 0;
@@ -27,19 +27,21 @@ input[type=text], input[type=password], select {
   border-radius: 4px;
   box-sizing: border-box;
   font-size: 15px;
-  color: #363636;
-}
-
-input[type=submit], button {
-  width: 100%;
   color: white;
   background-color: #417b5b;
-  border: 1px solid #fff;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  translate: 200;
+}
+
+input[type=text], input[type=password], select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 15px;
+    color: #363637;
+    background-color: whitesmoke;
 }
 
 input[type=submit]:hover, button:hover {

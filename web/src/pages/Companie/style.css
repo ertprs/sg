@@ -1,0 +1,29 @@
+.companie-container .filters-companie {
+    box-shadow: 1px 1px 10px -2px rgba(54,54,54,0.77);
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    width: 450px;
+    max-width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.companie-container .companie-filters .select-search  {
+    width: 10px;
+}
+
+.companie-container .companie-filters.field-search  {
+    width: 50px; 
+}
+
+.react-bootstrap-table table {
+    table-layout: auto;
+  }
+
+

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { Spinner, Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
-import api from '../../services/api';
 import './style.css';
+import api from '../../services/api';
+import * as loadingActions from '../../store/actions/loading';
 import AppBar from '../../components/AppBar';
 
 
-export default function Client() {
+function Client(props) {
     const history = useHistory();
     const [show, setShow] = useState(false);
     const [clients, setClients] = useState([]);
@@ -23,9 +25,11 @@ export default function Client() {
 
     const loadClients = async () => {
         try {
-            const res = await api.get('clients')
+            props.dispatch(loadingActions.setLoading(true));
+            const res = await api.get('collects')
             setClients(res.data);
             setSearch(res.data)
+            props.dispatch(loadingActions.setLoading(false));
         } catch (error) {
             console.log(error)
         }
@@ -42,7 +46,6 @@ export default function Client() {
             tempSearch = clients.filter(find =>
                 find.cellphone.toLowerCase().indexOf(searchField.toLowerCase()) > -1
             )
-
         setSearch(tempSearch)
     }
 
@@ -50,7 +53,6 @@ export default function Client() {
         setShow(true)
         setClient(cli)
     }
-
 
     return (
         <div className="client-container">
@@ -78,7 +80,6 @@ export default function Client() {
                         <th>Celular</th>
                         <th>Fixo</th>
                         <th>Opções</th>
-
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
@@ -108,3 +109,5 @@ export default function Client() {
         </div>
     );
 }
+
+export default connect(state => ({ state }))(Client);
