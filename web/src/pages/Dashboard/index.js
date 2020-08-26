@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import './style.css';
+import api from '../../services/api';
 import AppBar from '../../components/AppBar';
-import { connect } from 'react-redux';
 import imgLogin from '../../assets/login.png';
 
 export default function Dashboard() {
     const history = useHistory();
+
+    useEffect(() => {
+        
+    },[])
 
 
     return (

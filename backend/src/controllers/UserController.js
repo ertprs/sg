@@ -12,7 +12,7 @@ module.exports = {
 
   },
 
-  async new(request, response) {
+  async newRegister(request, response) {
     const { name, username, password } = request.body;
     try {
       await connection('users').insert({

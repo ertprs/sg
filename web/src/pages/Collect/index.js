@@ -12,22 +12,22 @@ import AppBar from '../../components/AppBar';
 function Client(props) {
     const history = useHistory();
     const [show, setShow] = useState(false);
-    const [clients, setClients] = useState([]);
-    const [client, setClient] = useState({});
+    const [registers, setRegisters] = useState([]);
+    const [register, setRegister] = useState({});
 
     const [searchField, setSearchField] = useState('');
     const [search, setSearch] = useState([]);
     const [selectFilterField, setSelectFilterField] = useState('phone')
 
     useEffect(() => {
-        loadClients();
+        loadRegisters();
     }, []);
 
-    const loadClients = async () => {
+    const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
             const res = await api.get('collects')
-            setClients(res.data);
+            setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));
         } catch (error) {
@@ -38,26 +38,26 @@ function Client(props) {
     const handleSearch = async () => {
         var tempSearch = [];
         if (selectFilterField === 'name')
-            tempSearch = clients.filter(find =>
-                find.name.toLowerCase().indexOf(searchField.toLowerCase()) > -1
+            tempSearch = registers.filter(find =>
+                find.client_name.toLowerCase().indexOf(searchField+''.toLowerCase()) > -1
             )
 
         if (selectFilterField === 'phone')
-            tempSearch = clients.filter(find =>
-                find.cellphone.toLowerCase().indexOf(searchField.toLowerCase()) > -1
+            tempSearch = registers.filter(find =>
+                find.phone.indexOf(searchField) > -1
             )
         setSearch(tempSearch)
     }
 
-    const openClient = async (cli) => {
+    const open = async (reg) => {
         setShow(true)
-        setClient(cli)
+        setRegister(reg)
     }
 
     return (
-        <div className="client-container">
+        <div className="collect-container">
             <AppBar />
-            <div className="filters-client">
+            <div className="filters">
                 <select
                     className="select-search"
                     onChange={e => setSelectFilterField(e.target.value)}>
@@ -78,18 +78,18 @@ function Client(props) {
                         <th>Código</th>
                         <th>Nome</th>
                         <th>Celular</th>
-                        <th>Fixo</th>
+                        <th>Telefone</th>
                         <th>Opções</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
-                    {search.map(cli => (
-                        <tr key={cli.id}>
-                            <td>{cli.id}</td>
-                            <td>{cli.name}</td>
-                            <td>{cli.cellphone}</td>
-                            <td>{cli.phone}</td>
-                            <td><button onClick={() => openClient(cli)}>ABRIR</button></td>
+                    {search.map(reg => (
+                        <tr key={reg.id}>
+                            <td>{reg.id}</td>
+                            <td>{reg.client + ' - ' + reg.client_name}</td>
+                            <td>{reg.cellphone}</td>
+                            <td>{reg.phone}</td>
+                            <td><button onClick={() => open(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -100,7 +100,7 @@ function Client(props) {
                     <Modal.Title>Cadastro de cliente</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <label> {client.name} </label>
+                    <label> {register.name} </label>
                 </Modal.Body>
                 <Modal.Footer>
                     <button onClick={() => setShow(false)}> Ok </button>

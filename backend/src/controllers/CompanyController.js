@@ -1,18 +1,16 @@
-const crypto = require('crypto');
 const connection = require('../database/connection');
 
-module.exports = {
-  async getAll(request, response) {
+
+  const getAll = async (request, response) => {
     try {
       const result = await connection('companies').select('*');
       return response.json(result);
     } catch (error) {
       return response.json(error);
     }
+  }
 
-  },
-
-  async new(request, response) {
+  const newRegister = async (request, response) => {
     const { name } = request.body;
     try {
       await connection('companies').insert({
@@ -22,6 +20,21 @@ module.exports = {
     } catch (error) {
       return response.json({ error });
     }
-  },
+  }
 
-};
+  const getById = async (id) => {
+    try {
+      const result = await connection('companies')
+      .where('id', '=', id )
+      .select('*');
+      return result[0];
+    } catch (error) {
+      return error.message;
+    }
+  }
+
+module.exports = {
+  getAll,
+  newRegister,
+  getById
+}

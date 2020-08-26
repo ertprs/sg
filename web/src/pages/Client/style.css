@@ -1,4 +1,4 @@
-.companie-container .filters {
+.client-container .filters {
     box-shadow: 1px 1px 10px -2px rgba(54,54,54,0.77);
     margin: auto;
     margin-top: 10px;
@@ -14,30 +14,16 @@
     justify-content: space-between;
 }
 
-.companie-container .filters .select-search  {
+.client-container .filters .select-search  {
     width: 10px;
 }
 
-.companie-container .filters.field-search  {
+.client-container .filters.field-search  {
     width: 50px; 
 }
 
 .react-bootstrap-table table {
     table-layout: auto;
   }
-
-.companie-container .fab-container {
-    position: fixed;
-    bottom:10px;
-    right:10px;
-}
-
-.companie-container .fab-container button {
-    height: 60px;
-    width: 60px;
-    border-radius: 50px;
-    padding: 0px;
-    font-size: 30px;
-}
 
 

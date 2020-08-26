@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import * as XLSX from 'xlsx';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import { connect } from 'react-redux';
+import moment, { now } from 'moment';
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
@@ -12,32 +13,70 @@ function ImportCollects(props) {
     const history = useHistory();
     const sheetFile = React.useRef()
     const [importedArray, setImportedArray] = useState([])
+    const [companies, setCompanies] = useState([]);
+    const [companieId, setCompanieId] = useState(0);
+
+
+    useEffect(() => {
+        loadCompanies();
+    }, []);
+
+    const loadCompanies = async () => {
+        const res = await api.get('companies');
+        console.log(res.data)
+        if (res.data.length > 0) {
+            setCompanies(res.data);
+            setCompanieId(res.data[0].id)
+        }
+    }
 
     const configStrTelephone = tel => {
+        if (!tel)
+            return ''
         var telFormated = tel + '';
         telFormated = telFormated.toString();
         telFormated = telFormated.replace(/[^\d]+/g, '');
+        if (telFormated.substring(0, 2) !== '55')
+            telFormated = '55' + telFormated;
         return telFormated;
     }
 
-    const importToDatabase = async () => {
-        importedArray.filter(async client => {
+    const configStrDate = date => {
+        if (date) {
+            return moment(date).format('L');
+        }
+    }
+
+    const registerOnBackend = async () => {
+        props.dispatch(loadingActions.setLoading(true));
+        importedArray.filter(async register => {
             try {
-                props.dispatch(loadingActions.setLoading(true));
-                const res = await api.post('collects', {
-                    name: client.__EMPTY,
-                    cellphone: client.__EMPTY_1,
-                    phone: client.__EMPTY_2
+                const res = await api.post('collects/importCollect', {
+                    companie: companieId,
+                    code: Object.values(register)[0],
+                    client: register.__EMPTY,
+                    cellphone: register.__EMPTY_1,
+                    phone: register.__EMPTY_2,
+                    account: register.__EMPTY_3,
+                    document: register.__EMPTY_4,
+                    type_maturity: register.__EMPTY_5,
+                    dt_emission: register.__EMPTY_6,
+                    dt_begin: register.__EMPTY_7,
+                    dt_end: register.__EMPTY_8,
+                    dt_maturity: register.__EMPTY_9,
+                    days: register.__EMPTY_10,
+                    value: register.__EMPTY_11,
+                    amount: register.__EMPTY_12,
                 });
-                props.dispatch(loadingActions.setLoading(false));
             } catch (error) {
                 console.log(error)
             }
+            props.dispatch(loadingActions.setLoading(false));
         });
 
     }
 
-    const upload = async sheet => {
+    const readFile = async sheet => {
         var f = sheet.current.files[0]
         var reader = new FileReader();
         reader.readAsArrayBuffer(f);
@@ -54,7 +93,7 @@ function ImportCollects(props) {
             var workbook = XLSX.read(bstr, { type: "binary" })
             var first_sheet_name = workbook.SheetNames[0];
             var worksheet = workbook.Sheets[first_sheet_name];
-            var xlsxJSON = await (XLSX.utils.sheet_to_json(worksheet, { raw: true }));
+            var xlsxJSON = await (XLSX.utils.sheet_to_json(worksheet, { raw: false }));
             var tempArray = [];
             var count = 0;
             xlsxJSON.filter(json => {
@@ -62,11 +101,15 @@ function ImportCollects(props) {
                     count = count + 1;
                     json.__EMPTY_1 = configStrTelephone(json.__EMPTY_1);
                     json.__EMPTY_2 = configStrTelephone(json.__EMPTY_2);
+
+                    json.__EMPTY_6 = configStrDate(json.__EMPTY_6);
+                    json.__EMPTY_7 = configStrDate(json.__EMPTY_7);
+                    json.__EMPTY_8 = configStrDate(json.__EMPTY_8);
+                    json.__EMPTY_9 = configStrDate(json.__EMPTY_9);
+
                     tempArray.push(json)
                 }
             });
-            console.log(tempArray.length);
-            console.log(count)
             setImportedArray(tempArray);
             props.dispatch(loadingActions.setLoading(false));
         }
@@ -78,34 +121,59 @@ function ImportCollects(props) {
             <div className="import-collet-container">
                 <div className="form">
                     <select
+                        onChange={(e) => setCompanieId(e.target.value)}
                         className="select-client">
-                        <option value="chimba">Posto Chimba</option>
+                        {companies.map(comp => (
+                            <option key={comp.id} value={comp.id}> {comp.name}</option>
+                        ))}
                     </select>
-                    <label htmlFor="file-upload" className="custom-file-upload">
+                    <label htmlFor={companieId > 0 ? "file-upload" : ""} className="custom-file-upload">
                         Carregar arquivo
                     </label>
-                    <input id="file-upload" type="file" ref={sheetFile} onChange={() => upload(sheetFile)} />
+                    <input id="file-upload" type="file" ref={sheetFile} onChange={() => readFile(sheetFile)} />
                     <button
                         disabled={(!importedArray.length > 0)}
                         className="import-button"
-                        onClick={importToDatabase} >
+                        onClick={registerOnBackend} >
                         Importar
                     </button>
                 </div>
                 <MDBTable responsive hover bordered>
                     <MDBTableHead>
                         <tr>
-                            <th>Nome</th>
+                            <th>Código</th>
+                            <th>Cliente</th>
                             <th>Celular</th>
                             <th>Fixo</th>
+                            <th>Conta</th>
+                            <th>Doc.</th>
+                            <th>Tp. Venc.</th>
+                            <th>Emissão</th>
+                            <th>Início</th>
+                            <th>Fim</th>
+                            <th>Vencimento</th>
+                            <th>Valor</th>
+                            <th>Dias</th>
+                            <th>Saldo</th>
                         </tr>
                     </MDBTableHead>
                     <MDBTableBody>
                         {importedArray.map(collect => (
                             <tr key={collect.__rowNum__}>
+                                <td>{Object.values(collect)[0]}</td>
                                 <td>{collect.__EMPTY}</td>
                                 <td>{collect.__EMPTY_1}</td>
                                 <td>{collect.__EMPTY_2}</td>
+                                <td>{collect.__EMPTY_3}</td>
+                                <td>{collect.__EMPTY_4}</td>
+                                <td>{collect.__EMPTY_5}</td>
+                                <td>{collect.__EMPTY_6}</td>
+                                <td>{collect.__EMPTY_7}</td>
+                                <td>{collect.__EMPTY_8}</td>
+                                <td>{collect.__EMPTY_9}</td>
+                                <td>{collect.__EMPTY_10}</td>
+                                <td>{collect.__EMPTY_11}</td>
+                                <td>{collect.__EMPTY_12}</td>
                             </tr>
                         ))}
                     </MDBTableBody>

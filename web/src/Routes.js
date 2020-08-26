@@ -8,6 +8,7 @@ import Collect from './pages/Collect';
 import ImportCollects from './pages/ImportCollects';
 import Companie from './pages/Companie';
 import NotFound from './pages/NotFound';
+import Client from './pages/Client';
 
 export default function Routes() {
     return (
@@ -18,6 +19,7 @@ export default function Routes() {
                 <Route exact path="/collect" component={Collect} />
                 <Route exact path="/import-collects" component={ImportCollects} />
                 <Route exact path="/companie" component={Companie} />
+                <Route exact path="/client" component={Client} />
                 <Route path='*' component={NotFound} />
             </Switch>
         </BrowserRouter>

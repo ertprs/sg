@@ -1,9 +1,22 @@
 exports.up = function(knex) {
   return knex.schema.createTable('collects', function (table) {
     table.increments();
-    table.string('name').notNullable();
-    table.string('cellphone').notNullable();
-    table.string('phone').notNullable();
+    table.timestamps();
+    table.string('code').notNullable();
+    table.string('cellphone');
+    table.string('phone');
+    table.string('account');
+    table.string('document');
+    table.string('type_maturity');
+    table.string('dt_emission');
+    table.string('dt_begin');
+    table.string('dt_end');
+    table.string('dt_maturity');
+    table.decimal('client');
+    table.decimal('companie');
+    table.decimal('days');
+    table.decimal('value', 14,2);
+    table.decimal('amount', 14,2);
   });
 };
 
