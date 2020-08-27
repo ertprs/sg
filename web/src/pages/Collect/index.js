@@ -76,9 +76,11 @@ function Client(props) {
                 <MDBTableHead>
                     <tr>
                         <th>Código</th>
-                        <th>Nome</th>
-                        <th>Celular</th>
-                        <th>Telefone</th>
+                        <th>Cliente</th>
+                        <th>Status</th>
+                        <th>Dt. Emissão </th>
+                        <th>Dias </th>
+                        <th>Empresa</th>
                         <th>Opções</th>
                     </tr>
                 </MDBTableHead>
@@ -87,8 +89,10 @@ function Client(props) {
                         <tr key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
-                            <td>{reg.cellphone}</td>
-                            <td>{reg.phone}</td>
+                            <td>{reg.status}</td>
+                            <td>{reg.dt_emission}</td>
+                            <td>{reg.days}</td>
+                            <td>{reg.companie + ' - ' + reg.companie_name}</td>
                             <td><button onClick={() => open(reg)}>ABRIR</button></td>
                         </tr>
                     ))}

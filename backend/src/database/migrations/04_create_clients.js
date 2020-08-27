@@ -3,6 +3,8 @@ exports.up = function(knex) {
       table.increments();
       table.string('name');
       table.decimal('companie');
+      table.string('phone');
+      table.string('cellphone');
     });
   };
   

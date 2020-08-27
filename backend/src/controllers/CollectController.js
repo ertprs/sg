@@ -1,5 +1,6 @@
 const connection = require('../database/connection');
 const ClientController = require('../controllers/ClientController');
+const CompanyController = require('../controllers/CompanyController');
 
 
 const getAll = async (request, response) => {
@@ -8,8 +9,10 @@ const getAll = async (request, response) => {
     collects = [];
     for (collect of res) {
       const client = await ClientController.getById(collect.client);
-      if (client)
-        collects = [...collects, { ...collect, client_name: client.name }]
+      const companie = await CompanyController.getById(collect.companie);
+
+      if (client && companie)
+        collects = [...collects, {...collect, client_name: client.name, companie_name: companie.name }]
     }
     return response.json(collects);
   } catch (error) {
@@ -33,10 +36,9 @@ const newRegister = async (request, response) => {
   const collect = {
     code: request.body.code,
     client: request.body.client,
-    cellphone: request.body.cellphone,
-    phone: request.body.phone,
     account: request.body.account,
     document: request.body.document,
+    status: request.body.status,
     type_maturity: request.body.type_maturity,
     dt_emission: request.body.dt_emission,
     dt_begin: request.body.dt_begin,
@@ -58,10 +60,14 @@ const importCollect = async (request, response) => {
   try {
     const collect = await {
       code: request.body.code,
-      client: await ClientController.newIfNotExists(request.body.client, request.body.companie),
+      client: await ClientController.newIfNotExists({
+        name: request.body.client,
+        companie: request.body.companie,
+        phone: request.body.phone,
+        cellphone: request.body.cellphone
+      }),
+      status: request.body.status,
       companie: request.body.companie,
-      cellphone: request.body.cellphone,
-      phone: request.body.phone,
       account: request.body.account,
       document: request.body.document,
       type_maturity: request.body.type_maturity,

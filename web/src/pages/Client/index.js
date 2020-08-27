@@ -64,6 +64,8 @@ function Client(props) {
                     <tr>
                         <th>Código</th>
                         <th>Nome</th>
+                        <th>Celular</th>
+                        <th>Telefone</th>
                         <th>Empresa</th>
                         <th>Opções</th>
                     </tr>
@@ -73,6 +75,8 @@ function Client(props) {
                         <tr key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.name}</td>
+                            <td>{reg.cellphone}</td>
+                            <td>{reg.phone}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                             <td><button onClick={() => open(reg)}>ABRIR</button></td>
                         </tr>

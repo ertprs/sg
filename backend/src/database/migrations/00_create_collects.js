@@ -3,9 +3,8 @@ exports.up = function(knex) {
     table.increments();
     table.timestamps();
     table.string('code').notNullable();
-    table.string('cellphone');
-    table.string('phone');
     table.string('account');
+    table.string('status');
     table.string('document');
     table.string('type_maturity');
     table.string('dt_emission');

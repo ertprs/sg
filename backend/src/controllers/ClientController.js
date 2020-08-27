@@ -8,11 +8,11 @@ const getAll = async (request, response) => {
     clients = [];
     for (client of res) {
       const companie = await CompanyController.getById(client.companie);
-      clients.push({...client, companie_name: companie.name })
+      clients.push({ ...client, companie_name: companie.name })
     }
     return response.json(clients);
   } catch (error) {
-    return response.json({error: error.message});
+    return response.json({ error: error.message });
   }
 }
 
@@ -28,14 +28,14 @@ const getOneByName = async (name) => {
   }
 }
 
-const newIfNotExists = async (name, companie) => {
+const newIfNotExists = async (client) => {
   try {
     var existent = [];
-    existent = await getOneByName(name);
+    existent = await getOneByName(client.name);
     if (existent) {
       return existent.id
     } else {
-      const res = await connection('clients').insert({ name, companie });
+      const res = await connection('clients').insert(client);
       return res[0]
     }
   } catch (error) {
@@ -45,10 +45,13 @@ const newIfNotExists = async (name, companie) => {
 }
 
 const newRegister = async (request, response) => {
-  const { name } = request.body;
+  const { name, companie, phone, cellphone } = request.body;
   try {
     const res = await connection('clients').insert({
       name,
+      companie,
+      phone,
+      cellphone
     });
     return response.json({ id: res.id });
   } catch (error) {

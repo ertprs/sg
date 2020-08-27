@@ -6,6 +6,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
+import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
 
 
@@ -17,10 +18,60 @@ function Companie(props) {
     const [searchField, setSearchField] = useState([]);
     const [registers, setRegisters] = useState([]);
     const [register, setRegister] = useState({});
+    const [isUpdating, setIsUpdating] = useState(false);
+
 
     useEffect(() => {
         loadRegisters();
     }, []);
+
+    const handleSubmit = async () => {
+        props.dispatch(loadingActions.setLoading(true));
+        if (!name) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
+            return 0
+        }
+        const regTemp = {
+            name
+        }
+        setRegister(regTemp);
+        try {
+            if (isUpdating) {
+                const res = await api.put(`companies/${register.id}`, regTemp)
+                setIsUpdating(false);
+                setRegister({});
+                setName('')
+                loadRegisters();
+                props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
+            } else {
+                const res = await api.post('companies', regTemp)
+                loadRegisters();
+                props.dispatch(toastActions.setToast(true, 'success', 'Registro cadastrado!'));
+            }
+            setShow(false)
+        } catch (error) {
+            console.log(error)
+        }
+        props.dispatch(loadingActions.setLoading(false));
+    }
+
+
+    const handleDelete = async () => {
+        props.dispatch(loadingActions.setLoading(true));
+        try {
+            const res = await api.delete(`companies/${register.id}`);
+            setIsUpdating(false);
+                setRegister({});
+                setName('')
+                loadRegisters();
+                setShow(false)
+            props.dispatch(toastActions.setToast(true, 'success', 'Registro deletado!'));
+        } catch (error) {
+            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro'));
+        }
+        props.dispatch(loadingActions.setLoading(false));
+    }
 
     const loadRegisters = async () => {
         try {
@@ -42,41 +93,19 @@ function Companie(props) {
         setSearch(tempSearch)
     }
 
-    const handleSubmit = async () => {
-        try {
-            props.dispatch(loadingActions.setLoading(true));
-            const regTemp = {
-                name
-            }
-            setRegister(regTemp)
-            if (!register["id"]) {
-                const res = await api.post('companies', regTemp)
-                setRegisters([...registers, res.data]);
-                setSearch(registers)
-            } else {
-                console.log('alterando')
-            }
 
-            setShow(false)
-            props.dispatch(loadingActions.setLoading(false));
-        } catch (error) {
-            console.log(error)
-        }
-
+    const setUpdating = (reg) => {
+        setIsUpdating(true);
+        setRegister(reg);
+        setName(reg.name);
+        setShow(true);
     }
 
-
-    const open = async (reg) => {
-        setShow(true)
-        setRegister(reg)
-        setName(reg.name)
-    }
-
-    const close = async (reg) => {
-        console.log('fechou')
-        setShow(false)
-        setRegister({})
-        setName()
+    const hide = async (reg) => {
+        setShow(false);
+        setRegister({});
+        setName('');
+        setIsUpdating(false);
     }
 
     return (
@@ -92,7 +121,7 @@ function Companie(props) {
                     onKeyPress={handleSearch} />
             </div>
 
-            <MDBTable responsive hover bordered>
+            <MDBTable responsive hover bordered className="table">
                 <MDBTableHead>
                     <tr>
                         <th>Código</th>
@@ -105,13 +134,13 @@ function Companie(props) {
                         <tr key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.name}</td>
-                            <td><button onClick={() => open(reg)}>ABRIR</button></td>
+                            <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={close}>
+            <Modal show={show} onHide={hide}>
                 <Modal.Header>
                     <Modal.Title>Cadastro de empresas</Modal.Title>
                 </Modal.Header>
@@ -125,6 +154,8 @@ function Companie(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <button onClick={handleSubmit}> Salvar </button>
+                    <button onClick={handleDelete}> Apagar </button>
+
                 </Modal.Footer>
             </Modal>
 

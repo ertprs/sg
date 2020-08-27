@@ -22,9 +22,6 @@
     width: 50px; 
 }
 
-.react-bootstrap-table table {
-    table-layout: auto;
-  }
 
 .companie-container .fab-container {
     position: fixed;
@@ -37,7 +34,7 @@
     width: 60px;
     border-radius: 50px;
     padding: 0px;
-    font-size: 30px;
+    font-size: 25px;
 }
 
 

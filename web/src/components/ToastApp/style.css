@@ -1,0 +1,24 @@
+.toast-container {
+    z-index:9999;
+    min-height: 100px;
+    top: 0;
+    right: 0;
+}
+
+.toast-container .toast {
+    min-width: 100px;
+    max-width: 500px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.toast-container button {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+}
+
+.toast-container button:hover {
+  box-shadow: none;
+}

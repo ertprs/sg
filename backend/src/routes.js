@@ -21,6 +21,8 @@ routes.post('/collects/importCollect', CollectController.importCollect);
 //COMPANIES
 routes.get('/companies', CompanyController.getAll);
 routes.post('/companies', CompanyController.newRegister);
+routes.put('/companies/:id', CompanyController.update);
+routes.delete('/companies/:id', CompanyController.deleteRegister);
 
 
 //CLIENT

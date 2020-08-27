@@ -7,6 +7,7 @@ import moment, { now } from 'moment';
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
+import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
 
 function ImportCollects(props) {
@@ -47,42 +48,45 @@ function ImportCollects(props) {
         }
     }
 
-    const registerOnBackend = async () => {
-        props.dispatch(loadingActions.setLoading(true));
-        importedArray.filter(async register => {
-            try {
-                const res = await api.post('collects/importCollect', {
-                    companie: companieId,
-                    code: Object.values(register)[0],
-                    client: register.__EMPTY,
-                    cellphone: register.__EMPTY_1,
-                    phone: register.__EMPTY_2,
-                    account: register.__EMPTY_3,
-                    document: register.__EMPTY_4,
-                    type_maturity: register.__EMPTY_5,
-                    dt_emission: register.__EMPTY_6,
-                    dt_begin: register.__EMPTY_7,
-                    dt_end: register.__EMPTY_8,
-                    dt_maturity: register.__EMPTY_9,
-                    days: register.__EMPTY_10,
-                    value: register.__EMPTY_11,
-                    amount: register.__EMPTY_12,
-                });
-            } catch (error) {
-                console.log(error)
-            }
-            props.dispatch(loadingActions.setLoading(false));
+    const insetOne = async register => {
+        await api.post('collects/importCollect', {
+            status: 'Aberto',
+            companie: companieId,
+            code: Object.values(register)[0],
+            client: register.__EMPTY,
+            cellphone: register.__EMPTY_1,
+            phone: register.__EMPTY_2,
+            account: register.__EMPTY_3,
+            document: register.__EMPTY_4,
+            type_maturity: register.__EMPTY_5,
+            dt_emission: register.__EMPTY_6,
+            dt_begin: register.__EMPTY_7,
+            dt_end: register.__EMPTY_8,
+            dt_maturity: register.__EMPTY_9,
+            value: register.__EMPTY_10,
+            days: register.__EMPTY_11,
+            amount: register.__EMPTY_12,
         });
 
     }
 
+    const registerOnBackend = async () => {
+        props.dispatch(loadingActions.setLoading(true));
+
+        await Promise.all(importedArray.map(reg => insetOne(reg)));
+
+        props.dispatch(loadingActions.setLoading(false));
+
+        props.dispatch(toastActions.setToast(true, 'success', 'Todos os registros foram importados!'));
+    }
+
     const readFile = async sheet => {
+        props.dispatch(loadingActions.setLoading(true));
         var f = sheet.current.files[0]
-        var reader = new FileReader();
-        reader.readAsArrayBuffer(f);
-        reader.onload = async (e) => {
-            props.dispatch(loadingActions.setLoading(true));
-            var data = new Uint8Array(reader.result);
+        var reader = await new FileReader();
+        await reader.readAsArrayBuffer(f);
+        reader.onload = async e => {
+            var data = await new Uint8Array(reader.result);
             var wb = await XLSX.read(data, { type: "array" });
             data = new Uint8Array(data);
             var arr = [];
@@ -107,7 +111,7 @@ function ImportCollects(props) {
                     json.__EMPTY_8 = configStrDate(json.__EMPTY_8);
                     json.__EMPTY_9 = configStrDate(json.__EMPTY_9);
 
-                    tempArray.push(json)
+                    tempArray.push(json);
                 }
             });
             setImportedArray(tempArray);
