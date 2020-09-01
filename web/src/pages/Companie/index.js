@@ -27,31 +27,41 @@ function Companie(props) {
 
     const handleSubmit = async () => {
         props.dispatch(loadingActions.setLoading(true));
+
+        //VALIDAÇÕES
         if (!name) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
+
+        //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             name
         }
         setRegister(regTemp);
+
         try {
             if (isUpdating) {
+                //ALTERAÇÃO
                 const res = await api.put(`companies/${register.id}`, regTemp)
                 setIsUpdating(false);
                 setRegister({});
-                setName('')
+                clearValues();
                 loadRegisters();
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
-                const res = await api.post('companies', regTemp)
+                //CADASTRO
+                const res = await api.post('companies', regTemp);
+                setIsUpdating(false);
+                setRegister({});
+                clearValues();
                 loadRegisters();
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro cadastrado!'));
             }
             setShow(false)
         } catch (error) {
-            console.log(error)
+            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
         }
         props.dispatch(loadingActions.setLoading(false));
     }
@@ -62,16 +72,17 @@ function Companie(props) {
         try {
             const res = await api.delete(`companies/${register.id}`);
             setIsUpdating(false);
-                setRegister({});
-                setName('')
-                loadRegisters();
-                setShow(false)
+            setRegister({});
+            clearValues();
+            loadRegisters();
+            setShow(false)
             props.dispatch(toastActions.setToast(true, 'success', 'Registro deletado!'));
         } catch (error) {
-            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro'));
+            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
         }
         props.dispatch(loadingActions.setLoading(false));
     }
+
 
     const loadRegisters = async () => {
         try {
@@ -88,9 +99,13 @@ function Companie(props) {
     const handleSearch = async () => {
         var tempSearch = [];
         tempSearch = registers.filter(find =>
-            find.name.toLowerCase().indexOf(searchField + ''.toLowerCase()) > -1
+            find.name.toLowerCase().indexOf(String(searchField).toLowerCase()) > -1
         )
         setSearch(tempSearch)
+    }
+
+    const clearValues = () => {
+        setName('')
     }
 
 
@@ -106,6 +121,11 @@ function Companie(props) {
         setRegister({});
         setName('');
         setIsUpdating(false);
+    }
+
+    const setNew = () => {
+        clearValues();
+        setShow(true);
     }
 
     return (
@@ -142,9 +162,18 @@ function Companie(props) {
 
             <Modal show={show} onHide={hide}>
                 <Modal.Header>
-                    <Modal.Title>Cadastro de empresas</Modal.Title>
+                    <Modal.Title>Cadastro de empresa</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {
+                        register.id ?
+                            <div>
+                                <label> Código </label>
+                                <label> {': ' + register.id} </label>
+                                <br />
+                            </div>
+                            : ''
+                    }
                     <label> Nome </label>
                     <input
                         type="text"
@@ -152,16 +181,16 @@ function Companie(props) {
                         value={name}
                         onChange={e => setName(e.target.value)} />
                 </Modal.Body>
-                <Modal.Footer>
+                <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>
-                    <button onClick={handleDelete}> Apagar </button>
-
-                </Modal.Footer>
+                    <button onClick={handleDelete} style={{ backgroundColor: '#ff6666' }} > Apagar </button>
+                    <button onClick={() => setShow(false)} style={{ backgroundColor: '#668cff' }} > Fechar </button>
+                </div>
             </Modal>
 
 
             <div className="fab-container">
-                <button onClick={() => setShow(true)}> + </button>
+                <button onClick={setNew}> + </button>
             </div>
         </div>
     );

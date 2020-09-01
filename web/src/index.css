@@ -52,3 +52,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.react-bootstrap-table table {
+  table-layout: auto;
+}
+
+.modal-footer-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+.modal-footer-container .button-delete {
+  background-color: rgb(204, 73, 73);
+}
+

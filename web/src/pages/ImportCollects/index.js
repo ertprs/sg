@@ -49,7 +49,7 @@ function ImportCollects(props) {
     }
 
     const insetOne = async register => {
-        await api.post('collects/importCollect', {
+        await api.post('collects/import-collect', {
             status: 'Aberto',
             companie: companieId,
             code: Object.values(register)[0],
@@ -67,7 +67,6 @@ function ImportCollects(props) {
             days: register.__EMPTY_11,
             amount: register.__EMPTY_12,
         });
-
     }
 
     const registerOnBackend = async () => {

@@ -8,7 +8,7 @@ const getAll = async (request, response) => {
     clients = [];
     for (client of res) {
       const companie = await CompanyController.getById(client.companie);
-      clients.push({ ...client, companie_name: companie.name })
+      clients.push({ ...client, companie_name: companie ? companie.name : '' })
     }
     return response.json(clients);
   } catch (error) {
@@ -45,15 +45,40 @@ const newIfNotExists = async (client) => {
 }
 
 const newRegister = async (request, response) => {
-  const { name, companie, phone, cellphone } = request.body;
+  const register = {
+    name: request.body.name,
+    companie: request.body.companie,
+    phone: request.body.phone,
+    cellphone: request.body.cellphone
+  };
   try {
-    const res = await connection('clients').insert({
-      name,
-      companie,
-      phone,
-      cellphone
-    });
+    const res = await connection('clients').insert(register);
     return response.json({ id: res.id });
+  } catch (error) {
+    return response.json(error);
+  }
+}
+
+const update = async (request, response) => {
+  const register = {
+    name: request.body.name,
+    companie: request.body.companie,
+    phone: request.body.phone,
+    cellphone: request.body.cellphone
+  };
+  try {
+    const res = await connection('clients').where('id', '=', request.params.id).update(register)
+    return response.json(res);
+  } catch (error) {
+    return response.json(error);
+  }
+}
+
+
+const deleteRegister = async (request, response) => {
+  try {
+    const res = await connection('clients').where('id', '=', request.params.id).del();
+    return response.json(res);
   } catch (error) {
     return response.json(error);
   }
@@ -77,5 +102,7 @@ module.exports = {
   getAll,
   newRegister,
   newIfNotExists,
-  getById
+  getById,
+  update,
+  deleteRegister
 }

@@ -16,7 +16,9 @@ routes.post('/users/login', UserController.login);
 //COLETCTS
 routes.get('/collects', CollectController.getAll);
 routes.post('/collects', CollectController.newRegister);
-routes.post('/collects/importCollect', CollectController.importCollect);
+routes.put('/collects/:id', CollectController.update);
+routes.delete('/collects/:id', CollectController.deleteRegister);
+routes.post('/collects/import-collect', CollectController.importCollect);
 
 //COMPANIES
 routes.get('/companies', CompanyController.getAll);
@@ -28,6 +30,8 @@ routes.delete('/companies/:id', CompanyController.deleteRegister);
 //CLIENT
 routes.get('/clients', ClientController.getAll);
 routes.post('/clients', ClientController.newRegister);
+routes.put('/clients/:id', ClientController.update);
+routes.delete('/clients/:id', ClientController.deleteRegister);
 
 
 module.exports = routes;

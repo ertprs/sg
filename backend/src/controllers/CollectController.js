@@ -8,32 +8,23 @@ const getAll = async (request, response) => {
     const res = await connection('collects').select('*');
     collects = [];
     for (collect of res) {
-      const client = await ClientController.getById(collect.client);
-      const companie = await CompanyController.getById(collect.companie);
-
-      if (client && companie)
-        collects = [...collects, {...collect, client_name: client.name, companie_name: companie.name }]
+      const client = await ClientController.getById(collect ? collect.client : 0);
+      const companie = await CompanyController.getById(client ? client.companie : 0);
+      collects.push({
+        ...collect,
+        client_name: client ? client.name : '',
+        companie: client ? client.companie : '',
+        companie_name: client && companie ? companie.name : '',
+      })
     }
     return response.json(collects);
   } catch (error) {
-    return response.json(error);
+    return response.json({ error: error.message });
   }
 }
 
-const getByCode = async (collectCode) => {
-  try {
-    const resCollect = await connection('collects')
-      .where('code', '=', collectCode)
-      .select('*');
-    return resCollect[0];
-  } catch (error) {
-    console.log(error)
-    return {};
-  }
-}
-
-const newRegister = async (request, response) => {
-  const collect = {
+const update = async (request, response) => {
+  const register = {
     code: request.body.code,
     client: request.body.client,
     account: request.body.account,
@@ -49,10 +40,58 @@ const newRegister = async (request, response) => {
     amount: request.body.amount,
   };
   try {
-    const res = await connection('collects').insert(collect);
-    return response.json({ id: res[0].id });
+    const res = await connection('collects').where('id', '=', request.params.id).update(register)
+    return response.json(res);
   } catch (error) {
-    return response.json(error);
+    return response.json({ error: error.message });
+  }
+}
+
+const deleteRegister = async (request, response) => {
+  try {
+    const res = await connection('collects').where('id', '=', request.params.id).del();
+    return response.json(res);
+  } catch (error) {
+    return response.json({ error: error.message });
+  }
+}
+
+const getByCode = async (collectCode) => {
+  try {
+    const resCollect = await connection('collects')
+      .where('code', '=', collectCode)
+      .select('*');
+    return resCollect[0];
+  } catch (error) {
+    console.log(error)
+    return { error: error.message };
+  }
+}
+
+const newRegister = async (request, response) => {
+  const register = {
+    code: request.body.code,
+    client: request.body.client,
+    account: request.body.account,
+    document: request.body.document,
+    status: request.body.status,
+    type_maturity: request.body.typeMaturity,
+    dt_emission: request.body.dtEmission,
+    dt_begin: request.body.dtBegin,
+    dt_end: request.body.dtEnd,
+    dt_maturity: request.body.dtMaturity,
+    days: request.body.days,
+    value: request.body.value,
+    amount: request.body.amount,
+  };
+  console.log(register)
+  try {
+    const res = await connection('collects').insert(register);
+    console.log(res)
+    return response.json(res[0]);
+  } catch (error) {
+    console.log(error.message)
+    return response.json({ error: error.message });
   }
 }
 
@@ -91,12 +130,14 @@ const importCollect = async (request, response) => {
     }
   } catch (error) {
     console.log(error)
-    return response.json(error);
+    return response.json({ error: error.message });
   }
 }
 
 module.exports = {
   getAll,
   newRegister,
-  importCollect
+  importCollect,
+  update,
+  deleteRegister
 }
