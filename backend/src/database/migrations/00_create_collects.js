@@ -6,16 +6,18 @@ exports.up = function(knex) {
     table.string('account');
     table.string('status');
     table.string('document');
-    table.string('type_maturity');
-    table.string('dt_emission');
-    table.string('dt_begin');
-    table.string('dt_end');
     table.string('dt_maturity');
     table.decimal('client');
     table.decimal('companie');
     table.decimal('days');
     table.decimal('value');
+    table.decimal('penalty');
+    table.decimal('interest');
+    table.decimal('updated_debt');
+    table.decimal('honorary');
     table.decimal('amount');
+    table.decimal('maximum_discount');
+    table.decimal('negotiated_value');
   });
 };
 
