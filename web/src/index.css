@@ -31,7 +31,7 @@ button, input[type=submit] {
   background-color: #417b5b;
 }
 
-input[type=text], input[type=password], select {
+input[type=text], input[type=number], input[type=password], select {
     width: 100%;
     padding: 10px;
     margin: 8px 0;
@@ -64,5 +64,27 @@ code {
 }
 .modal-footer-container .button-delete {
   background-color: rgb(204, 73, 73);
+}
+
+.field-other-table {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+}
+
+.field-other-table input[type=text]:first-child {
+  width: 80px;
+}
+.field-other-table input[type=text]:first-child {
+  width: 80px;
+}
+
+.field-other-table button {
+  width: auto;
+  padding: 5px;
+  margin: 7px;
+  margin-left: 5px;
+  border-radius: 5px;
+  font-size: 15px;
 }
 

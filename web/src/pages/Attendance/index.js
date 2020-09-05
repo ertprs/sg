@@ -10,7 +10,7 @@ import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
 
 
-function Companie(props) {
+function Attendance(props) {
     const history = useHistory();
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
@@ -207,4 +207,4 @@ function Companie(props) {
     );
 }
 
-export default connect(state => ({ state }))(Companie);
+export default connect(state => ({ state }))(Attendance);

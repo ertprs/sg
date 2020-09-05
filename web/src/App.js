@@ -1,11 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 
-import Loading from './components/Loading';
-import ToastApp from './components/ToastApp';
-
 import Routes from './Routes'
 import store from './store';
+
+import Loading from './components/Loading';
+import ToastApp from './components/ToastApp';
+import CallBack from './components/CallBack';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Routes />
       <Loading />
       <ToastApp />
+      <CallBack />
     </Provider>
   );
 }

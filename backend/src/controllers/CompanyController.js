@@ -11,11 +11,12 @@ const getAll = async (request, response) => {
 }
 
 const newRegister = async (request, response) => {
-  const { name } = request.body;
+  const reg = {
+     name: request.body.name,
+     obs: request.body.obs,
+  };
   try {
-    const res = await connection('companies').insert({
-      name,
-    })
+    const res = await connection('companies').insert(reg)
     return response.json(res);
   } catch (error) {
     return response.json(error);
@@ -25,7 +26,8 @@ const newRegister = async (request, response) => {
 const update = async (request, response) => {
   const reg = {
     name: request.body.name,
-  }
+    obs: request.body.obs,
+ };
   try {
     const res =  await connection('companies').where('id', '=', request.params.id).update(reg)
     return response.json(res);
@@ -43,14 +45,26 @@ const deleteRegister = async (request, response) => {
   }
 }
 
-const getById = async (id) => {
+
+const getById = async (request, response) => {
   try {
     const res = await connection('companies')
-      .where('id', '=', id)
+      .where('id', '=', request.params.id)
       .select('*');
-    return res[0];
+      return response.json(res[0]);
   } catch (error) {
-    return error.message;
+    return response.json(error);
+  }
+}
+
+const findByName = async (request, response) => {
+  try {
+    const res = await connection('companies')
+      .where('name', 'like', '%'+request.params.name+'%')
+      .select('*');
+      return response.json(res);
+  } catch (error) {
+    return response.json(error);
   }
 }
 
@@ -58,6 +72,7 @@ module.exports = {
   getAll,
   newRegister,
   getById,
+  findByName,
   update,
   deleteRegister
 }

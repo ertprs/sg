@@ -1,5 +1,5 @@
 const connection = require('../database/connection');
-const CompanyController = require('../controllers/CompanyController')
+const CompanieHelper = require('../helpers/CompanieHelper');
 
 
 const getAll = async (request, response) => {
@@ -7,7 +7,7 @@ const getAll = async (request, response) => {
     const res = await connection('clients').select('*');
     clients = [];
     for (client of res) {
-      const companie = await CompanyController.getById(client.companie);
+      const companie = await CompanieHelper.getById(client.companie);
       clients.push({ ...client, companie_name: companie ? companie.name : '' })
     }
     return response.json(clients);
@@ -49,11 +49,15 @@ const newRegister = async (request, response) => {
     name: request.body.name,
     companie: request.body.companie,
     phone: request.body.phone,
-    cellphone: request.body.cellphone
+    cellphone: request.body.cellphone,
+    edress: request.body.edress,
+    email: request.body.email,
+    document: request.body.document,
+    obs: request.body.obs,
   };
   try {
     const res = await connection('clients').insert(register);
-    return response.json({ id: res.id });
+    return response.json(res);
   } catch (error) {
     return response.json(error);
   }
@@ -64,7 +68,11 @@ const update = async (request, response) => {
     name: request.body.name,
     companie: request.body.companie,
     phone: request.body.phone,
-    cellphone: request.body.cellphone
+    cellphone: request.body.cellphone,
+    edress: request.body.edress,
+    email: request.body.email,
+    document: request.body.document,
+    obs: request.body.obs,
   };
   try {
     const res = await connection('clients').where('id', '=', request.params.id).update(register)
@@ -84,15 +92,27 @@ const deleteRegister = async (request, response) => {
   }
 }
 
-const getById = async (id) => {
+const getById = async (request, response) => {
   try {
-    const result = await connection('clients')
-      .where('id', '=', id)
+    const res = await connection('clients')
+      .where('id', '=', request.params.id)
       .select('*');
-    return result[0];
+      return response.json(res[0]);
   } catch (error) {
     console.log(error)
-    return error;
+    return response.json(error);
+  }
+}
+
+
+const findByName = async (request, response) => {
+  try {
+    const res = await connection('clients')
+      .where('name', 'like', '%'+request.params.name+'%')
+      .select('*');
+      return response.json(res);
+  } catch (error) {
+    return response.json(error);
   }
 }
 
@@ -103,6 +123,7 @@ module.exports = {
   newRegister,
   newIfNotExists,
   getById,
+  findByName,
   update,
   deleteRegister
 }

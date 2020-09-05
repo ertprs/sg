@@ -18,6 +18,8 @@ exports.up = function(knex) {
     table.decimal('amount');
     table.decimal('maximum_discount');
     table.decimal('negotiated_value');
+    
+    table.string('obs');
   });
 };
 

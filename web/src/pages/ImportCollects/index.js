@@ -150,10 +150,7 @@ function ImportCollects(props) {
                             <th>Fixo</th>
                             <th>Conta</th>
                             <th>Doc.</th>
-                            <th>Tp. Venc.</th>
                             <th>Emissão</th>
-                            <th>Início</th>
-                            <th>Fim</th>
                             <th>Vencimento</th>
                             <th>Valor</th>
                             <th>Dias</th>
@@ -168,11 +165,8 @@ function ImportCollects(props) {
                                 <td>{collect.__EMPTY_1}</td>
                                 <td>{collect.__EMPTY_2}</td>
                                 <td>{collect.__EMPTY_3}</td>
-                                <td>{collect.__EMPTY_4}</td>
-                                <td>{collect.__EMPTY_5}</td>
+                                <td>{collect.__EMPTY_4}</td>                
                                 <td>{collect.__EMPTY_6}</td>
-                                <td>{collect.__EMPTY_7}</td>
-                                <td>{collect.__EMPTY_8}</td>
                                 <td>{collect.__EMPTY_9}</td>
                                 <td>{collect.__EMPTY_10}</td>
                                 <td>{collect.__EMPTY_11}</td>

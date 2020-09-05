@@ -1,4 +1,4 @@
-.client-container .filters {
+.companie-container .filters {
     box-shadow: 1px 1px 10px -2px rgba(54,54,54,0.77);
     margin: auto;
     margin-top: 10px;
@@ -14,21 +14,21 @@
     justify-content: space-between;
 }
 
-.client-container .filters .select-search  {
-    width: 100%;
+.companie-container .filters .select-search  {
+    width: 10px;
 }
 
-.client-container .filters .field-search  {
-    width: 100%; 
+.companie-container .filters.field-search  {
+    width: 50px; 
 }
 
-.client-container .fab-container {
+.companie-container .fab-container {
     position: fixed;
     bottom:10px;
     right:10px;
 }
 
-.client-container .fab-container button {
+.companie-container .fab-container button {
     height: 60px;
     width: 60px;
     border-radius: 50px;

@@ -1,6 +1,6 @@
 const connection = require('../database/connection');
-const ClientController = require('../controllers/ClientController');
-const CompanyController = require('../controllers/CompanyController');
+const ClientHelper = require('../helpers/ClientHelper');
+const CompanieHelper = require('../helpers/CompanieHelper');
 
 
 const getAll = async (request, response) => {
@@ -8,13 +8,13 @@ const getAll = async (request, response) => {
     const res = await connection('collects').select('*');
     collects = [];
     for (collect of res) {
-      const client = await ClientController.getById(collect ? collect.client : 0);
-      const companie = await CompanyController.getById(client ? client.companie : 0);
+      const client = await ClientHelper.getById(collect.client);
+      const companie = await CompanieHelper.getById(collect.companie);
       collects.push({
         ...collect,
         client_name: client ? client.name : '',
-        companie: client ? client.companie : '',
-        companie_name: client && companie ? companie.name : '',
+        client_document: client ? client.document : '',
+        companie_name: companie && companie ? companie.name : '',
       })
     }
     return response.json(collects);
@@ -27,17 +27,21 @@ const update = async (request, response) => {
   const register = {
     code: request.body.code,
     client: request.body.client,
+    status: request.body.status,
+    companie: request.body.companie,
     account: request.body.account,
     document: request.body.document,
-    status: request.body.status,
-    type_maturity: request.body.type_maturity,
-    dt_emission: request.body.dt_emission,
-    dt_begin: request.body.dt_begin,
-    dt_end: request.body.dt_end,
     dt_maturity: request.body.dt_maturity,
     days: request.body.days,
     value: request.body.value,
     amount: request.body.amount,
+    penalty: request.body.penalty,
+    interest: request.body.interest,
+    updated_debt: request.body.updated_debt,
+    honorary: request.body.honorary,
+    maximum_discount: request.body.maximum_discount,
+    negotiated_value: request.body.negotiated_value,
+    obs: request.body.obs
   };
   try {
     const res = await connection('collects').where('id', '=', request.params.id).update(register)
@@ -72,22 +76,24 @@ const newRegister = async (request, response) => {
   const register = {
     code: request.body.code,
     client: request.body.client,
+    status: request.body.status,
+    companie: request.body.companie,
     account: request.body.account,
     document: request.body.document,
-    status: request.body.status,
-    type_maturity: request.body.typeMaturity,
-    dt_emission: request.body.dtEmission,
-    dt_begin: request.body.dtBegin,
-    dt_end: request.body.dtEnd,
-    dt_maturity: request.body.dtMaturity,
+    dt_maturity: request.body.dt_maturity,
     days: request.body.days,
     value: request.body.value,
     amount: request.body.amount,
+    penalty: request.body.penalty,
+    interest: request.body.interest,
+    updated_debt: request.body.updated_debt,
+    honorary: request.body.honorary,
+    maximum_discount: request.body.maximum_discount,
+    negotiated_value: request.body.negotiated_value,
+    obs: request.body.obs
   };
-  console.log(register)
   try {
     const res = await connection('collects').insert(register);
-    console.log(res)
     return response.json(res[0]);
   } catch (error) {
     console.log(error.message)
@@ -109,14 +115,11 @@ const importCollect = async (request, response) => {
       companie: request.body.companie,
       account: request.body.account,
       document: request.body.document,
-      type_maturity: request.body.type_maturity,
-      dt_emission: request.body.dt_emission,
-      dt_begin: request.body.dt_begin,
-      dt_end: request.body.dt_end,
       dt_maturity: request.body.dt_maturity,
       days: request.body.days,
       value: request.body.value,
       amount: request.body.amount,
+      obs: 'importado'
     };
     var res;
     const existentCollect = await getByCode(request.body.code);

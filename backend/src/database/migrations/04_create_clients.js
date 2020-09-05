@@ -5,6 +5,11 @@ exports.up = function(knex) {
       table.decimal('companie');
       table.string('phone');
       table.string('cellphone');
+      table.string('email');
+      table.string('document');
+      table.string('edress');
+
+      table.string('obs');
     });
   };
   
