@@ -22,6 +22,7 @@ function Client(props) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [selectFilterField, setSelectFilterField] = useState('name')
 
+    const [code, setCode] = useState('')
     const [name, setName] = useState('');
     const [cellphone, setCellphone] = useState('');
     const [phone, setPhone] = useState('');
@@ -55,17 +56,18 @@ function Client(props) {
     }
 
     const handleSubmit = async () => {
-        props.dispatch(loadingActions.setLoading(true));
-
         //VALIDAÇÕES
-        if (!name) {
+        if (!name || !companieName) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
 
+
+        props.dispatch(loadingActions.setLoading(true));
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
+            code,
             name,
             cellphone,
             phone,
@@ -144,6 +146,7 @@ function Client(props) {
             resCompanieName = ''
         setIsUpdating(true);
         setRegister(reg);
+        setCode(reg.code)
         setName(reg.name)
         setCellphone(reg.cellphone)
         setPhone(reg.phone)
@@ -157,6 +160,7 @@ function Client(props) {
     }
 
     const clearValues = () => {
+        setCode('')
         setName('')
         setCellphone('')
         setPhone('')
@@ -235,6 +239,13 @@ function Client(props) {
                             </div>
                             : ''
                     }
+
+                    <label> Código </label>
+                    <input
+                        type="text"
+                        placeholder="Codigo"
+                        value={code}
+                        onChange={e => setCode(e.target.value)} />
 
                     <label> Nome </label>
                     <input

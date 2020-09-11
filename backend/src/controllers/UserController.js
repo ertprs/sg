@@ -7,7 +7,7 @@ module.exports = {
       const result = await connection('users').select('*');
       return response.json(result);
     } catch (error) {
-      return response.json({ error });
+      return response.json({ error: error.message });
     }
 
   },
@@ -22,7 +22,7 @@ module.exports = {
       });
       return response.json({ id });
     } catch (error) {
-      return response.json({ error });
+      return response.json({ error: error.message });
     }
 
   },
@@ -35,10 +35,11 @@ module.exports = {
           username: username,
           password: password
         })
-        .select('*');
-      return response.json(result[0]);
+        .select('*')
+        .first();
+      return response.json(result);
     } catch (error) {
-      return response.json({ error });
+      return response.json({ error: error.message });
     }
   },
 };

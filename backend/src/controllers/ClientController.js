@@ -16,36 +16,9 @@ const getAll = async (request, response) => {
   }
 }
 
-const getOneByName = async (name) => {
-  if (!name) return {}
-  try {
-    const res = await connection('clients')
-      .where('name', '=', name)
-      .select('*');
-    return res[0];
-  } catch (error) {
-    return error;
-  }
-}
-
-const newIfNotExists = async (client) => {
-  try {
-    var existent = [];
-    existent = await getOneByName(client.name);
-    if (existent) {
-      return existent.id
-    } else {
-      const res = await connection('clients').insert(client);
-      return res[0]
-    }
-  } catch (error) {
-    console.log(error)
-    return error;
-  }
-}
-
 const newRegister = async (request, response) => {
   const register = {
+    code: request.body.code,
     name: request.body.name,
     companie: request.body.companie,
     phone: request.body.phone,
@@ -65,6 +38,7 @@ const newRegister = async (request, response) => {
 
 const update = async (request, response) => {
   const register = {
+    code: request.body.code,
     name: request.body.name,
     companie: request.body.companie,
     phone: request.body.phone,
@@ -96,8 +70,9 @@ const getById = async (request, response) => {
   try {
     const res = await connection('clients')
       .where('id', '=', request.params.id)
-      .select('*');
-      return response.json(res[0]);
+      .select('*')
+      .first();
+      return response.json(res);
   } catch (error) {
     console.log(error)
     return response.json(error);
@@ -121,7 +96,6 @@ const findByName = async (request, response) => {
 module.exports = {
   getAll,
   newRegister,
-  newIfNotExists,
   getById,
   findByName,
   update,

@@ -53,7 +53,6 @@ function CallBack(props) {
                                 <tr>
                                     <th>Código</th>
                                     <th>Nome</th>
-                                    <th>Selecionar</th>
                                 </tr>
                             </MDBTableHead>
                             <MDBTableBody>
@@ -61,7 +60,6 @@ function CallBack(props) {
                                     <tr key={reg.id}>
                                         <td>{reg.id}</td>
                                         <td>{reg.name}</td>
-                                        <td><button onClick={() => props.dispatch(callBackActions.setCallback(false, '', reg.id))}> Selecionar </button> </td>
                                     </tr>
                                 ))}
                             </MDBTableBody>

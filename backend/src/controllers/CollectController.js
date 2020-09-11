@@ -14,6 +14,8 @@ const getAll = async (request, response) => {
         ...collect,
         client_name: client ? client.name : '',
         client_document: client ? client.document : '',
+        client_phoe: client ? client.phone : '',
+        client_cellphone: client ? client.cellphone : '',
         companie_name: companie && companie ? companie.name : '',
       })
     }
@@ -67,14 +69,24 @@ const getByCode = async (collectCode) => {
       .select('*');
     return resCollect[0];
   } catch (error) {
-    console.log(error)
     return { error: error.message };
+  }
+}
+
+
+const getByClient = async (request, response) => {
+  try {
+    const res = await connection('collects')
+      .where('client', '=', request.params.client_id)
+      .select('*');
+    return response.json(res);
+  } catch (error) {
+    return response.json({ error: error.message });
   }
 }
 
 const newRegister = async (request, response) => {
   const register = {
-    code: request.body.code,
     client: request.body.client,
     status: request.body.status,
     companie: request.body.companie,
@@ -104,8 +116,8 @@ const newRegister = async (request, response) => {
 const importCollect = async (request, response) => {
   try {
     const collect = await {
-      code: request.body.code,
-      client: await ClientController.newIfNotExists({
+      client: await ClientHelper.newIfNotExists({
+        code: request.body.code,
         name: request.body.client,
         companie: request.body.companie,
         phone: request.body.phone,
@@ -122,15 +134,10 @@ const importCollect = async (request, response) => {
       obs: 'importado'
     };
     var res;
-    const existentCollect = await getByCode(request.body.code);
-    if (existentCollect) {
-      res = await connection('collects').where('code', '=', collect.code).update(collect);
-      return response.json(res);
-    }
-    else {
-      res = await connection('collects').insert(collect);
-      return response.json(res);
-    }
+
+    res = await connection('collects').insert(collect);
+    return response.json(res);
+
   } catch (error) {
     console.log(error)
     return response.json({ error: error.message });
@@ -142,5 +149,6 @@ module.exports = {
   newRegister,
   importCollect,
   update,
-  deleteRegister
+  deleteRegister,
+  getByClient
 }

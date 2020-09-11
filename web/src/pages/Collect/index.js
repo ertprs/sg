@@ -23,7 +23,6 @@ function Client(props) {
     const [selectFilterField, setSelectFilterField] = useState('client_document')
 
     //FIELDS
-    const [code, setCode] = useState('');
     const [client, setClient] = useState('');
     const [clientName, setClientName] = useState('');
     const [status, setStatus] = useState('Aberto');
@@ -74,7 +73,6 @@ function Client(props) {
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             client,
-            code,
             status,
             document,
             dt_maturity: dtMaturity,
@@ -144,10 +142,6 @@ function Client(props) {
             tempSearch = await registers.filter(find =>
                 String(find.id).toLowerCase().indexOf(String(searchField).toLowerCase()) > -1)
 
-        else if (selectFilterField === 'code')
-            tempSearch = registers.filter(find =>
-                String(find.code).toLowerCase().indexOf(String(searchField).toLowerCase()) > -1)
-
         else if (selectFilterField === 'client_name')
             tempSearch = registers.filter(find =>
                 String(find.client_name).toLowerCase().indexOf(String(searchField).toLowerCase()) > -1)
@@ -155,6 +149,12 @@ function Client(props) {
         else if (selectFilterField === 'client_document')
             tempSearch = registers.filter(find =>
                 String(find.client_document).toLowerCase().indexOf(String(searchField).toLowerCase()) > -1)
+
+        else if (selectFilterField === 'client_phones')
+            tempSearch = registers.filter(find =>
+                String(find.client_phone + find.client_cellphone).toLowerCase().indexOf(String(searchField).toLowerCase()) > -1)
+
+
         setSearch(tempSearch)
     }
 
@@ -172,13 +172,10 @@ function Client(props) {
         else
             resClientName = '';
 
-
-        
         setIsUpdating(true);
         setRegister(reg);
         setClient(reg.client);
         setClientName(resClientName);
-        setCode(reg.code)
         setStatus(reg.status);
         setDays(reg.days);
         setCompanie(reg.companie)
@@ -201,7 +198,7 @@ function Client(props) {
 
     const clearValues = () => {
         setClient('')
-        setCode('')
+        setClientName('')
         setStatus('Aberto')
         setDocument('');
         setDtMaturity('');
@@ -234,9 +231,9 @@ function Client(props) {
                     className="select-search"
                     onChange={e => setSelectFilterField(e.target.value)}>
                     <option value="id">Código</option>
-                    <option value="code" selected>Código no cliente</option>
                     <option value="client_name" selected>Nome do cliente</option>
-                    <option value="client_document" selected>Documento do cliente</option>
+                    <option value="client_document" >Documento do cliente</option>
+                    <option value="client_phones" >Telefone do cliente</option>
                 </select>
                 <input
                     className="field-search"
@@ -306,7 +303,7 @@ function Client(props) {
                                 if (res.data)
                                     setClientName(res.data.name)
                                 else
-                                setClientName('')
+                                    setClientName('')
                             }} />
                         <input
                             type="text"
@@ -315,15 +312,6 @@ function Client(props) {
                         <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients', companie))}> Consultar </button>
                         <br />
                     </div>
-
-
-                    <label> Código </label>
-                    <input
-                        type="text"
-                        placeholder="Código do cliente na empresa"
-                        value={code}
-                        onChange={e => setCode(e.target.value)} />
-
 
                     <label> Dt. Vencimento </label>
                     <input

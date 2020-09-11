@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useHistory } from "react-router-dom";
+import { connect } from 'react-redux';
 import './style.css';
-import api from '../../services/api';
 import AppBar from '../../components/AppBar';
 import imgLogin from '../../assets/login.png';
 
-export default function Dashboard() {
+function Dashboard(props) {
     const history = useHistory();
 
     useEffect(() => {
@@ -22,3 +22,5 @@ export default function Dashboard() {
         </div>
     );
 }
+
+export default connect(state => ({ state }))(Dashboard);

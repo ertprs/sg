@@ -50,12 +50,14 @@ const getById = async (request, response) => {
   try {
     const res = await connection('companies')
       .where('id', '=', request.params.id)
-      .select('*');
-      return response.json(res[0]);
+      .select('*')
+      .first();
+      return response.json(res);
   } catch (error) {
-    return response.json(error);
+    return response.json({error: error.message});
   }
 }
+
 
 const findByName = async (request, response) => {
   try {
