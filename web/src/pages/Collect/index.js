@@ -25,6 +25,7 @@ function Client(props) {
     //FIELDS
     const [client, setClient] = useState('');
     const [clientName, setClientName] = useState('');
+    const [dtClosure, setDtClosure] = useState('');
     const [status, setStatus] = useState('Aberto');
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
@@ -33,7 +34,6 @@ function Client(props) {
     const [dtMaturity, setDtMaturity] = useState('');
     const [days, setDays] = useState(0);
     const [value, setValue] = useState(0);
-    const [amount, setAmount] = useState(0);
     const [penalty, setPenalty] = useState(0);
     const [interest, setInterest] = useState(0);
     const [updatedDebt, setUpdatedDebt] = useState(0);
@@ -77,9 +77,9 @@ function Client(props) {
             document,
             dt_maturity: dtMaturity,
             value,
-            amount,
             account,
             days,
+            dt_closure: dtClosure,
             companie,
             penalty,
             interest,
@@ -178,6 +178,7 @@ function Client(props) {
         setClientName(resClientName);
         setStatus(reg.status);
         setDays(reg.days);
+        setDtClosure(reg.dt_closure)
         setCompanie(reg.companie)
         setCompanieName(resCompanieName)
         setPenalty(reg.penalty)
@@ -190,7 +191,6 @@ function Client(props) {
         setMaximumDiscount(reg.maximum_discount)
         setNegotiatedValue(reg.negotiated_value)
         setValue(reg.value);
-        setAmount(reg.amount);
         setObs(reg.obs)
 
         setShow(true)
@@ -203,6 +203,7 @@ function Client(props) {
         setDocument('');
         setDtMaturity('');
         setAccount('');
+        setDtClosure('')
         setCompanie('')
         setPenalty('')
         setInterest('')
@@ -213,7 +214,6 @@ function Client(props) {
         setObs('')
         setDays(0);
         setValue(0);
-        setAmount(0);
         loadRegisters();
     }
 
@@ -231,9 +231,9 @@ function Client(props) {
                     className="select-search"
                     onChange={e => setSelectFilterField(e.target.value)}>
                     <option value="id">Código</option>
-                    <option value="client_name" selected>Nome do cliente</option>
-                    <option value="client_document" >Documento do cliente</option>
-                    <option value="client_phones" >Telefone do cliente</option>
+                    <option value="client_name" selected> Nome do cliente</option>
+                    <option value="client_document" > Documento do cliente</option>
+                    <option value="client_phones" > Telefone do cliente</option>
                 </select>
                 <input
                     className="field-search"
@@ -251,7 +251,7 @@ function Client(props) {
                         <th>Status</th>
                         <th>Dt. Venc. </th>
                         <th>Total </th>
-                        <th>Empresa</th>
+                        <th>Credor</th>
                         <th>Opções</th>
                     </tr>
                 </MDBTableHead>
@@ -262,7 +262,7 @@ function Client(props) {
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
                             <td>{reg.dt_maturity}</td>
-                            <td>{reg.amount}</td>
+                            <td>{reg.value}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                             <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
@@ -287,7 +287,7 @@ function Client(props) {
 
                     <br />
 
-                    <label> Client </label>
+                    <label> Cliente </label>
                     <div className="field-other-table">
                         <input
                             type="text"
@@ -326,13 +326,14 @@ function Client(props) {
                         className="select-search"
                         onChange={e => setStatus(e.target.value)}>
                         <option value="Aberto" selected={status === 'Aberto' ? true : false}>Aberto</option>
-                        <option value="Fechado" selected={status === 'Fechado' ? true : false}>Fechado</option>
+                        <option value="Negociado" selected={status === 'Negociado' ? true : false}>Negociado</option>
+                        <option value="Liquidado" selected={status === 'Liquidado' ? true : false}>Liquidado</option>
                     </select>
 
-                    <label> Documento </label>
+                    <label> Nota fiscal </label>
                     <input
                         type="text"
-                        placeholder="Documento"
+                        placeholder="Nota fiscal"
                         value={document}
                         onChange={e => setDocument(e.target.value)} />
 
@@ -342,13 +343,6 @@ function Client(props) {
                         placeholder="Valor"
                         value={value}
                         onChange={e => setValue(e.target.value)} />
-
-                    <label> Montante </label>
-                    <input
-                        type="text"
-                        placeholder="Montante"
-                        value={amount}
-                        onChange={e => setAmount(e.target.value)} />
 
                     <label> Conta </label>
                     <input
@@ -364,7 +358,14 @@ function Client(props) {
                         value={days}
                         onChange={e => setDays(e.target.value)} />
 
-                    <label> Empresa </label>
+                    <label> Data de encerramento </label>
+                    <input
+                        type="text"
+                        placeholder="Data de encerramento"
+                        value={dtClosure}
+                        onChange={e => setDtClosure(e.target.value)} />
+
+                    <label> Credor </label>
                     <div className="field-other-table">
                         <input
                             type="text"

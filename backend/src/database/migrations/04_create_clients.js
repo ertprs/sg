@@ -5,10 +5,13 @@ exports.up = function(knex) {
       table.string('name');
       table.decimal('companie');
       table.string('phone');
+      table.string('phone_additional');
       table.string('cellphone');
       table.string('email');
+      table.string('email_additional');
       table.string('document');
       table.string('edress');
+      table.string('edress_additional');
 
       table.string('obs');
     });

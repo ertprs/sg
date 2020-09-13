@@ -20,6 +20,16 @@ function Companie(props) {
     const [isUpdating, setIsUpdating] = useState(false);
 
     const [name, setName] = useState('');
+    const [cnpj, setCnpj] = useState('');
+    const [edress, setEdress] = useState('');
+    const [phone, setPhone] = useState('');
+    const [responsibleStaff, setResponsibleStaff] = useState('');
+    const [dtContract, setDtContract] = useState('');
+    const [dtRenovation, setDtRenovation] = useState('');
+    const [renovationTerm, setRenovarionTerm] = useState('');
+
+    const [interest, setInterest] = useState('');
+    const [defaultHonorary, setDefaultHonorary] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -40,7 +50,17 @@ function Companie(props) {
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             name,
-            obs
+            cnpj,
+            edress,
+            phone,
+            responsible_staff: responsibleStaff,
+            dt_contract: dtContract,
+            dt_renovation: dtRenovation,
+            renovation_term: renovationTerm,
+            interest,
+            default_honorary: defaultHonorary,
+            obs,
+
         }
         setRegister(regTemp);
 
@@ -116,6 +136,16 @@ function Companie(props) {
         setIsUpdating(true);
         setRegister(reg);
         setName(reg.name);
+        setCnpj(reg.cnpj);
+        setEdress(reg.edress);
+        setPhone(reg.phone);
+        setResponsibleStaff(reg.responsible_staff);
+        setDtContract(reg.dt_contract);
+        setDtRenovation(reg.dt_renovation);
+        setRenovarionTerm(reg.renovation_term);
+        setInterest(reg.interest);
+        setDefaultHonorary(reg.default_honorary);
+        setObs(reg.obs);
         setShow(true);
     }
 
@@ -123,6 +153,17 @@ function Companie(props) {
         setShow(false);
         setRegister({});
         setName('');
+        setName('');
+        setCnpj('');
+        setEdress('');
+        setPhone('');
+        setResponsibleStaff('');
+        setDtContract('');
+        setDtRenovation('');
+        setRenovarionTerm('');
+        setInterest('');
+        setDefaultHonorary('');
+        setObs('');
         setIsUpdating(false);
     }
 
@@ -168,7 +209,7 @@ function Companie(props) {
 
             <Modal show={show} onHide={hide}>
                 <Modal.Header>
-                    <Modal.Title>Cadastro de empresa</Modal.Title>
+                    <Modal.Title>Cadastro de Credor</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {
@@ -186,6 +227,74 @@ function Companie(props) {
                         placeholder="Nome"
                         value={name}
                         onChange={e => setName(e.target.value)} />
+
+                    <label> CNPJ </label>
+                    <input
+                        type="text"
+                        placeholder="CNPJ"
+                        value={cnpj}
+                        onChange={e => setCnpj(e.target.value)} />
+
+                    <label> Endereço </label>
+                    <input
+                        type="text"
+                        placeholder="Endereço"
+                        value={edress}
+                        onChange={e => setEdress(e.target.value)} />
+
+                    <label> Telefone </label>
+                    <input
+                        type="text"
+                        placeholder="Telefone"
+                        value={phone}
+                        onChange={e => setPhone(e.target.value)} />
+
+                    <label> Pessoa responsável </label>
+                    <input
+                        type="text"
+                        placeholder="Endereço"
+                        value={responsibleStaff}
+                        onChange={e => setResponsibleStaff(e.target.value)} />
+
+
+                    <label> Data do contrato </label>
+                    <input
+                        type="text"
+                        placeholder="Data do contrato"
+                        value={dtContract}
+                        onChange={e => setDtContract(e.target.value)} />
+
+                    <label> Data de renovação </label>
+                    <input
+                        type="text"
+                        placeholder="Data de renovação"
+                        value={dtRenovation}
+                        onChange={e => setDtRenovation(e.target.value)} />
+
+
+                    <label> Prazo de renovação </label>
+                    <input
+                        type="text"
+                        placeholder="Prazo de renovação"
+                        value={renovationTerm}
+                        onChange={e => setRenovarionTerm(e.target.value)} />
+
+                    <label> Juros </label>
+                    <input
+                        type="text"
+                        placeholder="Juros"
+                        value={interest}
+                        onChange={e => setInterest(e.target.value)} />
+
+                    <label> Honorário </label>
+                    <input
+                        type="text"
+                        placeholder="Honorário padrão"
+                        value={defaultHonorary}
+                        onChange={e => setDefaultHonorary(e.target.value)} />
+
+
+                    <label> Obs </label>
                     <input
                         type="text"
                         placeholder="Observação"

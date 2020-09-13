@@ -34,9 +34,9 @@ const update = async (request, response) => {
     account: request.body.account,
     document: request.body.document,
     dt_maturity: request.body.dt_maturity,
+    dt_closure: request.body.dt_closure,
     days: request.body.days,
     value: request.body.value,
-    amount: request.body.amount,
     penalty: request.body.penalty,
     interest: request.body.interest,
     updated_debt: request.body.updated_debt,
@@ -79,7 +79,20 @@ const getByClient = async (request, response) => {
     const res = await connection('collects')
       .where('client', '=', request.params.client_id)
       .select('*');
-    return response.json(res);
+    collects = [];
+    for (collect of res) {
+      const client = await ClientHelper.getById(collect.client);
+      const companie = await CompanieHelper.getById(collect.companie);
+      collects.push({
+        ...collect,
+        client_name: client ? client.name : '',
+        client_document: client ? client.document : '',
+        client_phoe: client ? client.phone : '',
+        client_cellphone: client ? client.cellphone : '',
+        companie_name: companie && companie ? companie.name : '',
+      })
+    }
+    return response.json(collects);
   } catch (error) {
     return response.json({ error: error.message });
   }
@@ -95,7 +108,7 @@ const newRegister = async (request, response) => {
     dt_maturity: request.body.dt_maturity,
     days: request.body.days,
     value: request.body.value,
-    amount: request.body.amount,
+    dt_closure: request.body.dt_closure,
     penalty: request.body.penalty,
     interest: request.body.interest,
     updated_debt: request.body.updated_debt,
@@ -130,7 +143,6 @@ const importCollect = async (request, response) => {
       dt_maturity: request.body.dt_maturity,
       days: request.body.days,
       value: request.body.value,
-      amount: request.body.amount,
       obs: 'importado'
     };
     var res;

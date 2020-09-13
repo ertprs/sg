@@ -74,6 +74,7 @@ code {
   justify-content: space-between;
   padding: 10px;
 }
+
 .modal-footer-container .button-delete {
   background-color: rgb(204, 73, 73);
 }
@@ -81,22 +82,18 @@ code {
 .field-other-table {
   display: flex;
   flex-direction: row;
-  align-content: center;
+  align-items: center;
 }
 
 .field-other-table input[type=text]:first-child {
   width: 80px;
-}
-.field-other-table input[type=text]:first-child {
-  width: 80px;
+  margin-right: 5px;
 }
 
 .field-other-table button {
   width: auto;
-  padding: 5px;
-  margin: 7px;
-  margin-left: 5px;
+  margin-bottom: 10px;
+  margin-left: 3px;
   border-radius: 5px;
-  font-size: 15px;
 }
 

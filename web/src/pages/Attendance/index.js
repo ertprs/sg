@@ -82,15 +82,17 @@ function Attendance(props) {
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
+        setADtEnd(moment().format('DD/mm/yyyy HH:MM'))
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             client: aClient,
             dt_begin: aDtBegin,
-            dt_end: aDtEnd,
+            dt_end: moment().format('DD/mm/yyyy HH:MM'),
             user: aUser,
             description: aDescription,
             obs: aObs
         }
+        console.log(regTemp)
         setRegister(regTemp);
         try {
             if (isUpdating) {
@@ -158,7 +160,7 @@ function Attendance(props) {
 
     const getCollectsByClientId = async cliId => {
         try {
-            const res = await api.get('/collects/find-by-client/' + cliId)    
+            const res = await api.get('/collects/find-by-client/' + cliId)
             setCCollects(res.data)
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
@@ -184,7 +186,6 @@ function Attendance(props) {
     const clearCollectValues = () => {
         setCCollects([]);
         setCCollect([]);
-
     }
 
 
@@ -394,11 +395,11 @@ function Attendance(props) {
                                 <br />
                             </div>
 
-                            <label> Empresa </label>
+                            <label> Credor </label>
                             <div className="field-other-table">
                                 <input
                                     type="text"
-                                    placeholder="Cód."
+                                    placeholder="Credor"
                                     value={cliCompanie}
                                     readOnly />
                                 <input
@@ -459,49 +460,24 @@ function Attendance(props) {
                         </Tab>
 
                         <Tab eventKey="collect" title="Cobranças">
-                            {cCollects.map(collect => (
-                                <Card style={{ margin: '10px' }} key={collect.id}>
-                                    <Card.Body>
-                                        <Card.Title>
-                                            <label> Código </label>
-                                            <label> {': ' + collect.id} </label>
-                                            <br />
-                                            <label> Débito atualizado </label>
-                                            <label> {': ' + collect.days} </label>
-                                            <br />
-                                            <label> Dias </label>
-                                            <label> {': ' + collect.updated_debt} </label>
-                                            <br />
-                                            <label> Disconto máximo </label>
-                                            <label> {': ' + collect.maximum_discount} </label>
-                                            <br />
-                                        </Card.Title>
-                                        <Card.Text>
-                                            <label> Status </label>
-                                            <select
-                                                className="select-search"
-                                                onChange={e => collect.obs = e.target.value}>
-                                                <option value="Aberto" selected={collect.status === 'Aberto' ? true : false}>Aberto</option>
-                                                <option value="Fechado" selected={collect.status === 'Fechado' ? true : false}>Fechado</option>
-                                            </select>
 
-                                            <label> Valor negociado </label>
-                                            <input
-                                                type="text"
-                                                placeholder="Valor negociado"
-                                                value={collect.cNegotiatedValue}
-                                                onChange={e => changeArrayValue('negotiatedValue', collect.id, e.target.value)} />
-
-                                            <label> Observação </label>
-                                            <input
-                                                type="text"
-                                                placeholder="Obs"
-                                                value={collect.obs}
-                                                onChange={e => changeArrayValue('obs', collect.id, e.target.value)} />
-                                        </Card.Text>
-                                    </Card.Body>
-                                </Card>
-                            ))}
+                            <MDBTable responsive hover bordered className="table">
+                                <MDBTableHead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </MDBTableHead>
+                                <MDBTableBody>
+                                    {cCollects.map(collect => (
+                                        <tr key={collect.id}>
+                                            <td>{collect.id}</td>
+                                            <td>{collect.value}</td>
+                                        </tr>
+                                    ))}
+                                </MDBTableBody>
+                            </MDBTable>
+                            
                         </Tab>
                     </Tabs>
 

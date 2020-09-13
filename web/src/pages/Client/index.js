@@ -26,6 +26,9 @@ function Client(props) {
     const [name, setName] = useState('');
     const [cellphone, setCellphone] = useState('');
     const [phone, setPhone] = useState('');
+    const [phoneAdditional, setPhoneAdditional] = useState('');
+    const [emailAdditional, setEmailAdditional] = useState('');
+    const [edressAdditional, setEdressAdditional] = useState('');
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
     const [email, setEmail] = useState('');
@@ -72,6 +75,9 @@ function Client(props) {
             cellphone,
             phone,
             companie,
+            edress_additional: edressAdditional,
+            email_additional: emailAdditional,
+            phone_additional: phoneAdditional,
             email,
             edress,
             document,
@@ -151,7 +157,10 @@ function Client(props) {
         setCellphone(reg.cellphone)
         setPhone(reg.phone)
         setCompanie(reg.companie)
-        setCompanieName(resCompanieName)
+        setCompanieName(reg.CompanieName)
+        setEmailAdditional(reg.email_additional)
+        setPhoneAdditional(reg.phone_additional)
+        setEdressAdditional(reg.edress_additional)
         setEmail(reg.email)
         setEdress(reg.edress)
         setDocument(reg.document)
@@ -164,6 +173,9 @@ function Client(props) {
         setName('')
         setCellphone('')
         setPhone('')
+        setEmailAdditional('')
+        setPhoneAdditional('')
+        setEdressAdditional('')
         setCompanie('')
         setCompanieName('')
         setEdress('')
@@ -206,7 +218,7 @@ function Client(props) {
                         <th>Documento</th>
                         <th>Celular</th>
                         <th>Telefone</th>
-                        <th>Empresa</th>
+                        <th>Credor</th>
                         <th>Opções</th>
                     </tr>
                 </MDBTableHead>
@@ -268,6 +280,13 @@ function Client(props) {
                         value={phone}
                         onChange={e => setPhone(e.target.value)} />
 
+                    <label> Telefone adicional </label>
+                    <input
+                        type="text"
+                        placeholder="Telefone"
+                        value={phoneAdditional}
+                        onChange={e => setPhoneAdditional(e.target.value)} />
+
                     <label> Email </label>
                     <input
                         type="text"
@@ -275,12 +294,18 @@ function Client(props) {
                         value={email}
                         onChange={e => setEmail(e.target.value)} />
 
+                    <label> Email adicional </label>
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={emailAdditional}
+                        onChange={e => setEmailAdditional(e.target.value)} />
 
-                    <label> Empresa </label>
+                    <label> Credor </label>
                     <div className="field-other-table">
                         <input
                             type="text"
-                            placeholder="Cód."
+                            placeholder="Credor"
                             value={companie}
                             onChange={async e => {
                                 setCompanie(e.target.value)
@@ -302,7 +327,6 @@ function Client(props) {
                         <br />
                     </div>
 
-
                     <label> Documento (CPF/CNPJ) </label>
                     <input
                         type="text"
@@ -316,6 +340,13 @@ function Client(props) {
                         placeholder="Endereço"
                         value={edress}
                         onChange={e => setEdress(e.target.value)} />
+                    
+                    <label>  Endereço adicional </label>
+                    <input
+                        type="text"
+                        placeholder="Endereço"
+                        value={edressAdditional}
+                        onChange={e => setEdressAdditional(e.target.value)} />
 
                     <label>  Observações </label>
                     <input

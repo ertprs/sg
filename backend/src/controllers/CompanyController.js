@@ -12,8 +12,17 @@ const getAll = async (request, response) => {
 
 const newRegister = async (request, response) => {
   const reg = {
-     name: request.body.name,
-     obs: request.body.obs,
+    name: request.body.name,
+    cnpj: request.body.cnpj,
+    edress: request.body.edress,
+    phone: request.body.phone,
+    responsible_staff: request.body.responsible_staff,
+    dt_contract: request.body.dt_contract,
+    dt_renovation: request.body.dt_renovation,
+    renovation_term: request.body.renovation_term,
+    interest: request.body.interest,
+    default_honorary: request.body.default_honorary,
+    obs: request.body.obs,
   };
   try {
     const res = await connection('companies').insert(reg)
@@ -26,6 +35,15 @@ const newRegister = async (request, response) => {
 const update = async (request, response) => {
   const reg = {
     name: request.body.name,
+    cnpj: request.body.cnpj,
+    edress: request.body.edress,
+    phone: request.body.phone,
+    responsible_staff: request.body.responsible_staff,
+    dt_contract: request.body.dt_contract,
+    dt_renovation: request.body.dt_renovation,
+    renovation_term: request.body.renovation_term,
+    interest: request.body.interest,
+    default_honorary: request.body.default_honorary,
     obs: request.body.obs,
  };
   try {
