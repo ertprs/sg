@@ -9,8 +9,9 @@ exports.up = function(knex) {
     table.string('dt_contract');
     table.string('dt_renovation');
     table.string('renovation_term');
-    table.string('interest');
-    table.string('default_honorary');
+    table.float('default_interest');
+    table.float('default_honorary');
+    table.float('default_penalty');
     
     table.string('obs');
   });

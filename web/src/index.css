@@ -79,20 +79,33 @@ code {
   background-color: rgb(204, 73, 73);
 }
 
+.inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.inline button {
+  width: auto;
+  margin-bottom: -15px;
+  border-radius: 5px;
+}
+
+
 .field-other-table {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.field-other-table input[type=text]:first-child {
-  width: 80px;
+.field-other-table input[type=number]:first-child {
+  width: 85px;
   margin-right: 5px;
 }
 
 .field-other-table button {
   width: auto;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   margin-left: 3px;
   border-radius: 5px;
 }

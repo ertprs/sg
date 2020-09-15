@@ -20,8 +20,9 @@ const newRegister = async (request, response) => {
     dt_contract: request.body.dt_contract,
     dt_renovation: request.body.dt_renovation,
     renovation_term: request.body.renovation_term,
-    interest: request.body.interest,
+    default_interest: request.body.default_interest,
     default_honorary: request.body.default_honorary,
+    default_penalty: request.body.default_penalty,
     obs: request.body.obs,
   };
   try {
@@ -42,8 +43,9 @@ const update = async (request, response) => {
     dt_contract: request.body.dt_contract,
     dt_renovation: request.body.dt_renovation,
     renovation_term: request.body.renovation_term,
-    interest: request.body.interest,
+    default_interest: request.body.default_interest,
     default_honorary: request.body.default_honorary,
+    default_penalty: request.body.default_penalty,
     obs: request.body.obs,
  };
   try {

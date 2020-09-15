@@ -17,6 +17,9 @@ const getAll = async (request, response) => {
         client_phoe: client ? client.phone : '',
         client_cellphone: client ? client.cellphone : '',
         companie_name: companie && companie ? companie.name : '',
+        default_interest: companie && companie ? companie.default_interest : 0,
+        default_honorary: companie && companie ? companie.default_honorary : 0,
+        default_penalty: companie && companie ? companie.default_penalty : 0,
       })
     }
     return response.json(collects);
@@ -37,10 +40,9 @@ const update = async (request, response) => {
     dt_closure: request.body.dt_closure,
     days: request.body.days,
     value: request.body.value,
-    penalty: request.body.penalty,
-    interest: request.body.interest,
     updated_debt: request.body.updated_debt,
     honorary: request.body.honorary,
+    honorary_per: request.body.honorary_per,
     maximum_discount: request.body.maximum_discount,
     negotiated_value: request.body.negotiated_value,
     obs: request.body.obs
@@ -59,17 +61,6 @@ const deleteRegister = async (request, response) => {
     return response.json(res);
   } catch (error) {
     return response.json({ error: error.message });
-  }
-}
-
-const getByCode = async (collectCode) => {
-  try {
-    const resCollect = await connection('collects')
-      .where('code', '=', collectCode)
-      .select('*');
-    return resCollect[0];
-  } catch (error) {
-    return { error: error.message };
   }
 }
 
@@ -109,8 +100,6 @@ const newRegister = async (request, response) => {
     days: request.body.days,
     value: request.body.value,
     dt_closure: request.body.dt_closure,
-    penalty: request.body.penalty,
-    interest: request.body.interest,
     updated_debt: request.body.updated_debt,
     honorary: request.body.honorary,
     maximum_discount: request.body.maximum_discount,
@@ -143,6 +132,7 @@ const importCollect = async (request, response) => {
       dt_maturity: request.body.dt_maturity,
       days: request.body.days,
       value: request.body.value,
+      maximum_discount: request.body.maximum_discount,
       obs: 'importado'
     };
     var res;

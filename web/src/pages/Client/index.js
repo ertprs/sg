@@ -145,11 +145,6 @@ function Client(props) {
     }
 
     const setUpdating = async (reg) => {
-        let resCompanieName = await api.get(`companies/find-by-id/${reg.companie}`);
-        if (resCompanieName.data)
-            resCompanieName = resCompanieName.data.name
-        else
-            resCompanieName = ''
         setIsUpdating(true);
         setRegister(reg);
         setCode(reg.code)
@@ -157,7 +152,7 @@ function Client(props) {
         setCellphone(reg.cellphone)
         setPhone(reg.phone)
         setCompanie(reg.companie)
-        setCompanieName(reg.CompanieName)
+        setCompanieName(reg.companie_name)
         setEmailAdditional(reg.email_additional)
         setPhoneAdditional(reg.phone_additional)
         setEdressAdditional(reg.edress_additional)

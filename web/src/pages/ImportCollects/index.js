@@ -42,12 +42,6 @@ function ImportCollects(props) {
         return telFormated;
     }
 
-    const configStrDate = date => {
-        if (date) {
-            return moment(date).format('L');
-        }
-    }
-
     const insetOne = async register => {
         await api.post('collects/import-collect', {
             status: 'Aberto',
@@ -63,9 +57,9 @@ function ImportCollects(props) {
             dt_begin: register.__EMPTY_7,
             dt_end: register.__EMPTY_8,
             dt_maturity: register.__EMPTY_9,
-            value: register.__EMPTY_10,
+            maximum_discount: register.__EMPTY_10,
             days: register.__EMPTY_11,
-            amount: register.__EMPTY_12,
+            value: register.__EMPTY_12,
         });
     }
 
@@ -105,12 +99,13 @@ function ImportCollects(props) {
                     json.__EMPTY_1 = configStrTelephone(json.__EMPTY_1);
                     json.__EMPTY_2 = configStrTelephone(json.__EMPTY_2);
 
-                    json.__EMPTY_6 = configStrDate(json.__EMPTY_6);
-                    json.__EMPTY_7 = configStrDate(json.__EMPTY_7);
-                    json.__EMPTY_8 = configStrDate(json.__EMPTY_8);
-                    json.__EMPTY_9 = configStrDate(json.__EMPTY_9);
+                    json.__EMPTY_6 = moment(json.__EMPTY_6).format('DD/MM/YYYY')
+                    json.__EMPTY_7 = moment(json.__EMPTY_7).format('DD/MM/YYYY')
+                    json.__EMPTY_8 = moment(json.__EMPTY_8).format('DD/MM/YYYY')
+                    json.__EMPTY_9 = moment(json.__EMPTY_9).format('DD/MM/YYYY')
 
                     tempArray.push(json);
+                    return 
                 }
             });
             setImportedArray(tempArray);
@@ -152,9 +147,9 @@ function ImportCollects(props) {
                             <th>Doc.</th>
                             <th>Emissão</th>
                             <th>Vencimento</th>
-                            <th>Valor</th>
+                            <th>Desconto máximo</th>
                             <th>Dias</th>
-                            <th>Saldo</th>
+                            <th>Valor</th>
                         </tr>
                     </MDBTableHead>
                     <MDBTableBody>

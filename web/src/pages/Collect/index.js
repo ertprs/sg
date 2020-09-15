@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import moment from 'moment';
 
 import './style.css';
 import api from '../../services/api';
@@ -34,12 +35,16 @@ function Client(props) {
     const [dtMaturity, setDtMaturity] = useState('');
     const [days, setDays] = useState(0);
     const [value, setValue] = useState(0);
-    const [penalty, setPenalty] = useState(0);
-    const [interest, setInterest] = useState(0);
     const [updatedDebt, setUpdatedDebt] = useState(0);
-    const [honorary, setHonorary] = useState(0);
+    const [defaultHonorary, setDefaultHonorary] = useState(0);
+    const [defaultInterest, setDefaultInterest] = useState(0);
+    const [interestCalculed, setInterestCalculed] = useState(0);
     const [maximumDiscount, setMaximumDiscount] = useState(0);
     const [negotiatedValue, setNegotiatedValue] = useState(0);
+    const [defaultPenalty, setDefaultPenalty] = useState(0);
+    const [penaltyCalculed, setPenaltyCalculed] = useState(0);
+    const [honoraryCalculed, setHonoraryCalculed] = useState(0);
+    const [honoraryPer, setHonoraryPer] = useState(0);
     const [obs, setObs] = useState('');
 
 
@@ -51,8 +56,9 @@ function Client(props) {
         try {
             props.dispatch(loadingActions.setLoading(true));
             const res = await api.get('collects')
-            setRegisters(res.data);
-            setSearch(res.data)
+            await setRegisters(res.data);
+            await setSearch(res.data)
+            await calculate()
             props.dispatch(loadingActions.setLoading(false));
         } catch (error) {
             props.dispatch(loadingActions.setLoading(false));
@@ -81,12 +87,10 @@ function Client(props) {
             days,
             dt_closure: dtClosure,
             companie,
-            penalty,
-            interest,
             updated_debt: updatedDebt,
-            honorary,
             maximum_discount: maximumDiscount,
             negotiated_value: negotiatedValue,
+            honorary_per: honoraryPer,
             obs: obs
         }
         setRegister(regTemp);
@@ -115,9 +119,7 @@ function Client(props) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
         }
-
     }
-
 
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
@@ -159,37 +161,25 @@ function Client(props) {
     }
 
     const setUpdating = async (reg) => {
-        let resCompanieName = await api.get(`companies/find-by-id/${reg.companie}`);
-        if (resCompanieName.data)
-            resCompanieName = resCompanieName.data.name
-        else
-            resCompanieName = '';
-
-
-        let resClientName = await api.get(`clients/find-by-id/${reg.client}`);
-        if (resClientName.data)
-            resClientName = resClientName.data.name
-        else
-            resClientName = '';
-
         setIsUpdating(true);
         setRegister(reg);
         setClient(reg.client);
-        setClientName(resClientName);
+        setClientName(reg.client_name);
         setStatus(reg.status);
         setDays(reg.days);
         setDtClosure(reg.dt_closure)
         setCompanie(reg.companie)
-        setCompanieName(resCompanieName)
-        setPenalty(reg.penalty)
-        setInterest(reg.interest)
+        setCompanieName(reg.companie_name)
         setUpdatedDebt(reg.updated_debt)
         setDocument(reg.document)
-        setHonorary(reg.honorary)
+        setDefaultInterest(reg.default_interest)
+        setDefaultHonorary(reg.default_honorary)
         setAccount(reg.account)
         setDtMaturity(reg.dt_maturity)
         setMaximumDiscount(reg.maximum_discount)
         setNegotiatedValue(reg.negotiated_value)
+        setHonoraryPer(reg.default_honorary);
+        setDefaultPenalty(reg.default_penalty)
         setValue(reg.value);
         setObs(reg.obs)
 
@@ -205,15 +195,16 @@ function Client(props) {
         setAccount('');
         setDtClosure('')
         setCompanie('')
-        setPenalty('')
-        setInterest('')
-        setUpdatedDebt('')
-        setHonorary('')
-        setMaximumDiscount('')
-        setNegotiatedValue('')
+        setUpdatedDebt(0)
+        setDefaultHonorary(0)
+        setDefaultInterest(0)
+        setMaximumDiscount(0)
+        setNegotiatedValue(0)
+        setHonoraryPer(0);
         setObs('')
         setDays(0);
         setValue(0);
+        setDefaultPenalty(0)
         loadRegisters();
     }
 
@@ -222,6 +213,36 @@ function Client(props) {
         clearValues();
         setShow(true);
     }
+
+
+    const calculate = () => {
+        if (!moment(dtMaturity, "DD/MM/YYYY")._isValid)
+            setDays(0)
+
+        const calculedDays =  moment(dtMaturity, "DD/MM/YYYY").diff(moment(), 'days')
+
+        if (calculedDays > -1)
+            setDays(0)
+
+        //DAYS
+        setDays(calculedDays * -1)
+
+        //INTEREST (JUROS)
+        const interest =  (((parseFloat(defaultInterest) / 1000) * parseFloat(value)) * parseFloat(days));
+        setInterestCalculed(interest);
+
+        //PENALTY (MULTA)
+        const penalty =  ((parseFloat(defaultPenalty) / 100) * parseFloat(value));
+        setPenaltyCalculed(penalty);
+
+        //HONORARY (HONORÁRIOS)
+        const honorary =  (parseFloat(penalty) + parseFloat(interest)) + ((parseFloat(honoraryPer) / 100) * parseFloat(value))
+        setHonoraryCalculed(honorary)
+
+
+        setUpdatedDebt(parseFloat(interest) + parseFloat(penalty) + parseFloat(honorary) + parseFloat(value))
+    }
+
 
     return (
         <div className="collect-container">
@@ -250,7 +271,7 @@ function Client(props) {
                         <th>Cliente</th>
                         <th>Status</th>
                         <th>Dt. Venc. </th>
-                        <th>Total </th>
+                        <th>Valor </th>
                         <th>Credor</th>
                         <th>Opções</th>
                     </tr>
@@ -284,13 +305,50 @@ function Client(props) {
                             </div>
                             : ''
                     }
-
                     <br />
+
+                    <label> Credor </label>
+                    <div className="field-other-table">
+                        <input
+                            type="number"
+                            placeholder="Cód."
+                            value={companie}
+                            onChange={async e => {
+                                setCompanie(e.target.value)
+                                if (!e.target.value) {
+                                    setCompanieName('')
+                                    setDefaultInterest('')
+                                    setDefaultHonorary('')
+                                    setDefaultPenalty('')
+                                    setHonoraryPer('')
+                                    return
+                                }
+                                const res = await api.get(`companies/find-by-id/${e.target.value}`)
+                                if (res.data) {
+                                    setCompanieName(res.data.name)
+                                    setDefaultInterest(res.data.default_interest)
+                                    setHonoraryPer(res.data.default_honorary)
+                                    setDefaultPenalty(res.data.default_penalty)
+                                }
+                                else {
+                                    setCompanieName('')
+                                    setDefaultInterest('')
+                                    setHonoraryPer('')
+                                    setDefaultPenalty('')
+                                }
+                            }} />
+                        <input
+                            type="text"
+                            readOnly
+                            value={companieName} />
+                        <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}> Consultar </button>
+                        <br />
+                    </div>
 
                     <label> Cliente </label>
                     <div className="field-other-table">
                         <input
-                            type="text"
+                            type="number"
                             placeholder="Cód."
                             value={client}
                             onChange={async e => {
@@ -312,14 +370,24 @@ function Client(props) {
                         <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients', companie))}> Consultar </button>
                         <br />
                     </div>
-
-                    <label> Dt. Vencimento </label>
-                    <input
-                        type="text"
-                        placeholder="Data de vencimento"
-                        value={dtMaturity}
-                        onChange={e => setDtMaturity(e.target.value)} />
-
+                    <div className="inline">
+                        <div style={{ marginRight: 10 }}>
+                            <label> Dt. Vencimento </label>
+                            <input
+                                type="text"
+                                placeholder="Data de vencimento"
+                                value={dtMaturity}
+                                onChange={e => setDtMaturity(e.target.value)} />
+                        </div>
+                        <div>
+                            <label> Dias em atraso </label>
+                            <input
+                                type="number"
+                                placeholder="Dias"
+                                value={days}
+                                readOnly />
+                        </div>
+                    </div>
 
                     <label> Status </label>
                     <select
@@ -337,26 +405,12 @@ function Client(props) {
                         value={document}
                         onChange={e => setDocument(e.target.value)} />
 
-                    <label> Valor </label>
-                    <input
-                        type="text"
-                        placeholder="Valor"
-                        value={value}
-                        onChange={e => setValue(e.target.value)} />
-
                     <label> Conta </label>
                     <input
                         type="text"
                         placeholder="Conta"
                         value={account}
                         onChange={e => setAccount(e.target.value)} />
-
-                    <label> Dias </label>
-                    <input
-                        type="number"
-                        placeholder="Dias"
-                        value={days}
-                        onChange={e => setDays(e.target.value)} />
 
                     <label> Data de encerramento </label>
                     <input
@@ -365,73 +419,66 @@ function Client(props) {
                         value={dtClosure}
                         onChange={e => setDtClosure(e.target.value)} />
 
-                    <label> Credor </label>
-                    <div className="field-other-table">
-                        <input
-                            type="text"
-                            placeholder="Cód."
-                            value={companie}
-                            onChange={async e => {
-                                setCompanie(e.target.value)
-                                if (!e.target.value) {
-                                    setCompanieName('')
-                                    return
-                                }
-                                const res = await api.get(`companies/find-by-id/${e.target.value}`)
-                                if (res.data)
-                                    setCompanieName(res.data.name)
-                                else
-                                    setCompanieName('')
-                            }} />
-                        <input
-                            type="text"
-                            readOnly
-                            value={companieName} />
-                        <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}> Consultar </button>
-                        <br />
-                    </div>
 
-                    <label> Multa </label>
+                    <label> R$ Valor Originário </label>
                     <input
-                        type="text"
+                        type="number"
+                        placeholder="Valor"
+                        value={value}
+                        onChange={e => setValue(e.target.value)} />
+
+                    <label> R$ Multa </label>
+                    <input
+                        type="number"
                         placeholder="Multa"
-                        value={penalty}
-                        onChange={e => setPenalty(e.target.value)} />
+                        value={penaltyCalculed}
+                        readOnly />
 
-                    <label> Juros </label>
+                    <label> R$ Juros </label>
                     <input
-                        type="text"
+                        type="number"
                         placeholder="Jutos"
-                        value={interest}
-                        onChange={e => setInterest(e.target.value)} />
+                        value={interestCalculed}
+                        readOnly />
 
-                    <label> Débito atualizado </label>
+                    <label> % Honorários </label>
                     <input
-                        type="text"
-                        placeholder="Débito atualizado"
-                        value={updatedDebt}
-                        onChange={e => setUpdatedDebt(e.target.value)} />
-
-                    <label> Honorário </label>
-                    <input
-                        type="text"
+                        type="number"
                         placeholder="Honarário"
-                        value={honorary}
-                        onChange={e => setHonorary(e.target.value)} />
+                        value={honoraryPer}
+                        onChange={e => setHonoraryPer(e.target.value)} />
 
-                    <label> Disconto máximo </label>
+                    <label> R$ Honorários </label>
                     <input
-                        type="text"
+                        type="number"
+                        placeholder="Honarários"
+                        value={honoraryCalculed}
+                        readOnly />
+
+                    <div className="inline">
+                        <div>
+                            <label> R$ Débito atualizado </label>
+                            <input
+                                type="number"
+                                placeholder="Débito atualizado"
+                                value={updatedDebt}
+                                readOnly />
+                        </div>
+                        <button onClick={calculate}> Atualizar </button>
+                    </div>
+                    <label> R$ Desconto máximo </label>
+                    <input
+                        type="number"
                         placeholder="Desconto máximo"
                         value={maximumDiscount}
-                        onChange={e => setMaximumDiscount(e.target.value)} />
+                        readOnly />
 
-                    <label> Valor negociado </label>
+                    <label> R$ Valor negociado </label>
                     <input
-                        type="text"
+                        type="number"
                         placeholder="Desconto negociado"
                         value={negotiatedValue}
-                        onChange={e => setNegotiatedValue(e.target.value)} />
+                        readOnly />
 
                     <label> Observação </label>
                     <input

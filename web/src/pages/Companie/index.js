@@ -28,8 +28,9 @@ function Companie(props) {
     const [dtRenovation, setDtRenovation] = useState('');
     const [renovationTerm, setRenovarionTerm] = useState('');
 
-    const [interest, setInterest] = useState('');
+    const [defaultInterest, setDefaultInterest] = useState('');
     const [defaultHonorary, setDefaultHonorary] = useState('');
+    const [defaultPenalty, setDefaultPenalty] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -57,11 +58,12 @@ function Companie(props) {
             dt_contract: dtContract,
             dt_renovation: dtRenovation,
             renovation_term: renovationTerm,
-            interest,
+            default_interest: defaultInterest,
             default_honorary: defaultHonorary,
+            default_penalty: defaultPenalty,
             obs,
-
         }
+
         setRegister(regTemp);
 
         try {
@@ -143,8 +145,9 @@ function Companie(props) {
         setDtContract(reg.dt_contract);
         setDtRenovation(reg.dt_renovation);
         setRenovarionTerm(reg.renovation_term);
-        setInterest(reg.interest);
+        setDefaultInterest(reg.default_interest);
         setDefaultHonorary(reg.default_honorary);
+        setDefaultPenalty(reg.default_penalty)
         setObs(reg.obs);
         setShow(true);
     }
@@ -161,8 +164,9 @@ function Companie(props) {
         setDtContract('');
         setDtRenovation('');
         setRenovarionTerm('');
-        setInterest('');
+        setDefaultInterest('');
         setDefaultHonorary('');
+        setDefaultPenalty('');
         setObs('');
         setIsUpdating(false);
     }
@@ -279,20 +283,26 @@ function Companie(props) {
                         value={renovationTerm}
                         onChange={e => setRenovarionTerm(e.target.value)} />
 
-                    <label> Juros </label>
+                    <label> % Juros </label>
                     <input
-                        type="text"
+                        type="number"
                         placeholder="Juros"
-                        value={interest}
-                        onChange={e => setInterest(e.target.value)} />
+                        value={defaultInterest}
+                        onChange={e => setDefaultInterest(e.target.value)} />
 
-                    <label> Honorário </label>
+                    <label> % Honorário </label>
                     <input
-                        type="text"
+                        type="number"
                         placeholder="Honorário padrão"
                         value={defaultHonorary}
                         onChange={e => setDefaultHonorary(e.target.value)} />
 
+                    <label> % Multa </label>
+                    <input
+                        type="number"
+                        placeholder="Honorário padrão"
+                        value={defaultPenalty}
+                        onChange={e => setDefaultPenalty(e.target.value)} />
 
                     <label> Obs </label>
                     <input
