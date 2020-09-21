@@ -6,7 +6,7 @@
     height: 100%;
     background-color: #417b5b;
     padding: 10px;
-    background-image: url("../../assets/login-background.png");
+    background-image: url("../../assets/login-background.jpeg");
 }
 .login-container form {
     display: flex;

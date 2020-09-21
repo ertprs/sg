@@ -3,6 +3,8 @@ import { useHistory } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import { AiOutlineSearch } from 'react-icons/ai';
+import CurrencyFormat from 'react-currency-format';
 import moment from 'moment';
 
 import './style.css';
@@ -215,11 +217,11 @@ function Client(props) {
     }
 
 
-    const calculate = () => {
+    const calculate = async () => {
         if (!moment(dtMaturity, "DD/MM/YYYY")._isValid)
             setDays(0)
 
-        const calculedDays =  moment(dtMaturity, "DD/MM/YYYY").diff(moment(), 'days')
+        const calculedDays = await moment(dtMaturity, "DD/MM/YYYY").diff(moment(), 'days')
 
         if (calculedDays > -1)
             setDays(0)
@@ -228,19 +230,19 @@ function Client(props) {
         setDays(calculedDays * -1)
 
         //INTEREST (JUROS)
-        const interest =  (((parseFloat(defaultInterest) / 1000) * parseFloat(value)) * parseFloat(days));
+        const interest = await (((parseFloat(defaultInterest) / 1000) * parseFloat(value)) * parseFloat(days));
         setInterestCalculed(interest);
 
         //PENALTY (MULTA)
-        const penalty =  ((parseFloat(defaultPenalty) / 100) * parseFloat(value));
+        const penalty = await ((parseFloat(defaultPenalty) / 100) * parseFloat(value));
         setPenaltyCalculed(penalty);
 
         //HONORARY (HONORÁRIOS)
-        const honorary =  (parseFloat(penalty) + parseFloat(interest)) + ((parseFloat(honoraryPer) / 100) * parseFloat(value))
+        const honorary = await ((parseFloat(value) + parseFloat(penalty) + parseFloat(interest)) * (parseFloat(honoraryPer) / 100))
         setHonoraryCalculed(honorary)
 
-
-        setUpdatedDebt(parseFloat(interest) + parseFloat(penalty) + parseFloat(honorary) + parseFloat(value))
+        const debit = await ((parseFloat(interest) + parseFloat(penalty) + parseFloat(honorary) + parseFloat(value)))
+        setUpdatedDebt(debit)
     }
 
 
@@ -273,19 +275,20 @@ function Client(props) {
                         <th>Dt. Venc. </th>
                         <th>Valor </th>
                         <th>Credor</th>
-                        <th>Opções</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
                     {search.map(reg => (
-                        <tr key={reg.id}>
+                        <tr
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setUpdating(reg)}
+                            key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
                             <td>{reg.dt_maturity}</td>
                             <td>{reg.value}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
-                            <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -308,8 +311,9 @@ function Client(props) {
                     <br />
 
                     <label> Credor </label>
-                    <div className="field-other-table">
+                    <div className="inline">
                         <input
+                            style={{ width: 80, marginRight: 5 }}
                             type="number"
                             placeholder="Cód."
                             value={companie}
@@ -341,13 +345,18 @@ function Client(props) {
                             type="text"
                             readOnly
                             value={companieName} />
-                        <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}> Consultar </button>
+                        <button
+                            style={{ width: 'auto', marginLeft: 5, padding: 10 }}
+                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}>
+                            <AiOutlineSearch size="25" />
+                        </button>
                         <br />
                     </div>
 
                     <label> Cliente </label>
-                    <div className="field-other-table">
+                    <div className="inline">
                         <input
+                            style={{ width: 80, marginRight: 5 }}
                             type="number"
                             placeholder="Cód."
                             value={client}
@@ -367,17 +376,22 @@ function Client(props) {
                             type="text"
                             readOnly
                             value={clientName} />
-                        <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients', companie))}> Consultar </button>
+                        <button
+                            style={{ width: 'auto', marginLeft: 5, padding: 10 }}
+                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients', companie))}>
+                            <AiOutlineSearch size="25" />
+                        </button>
                         <br />
                     </div>
                     <div className="inline">
                         <div style={{ marginRight: 10 }}>
                             <label> Dt. Vencimento </label>
-                            <input
-                                type="text"
+                            <CurrencyFormat 
+                                format="##/##/####"
                                 placeholder="Data de vencimento"
-                                value={dtMaturity}
-                                onChange={e => setDtMaturity(e.target.value)} />
+                                value={dtMaturity?dtMaturity:''}
+                                onValueChange={e => setDtMaturity(e.target.value)}
+                                onBlur={calculate} />
                         </div>
                         <div>
                             <label> Dias em atraso </label>
@@ -413,72 +427,87 @@ function Client(props) {
                         onChange={e => setAccount(e.target.value)} />
 
                     <label> Data de encerramento </label>
-                    <input
-                        type="text"
+                    <CurrencyFormat 
+                        format="##/##/####"
                         placeholder="Data de encerramento"
-                        value={dtClosure}
-                        onChange={e => setDtClosure(e.target.value)} />
+                        value={dtClosure?dtClosure:''}
+                        onValueChange={e => setDtClosure(e.value)} />
 
 
                     <label> R$ Valor Originário </label>
-                    <input
-                        type="number"
-                        placeholder="Valor"
-                        value={value}
-                        onChange={e => setValue(e.target.value)} />
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
+                        placeholder="Valor originário"
+                        value={value ? value : ''}
+                        onValueChange={e => setValue(e.value)} />
 
                     <label> R$ Multa </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
                         placeholder="Multa"
-                        value={penaltyCalculed}
+                        value={penaltyCalculed ? penaltyCalculed : ''}
                         readOnly />
 
                     <label> R$ Juros </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
                         placeholder="Jutos"
-                        value={interestCalculed}
+                        value={interestCalculed ? interestCalculed : ''}
                         readOnly />
 
                     <label> % Honorários </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        suffix={'%'}
+                        thousandSeparator={true}
                         placeholder="Honarário"
-                        value={honoraryPer}
-                        onChange={e => setHonoraryPer(e.target.value)} />
+                        value={honoraryPer ? honoraryPer : ''}
+                        onValueChange={e => setHonoraryPer(e.value)} />
 
                     <label> R$ Honorários </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
                         placeholder="Honarários"
-                        value={honoraryCalculed}
+                        value={honoraryCalculed ? honoraryCalculed : ''}
                         readOnly />
 
+                    <label> R$ Débito atualizado </label>
                     <div className="inline">
-                        <div>
-                            <label> R$ Débito atualizado </label>
-                            <input
-                                type="number"
-                                placeholder="Débito atualizado"
-                                value={updatedDebt}
-                                readOnly />
-                        </div>
-                        <button onClick={calculate}> Atualizar </button>
+                        <CurrencyFormat
+                            prefix={'R$'}
+                            decimalScale={2}
+                            thousandSeparator={true}
+                            placeholder="Débito atualizado"
+                            value={updatedDebt ? updatedDebt : ''}
+                            readOnly />
+                        <button
+                            style={{ marginLeft: 5, width: 'auto' }}
+                            onClick={calculate}> Atualizar </button>
                     </div>
                     <label> R$ Desconto máximo </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
                         placeholder="Desconto máximo"
-                        value={maximumDiscount}
+                        value={maximumDiscount ? maximumDiscount : ''}
                         readOnly />
 
                     <label> R$ Valor negociado </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={true}
                         placeholder="Desconto negociado"
-                        value={negotiatedValue}
-                        readOnly />
+                        value={negotiatedValue ? negotiatedValue : ''}
+                        onValueChange={e => setNegotiatedValue(e.value)} />
 
                     <label> Observação </label>
                     <input

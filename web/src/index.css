@@ -22,10 +22,8 @@ button, input[type=submit] {
   width: 100%;
   padding: 10px;
   margin: 8px 0;
-  display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
   font-size: 15px;
   color: white;
   background-color: #417b5b;
@@ -54,17 +52,6 @@ input[type=text]:read-only, input[type=number]:read-only, input[type=password]:r
   background-color: #b5ccbf;
 }
 
-label {
-  margin-bottom: 0px;
-  padding-bottom: 0px;
-}
-
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
 .react-bootstrap-table table {
   table-layout: auto;
 }
@@ -80,33 +67,12 @@ code {
 }
 
 .inline {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-.inline button {
-  width: auto;
-  margin-bottom: -15px;
-  border-radius: 5px;
-}
-
-
-.field-other-table {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.field-other-table input[type=number]:first-child {
-  width: 85px;
-  margin-right: 5px;
-}
-
-.field-other-table button {
-  width: auto;
-  margin-bottom: 15px;
-  margin-left: 3px;
-  border-radius: 5px;
+  align-items: baseline;
 }
 

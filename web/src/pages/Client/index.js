@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import CurrencyFormat from 'react-currency-format';
+
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
@@ -214,19 +217,20 @@ function Client(props) {
                         <th>Celular</th>
                         <th>Telefone</th>
                         <th>Credor</th>
-                        <th>Opções</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
                     {search.map(reg => (
-                        <tr key={reg.id}>
+                        <tr
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setUpdating(reg)}
+                            key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.name}</td>
                             <td>{reg.document}</td>
                             <td>{reg.cellphone}</td>
                             <td>{reg.phone}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
-                            <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -247,58 +251,10 @@ function Client(props) {
                             : ''
                     }
 
-                    <label> Código </label>
-                    <input
-                        type="text"
-                        placeholder="Codigo"
-                        value={code}
-                        onChange={e => setCode(e.target.value)} />
-
-                    <label> Nome </label>
-                    <input
-                        type="text"
-                        placeholder="Nome"
-                        value={name}
-                        onChange={e => setName(e.target.value)} />
-
-                    <label> Celular </label>
-                    <input
-                        type="text"
-                        placeholder="Celular"
-                        value={cellphone}
-                        onChange={e => setCellphone(e.target.value)} />
-
-                    <label> Telefone </label>
-                    <input
-                        type="text"
-                        placeholder="Telefone"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)} />
-
-                    <label> Telefone adicional </label>
-                    <input
-                        type="text"
-                        placeholder="Telefone"
-                        value={phoneAdditional}
-                        onChange={e => setPhoneAdditional(e.target.value)} />
-
-                    <label> Email </label>
-                    <input
-                        type="text"
-                        placeholder="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)} />
-
-                    <label> Email adicional </label>
-                    <input
-                        type="text"
-                        placeholder="Email"
-                        value={emailAdditional}
-                        onChange={e => setEmailAdditional(e.target.value)} />
-
                     <label> Credor </label>
-                    <div className="field-other-table">
+                    <div className="inline">
                         <input
+                            style={{ width: 85, marginRight: 5 }}
                             type="text"
                             placeholder="Credor"
                             value={companie}
@@ -318,16 +274,72 @@ function Client(props) {
                             type="text"
                             readOnly
                             value={companieName} />
-                        <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}> Consultar </button>
-                        <br />
+                        <button
+                            style={{ width: 'auto', marginLeft: 4, padding: 10 }}
+                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}>
+                            <AiOutlineSearch size="25" />
+                        </button>
                     </div>
 
-                    <label> Documento (CPF/CNPJ) </label>
+                    <label> Código </label>
                     <input
                         type="text"
+                        placeholder="Codigo"
+                        value={code}
+                        onChange={e => setCode(e.target.value)} />
+
+                    <label> Nome </label>
+                    <input
+                        type="text"
+                        placeholder="Nome"
+                        value={name}
+                        onChange={e => setName(e.target.value)} />
+
+                    <label> Celular </label>
+                    <CurrencyFormat
+                        format="## (##) #####-####"
+                        mask=" "
+                        placeholder="Celular"
+                        value={cellphone?cellphone:''}
+                        onValueChange={e => setCellphone(e.value)} />
+
+                    <label> Telefone </label>
+                    <CurrencyFormat
+                        format="## (##) #########"
+                        placeholder="Telefone"
+                        value={phone?phone:''}
+                        onValueChange={e => setPhone(e.value)} />
+
+                    <label> Telefone adicional </label>
+                    <CurrencyFormat
+                        format="## (##) #########"
+                        placeholder="Telefone"
+                        value={phoneAdditional?phoneAdditional:''}
+                        onValueChange={e => setPhoneAdditional(e.value)} />
+
+
+
+                    <label> Email </label>
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)} />
+
+                    <label> Email adicional </label>
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={emailAdditional}
+                        onChange={e => setEmailAdditional(e.target.value)} />
+
+
+                    <label> Documento (CPF/CNPJ) </label>
+                    <CurrencyFormat
+                        format="###.###.###-##"
                         placeholder="CPF OU CNPJ"
-                        value={document}
-                        onChange={e => setDocument(e.target.value)} />
+                        value={document ?document : ''}
+                        onValueChange={e => setDocument(e.value)} />
 
                     <label>  Endereço </label>
                     <input
@@ -335,7 +347,7 @@ function Client(props) {
                         placeholder="Endereço"
                         value={edress}
                         onChange={e => setEdress(e.target.value)} />
-                    
+
                     <label>  Endereço adicional </label>
                     <input
                         type="text"

@@ -167,10 +167,6 @@ function Attendance(props) {
         }
     }
 
-    const handleSalveCollect = async collect => {
-        console.log(collect);
-    }
-
 
     const clearValues = () => {
         setAClient('');
@@ -180,7 +176,6 @@ function Attendance(props) {
         setADtBegin(moment().format('DD/mm/yyyy HH:MM'))
         setADtEnd('')
         setAObs('');
-        clearClientValues();
     }
 
     const clearCollectValues = () => {
@@ -328,8 +323,9 @@ function Attendance(props) {
                                     : ''
                             }
                             <label> Usuário </label>
-                            <div className="field-other-table">
+                            <div className="inline">
                                 <input
+                                    style={{width: 80, marginRight: 5}}
                                     type="text"
                                     placeholder="Cód."
                                     value={aUser}
@@ -364,7 +360,7 @@ function Attendance(props) {
 
                         <Tab eventKey="client" title="Cliente">
                             <label> Cliente </label>
-                            <div className="field-other-table">
+                            <div className="inline">
                                 <input
                                     type="text"
                                     placeholder="Cód."
@@ -392,7 +388,6 @@ function Attendance(props) {
                                     readOnly
                                     value={cliName} />
                                 <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients'))}> Consultar </button>
-                                <br />
                             </div>
 
                             <label> Credor </label>

@@ -147,7 +147,7 @@ function Companie(props) {
         setRenovarionTerm(reg.renovation_term);
         setDefaultInterest(reg.default_interest);
         setDefaultHonorary(reg.default_honorary);
-        setDefaultPenalty(reg.default_penalty)
+        setDefaultPenalty(reg.default_penalty);
         setObs(reg.obs);
         setShow(true);
     }
@@ -196,16 +196,17 @@ function Companie(props) {
                         <th>Código</th>
                         <th>Nome</th>
                         <th>Observação</th>
-                        <th>Opções</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
                     {search.map(reg => (
-                        <tr key={reg.id}>
+                        <tr
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setUpdating(reg)}
+                            key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.name}</td>
                             <td>{reg.obs}</td>
-                            <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
