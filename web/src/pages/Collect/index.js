@@ -436,6 +436,7 @@ function Client(props) {
 
                     <label> R$ Valor Originário </label>
                     <CurrencyFormat
+                        readOnly={isUpdating?false:true}
                         prefix={'R$'}
                         decimalScale={2}
                         thousandSeparator={true}

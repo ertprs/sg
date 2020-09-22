@@ -4,6 +4,7 @@ import { Modal, Tabs, Tab, Card } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import moment from 'moment';
+import Downshift from 'downshift'
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
@@ -22,6 +23,7 @@ function Attendance(props) {
     const [isUpdating, setIsUpdating] = useState(false);
 
     //ATTEDANCE FIELDS
+    const [clients, setClients] = useState([]);
     const [aClient, setAClient] = useState('');
     const [aClientName, setAClientName] = useState('');
     const [aUser, setAUser] = useState(localStorage.getItem('@sg/user/id'));
@@ -92,7 +94,6 @@ function Attendance(props) {
             description: aDescription,
             obs: aObs
         }
-        console.log(regTemp)
         setRegister(regTemp);
         try {
             if (isUpdating) {
@@ -140,7 +141,7 @@ function Attendance(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('attendances')
+            const res = await api.get('attendances');
             setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));
@@ -178,26 +179,6 @@ function Attendance(props) {
         setAObs('');
     }
 
-    const clearCollectValues = () => {
-        setCCollects([]);
-        setCCollect([]);
-    }
-
-
-    const clearClientValues = () => {
-        setCliClient({});
-        setCliId('');
-        setCliName('');
-        setCliCompanie('');
-        setCliCompanieName('');
-        setCliCellphone('');
-        setCliPhone('');
-        setCliEmail('')
-        setCliEdress('');
-        setCliDocument('');
-        setCliObs('');
-    }
-
     const setClientValues = (client) => {
         setCliClient(client);
         setCliId(client.id);
@@ -222,7 +203,6 @@ function Attendance(props) {
         setAObs(reg.obs);
         setShow(true);
 
-
         //LOAD CLIENT
         if (reg.client) {
             const res = await api.get(`clients/find-by-id/${reg.client}`);
@@ -246,25 +226,6 @@ function Attendance(props) {
         clearValues();
         setShow(true);
     }
-
-    const findItem = (id) => {
-        for (var i = 0; i < cCollects.length; i++) {
-            if (cCollects[i].id === id) {
-                return i
-            }
-        }
-    }
-
-    const changeArrayValue = (value, id, obs) => {
-        var newCollects = cCollects;
-        if (value === 'obs')
-            newCollects[findItem(id)].obs = obs;
-        else if (value === 'negotiatedValue')
-            newCollects[findItem(id)].negotiatedValue = obs;
-        setCCollects([]);
-        setCCollects(newCollects);
-    }
-
 
 
     return (
@@ -305,7 +266,7 @@ function Attendance(props) {
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={hide}>
+            <Modal show={show} >
                 <Modal.Header>
                     <Modal.Title> Atendimento </Modal.Title>
                 </Modal.Header>
@@ -325,7 +286,7 @@ function Attendance(props) {
                             <label> Usuário </label>
                             <div className="inline">
                                 <input
-                                    style={{width: 80, marginRight: 5}}
+                                    style={{ width: 80, marginRight: 5 }}
                                     type="text"
                                     placeholder="Cód."
                                     value={aUser}
@@ -360,39 +321,46 @@ function Attendance(props) {
 
                         <Tab eventKey="client" title="Cliente">
                             <label> Cliente </label>
-                            <div className="inline">
-                                <input
-                                    type="text"
-                                    placeholder="Cód."
-                                    value={aClient}
-                                    onChangeCapture={async e => {
-                                        setAClient(e.target.value)
-                                        if (!e.target.value) {
-                                            clearClientValues()
-                                            clearCollectValues()
-                                            return
-                                        }
-                                        const res = await api.get(`clients/find-by-id/${e.target.value}`)
-                                        if (!res.data) {
-                                            clearClientValues()
-                                            clearCollectValues()
-                                        } else {
-                                            setClientValues(res.data);
-                                            setCliClient(res.data);
-                                            setAClientName(res.data.name)
-                                            getCollectsByClientId(res.data.id)
-                                        }
-                                    }} />
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={cliName} />
-                                <button onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients'))}> Consultar </button>
-                            </div>
+                            <Downshift onChange={selection => {
+                                setAClient(selection.id)
+                                setClientValues(selection)
+                            }}
+                                itemToString={item => (item ? item.name : '')}>
+                                {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
+                                    <div>
+                                        <div {...getRootProps({}, { suppressRefError: true })} className="inline">
+                                            <input value={aClient} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
+                                            <input
+                                                type="text"
+                                                value={aClientName}
+                                                placeholder="Pesquisa"
+                                                onChangeCapture={async e => {
+                                                    if (!e.target.value) return
+                                                    const { data } = await api.get(`clients/find-by-name/${e.target.value}`);
+                                                    setClients(data);
+                                                }}
+                                                {...getInputProps()} />
+                                        </div>
+                                        <ul {...getMenuProps({})}>
+                                            {isOpen ? clients
+                                                .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                                .map((item) => (
+                                                    <li
+                                                        className="search-field-results"
+                                                        {...getItemProps({ key: item.id, item })}>
+                                                        {`${item.id} - ${item.name}`}
+                                                    </li>))
+                                                : null}
+                                        </ul>
+                                    </div>
+                                )}
+                            </Downshift>
+
 
                             <label> Credor </label>
-                            <div className="field-other-table">
+                            <div className="inline">
                                 <input
+                                    style={{width: 80, marginRight: 5}}
                                     type="text"
                                     placeholder="Credor"
                                     value={cliCompanie}
@@ -472,7 +440,7 @@ function Attendance(props) {
                                     ))}
                                 </MDBTableBody>
                             </MDBTable>
-                            
+
                         </Tab>
                     </Tabs>
 
@@ -480,7 +448,7 @@ function Attendance(props) {
                 <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>
                     {isUpdating ? <button onClick={handleDelete} style={{ backgroundColor: '#ff6666' }} > Apagar </button> : <></>}
-                    <button onClick={() => setShow(false)} style={{ backgroundColor: '#668cff' }} > Fechar </button>
+                    <button onClick={hide} style={{ backgroundColor: '#668cff' }} > Fechar </button>
                 </div>
             </Modal>
 
