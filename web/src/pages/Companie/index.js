@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
+import CurrencyFormat from 'react-currency-format';
 import './style.css';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
@@ -26,11 +27,12 @@ function Companie(props) {
     const [responsibleStaff, setResponsibleStaff] = useState('');
     const [dtContract, setDtContract] = useState('');
     const [dtRenovation, setDtRenovation] = useState('');
-    const [renovationTerm, setRenovarionTerm] = useState('');
-
     const [defaultInterest, setDefaultInterest] = useState('');
     const [defaultHonorary, setDefaultHonorary] = useState('');
     const [defaultPenalty, setDefaultPenalty] = useState('');
+    const [monthlyValue, setMonthlyValue] = useState('');
+    const [payday, setPayDay] = useState('');
+    const [paymentType, setPaymentType] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -57,10 +59,12 @@ function Companie(props) {
             responsible_staff: responsibleStaff,
             dt_contract: dtContract,
             dt_renovation: dtRenovation,
-            renovation_term: renovationTerm,
             default_interest: defaultInterest,
             default_honorary: defaultHonorary,
             default_penalty: defaultPenalty,
+            monthly_value: monthlyValue,
+            payday: payday,
+            payment_type: paymentType,
             obs,
         }
 
@@ -144,10 +148,13 @@ function Companie(props) {
         setResponsibleStaff(reg.responsible_staff);
         setDtContract(reg.dt_contract);
         setDtRenovation(reg.dt_renovation);
-        setRenovarionTerm(reg.renovation_term);
         setDefaultInterest(reg.default_interest);
         setDefaultHonorary(reg.default_honorary);
         setDefaultPenalty(reg.default_penalty);
+        setMonthlyValue(reg.monthly_value);
+        setPayDay(reg.payday);
+        setPaymentType(reg.payment_type);
+
         setObs(reg.obs);
         setShow(true);
     }
@@ -163,10 +170,12 @@ function Companie(props) {
         setResponsibleStaff('');
         setDtContract('');
         setDtRenovation('');
-        setRenovarionTerm('');
         setDefaultInterest('');
         setDefaultHonorary('');
         setDefaultPenalty('');
+        setMonthlyValue('');
+        setPayDay('');
+        setPaymentType('');
         setObs('');
         setIsUpdating(false);
     }
@@ -194,7 +203,7 @@ function Companie(props) {
                 <MDBTableHead>
                     <tr>
                         <th>Código</th>
-                        <th>Nome</th>
+                        <th>Razão Social</th>
                         <th>Observação</th>
                     </tr>
                 </MDBTableHead>
@@ -212,7 +221,7 @@ function Companie(props) {
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={hide}>
+            <Modal show={show} onHide={() => console.log('Cant close')}>
                 <Modal.Header>
                     <Modal.Title>Cadastro de Credor</Modal.Title>
                 </Modal.Header>
@@ -226,19 +235,19 @@ function Companie(props) {
                             </div>
                             : ''
                     }
-                    <label> Nome </label>
+                    <label> Razão Social </label>
                     <input
                         type="text"
-                        placeholder="Nome"
+                        placeholder="Razão Social"
                         value={name}
                         onChange={e => setName(e.target.value)} />
 
                     <label> CNPJ </label>
-                    <input
-                        type="text"
+                    <CurrencyFormat
+                        format="##.###.###/###-##"
                         placeholder="CNPJ"
-                        value={cnpj}
-                        onChange={e => setCnpj(e.target.value)} />
+                        value={cnpj?cnpj:''}
+                        onValueChange={e => setCnpj(e.value)} />
 
                     <label> Endereço </label>
                     <input
@@ -248,13 +257,13 @@ function Companie(props) {
                         onChange={e => setEdress(e.target.value)} />
 
                     <label> Telefone </label>
-                    <input
-                        type="text"
+                    <CurrencyFormat
+                        format="## (##) #########"
                         placeholder="Telefone"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)} />
+                        value={phone?phone:''}
+                        onValueChange={e => setPhone(e.value)} />
 
-                    <label> Pessoa responsável </label>
+                    <label> Pessoa Responsável </label>
                     <input
                         type="text"
                         placeholder="Endereço"
@@ -262,27 +271,19 @@ function Companie(props) {
                         onChange={e => setResponsibleStaff(e.target.value)} />
 
 
-                    <label> Data do contrato </label>
-                    <input
-                        type="text"
+                    <label> Início de Vigência do Contrato </label>
+                    <CurrencyFormat
+                        format="##/##/####"
                         placeholder="Data do contrato"
-                        value={dtContract}
-                        onChange={e => setDtContract(e.target.value)} />
+                        value={dtContract?dtContract:''}
+                        onValueChange={e => setDtContract(e.value)} />
 
-                    <label> Data de renovação </label>
-                    <input
-                        type="text"
+                    <label> Data de Renovação </label>
+                    <CurrencyFormat
+                        format="##/##/####"
                         placeholder="Data de renovação"
-                        value={dtRenovation}
-                        onChange={e => setDtRenovation(e.target.value)} />
-
-
-                    <label> Prazo de renovação </label>
-                    <input
-                        type="text"
-                        placeholder="Prazo de renovação"
-                        value={renovationTerm}
-                        onChange={e => setRenovarionTerm(e.target.value)} />
+                        value={dtRenovation?dtRenovation:''}
+                        onCValuehange={e => setDtRenovation(e.value)} />
 
                     <label> % Juros </label>
                     <input
@@ -291,19 +292,46 @@ function Companie(props) {
                         value={defaultInterest}
                         onChange={e => setDefaultInterest(e.target.value)} />
 
-                    <label> % Honorário </label>
-                    <input
-                        type="number"
+                    <label> % Honorários </label>
+                    <CurrencyFormat
+                        suffix={'%'}
+                        thousandSeparator={','}
                         placeholder="Honorário padrão"
-                        value={defaultHonorary}
-                        onChange={e => setDefaultHonorary(e.target.value)} />
+                        value={defaultHonorary?defaultHonorary:''}
+                        onValueChange={e => setDefaultHonorary(e.value)} />
 
                     <label> % Multa </label>
-                    <input
-                        type="number"
+                    <CurrencyFormat
+                        suffix={'%'}
+                        thousandSeparator={','}
                         placeholder="Honorário padrão"
-                        value={defaultPenalty}
-                        onChange={e => setDefaultPenalty(e.target.value)} />
+                        value={defaultPenalty?defaultPenalty:''}
+                        onValueChange={e => setDefaultPenalty(e.value)} />
+
+                    <label> R$ Valor Mensal </label>
+                    <CurrencyFormat
+                        prefix={'R$'}
+                        decimalScale={2}
+                        thousandSeparator={','}
+                        placeholder="Valor Mensal"
+                        value={monthlyValue?monthlyValue:''}
+                        onValueChange={e => setMonthlyValue(e.value)} />
+
+                    <label> Data de Pagamento </label>
+                    <CurrencyFormat
+                        format="##/##/####"
+                        placeholder="Data de Pagamento"
+                        value={payday?payday:''}
+                        onValueChange={e => setPayDay(e.value)} />
+
+                    <label> Modalidade de Pagamento </label>
+                    <select
+                        className="select-search"
+                        onChange={e => setPaymentType(e.target.value)}>
+                        <option value="Permuta" selected={paymentType === 'Permuta' ? true : false}>Permuta</option>
+                        <option value="Sem mensalidade" selected={paymentType === 'Sem mensalidade' ? true : false}>Sem mensalidade</option>
+                        <option value="Dinheiro" selected={paymentType === 'Dinheiro' ? true : false}>Dinheiro</option>
+                    </select>
 
                     <label> Obs </label>
                     <input

@@ -50,9 +50,9 @@ const update = async (request, response) => {
     dt_end: request.body.dt_end,
     description: request.body.description,
     obs: request.body.obs
- };
+  };
   try {
-    const res =  await connection('attendances').where('id', '=', request.params.id).update(reg)
+    const res = await connection('attendances').where('id', '=', request.params.id).update(reg)
     return response.json(res);
   } catch (error) {
     return response.json(error);
@@ -73,8 +73,19 @@ const getById = async (request, response) => {
   try {
     const res = await connection('attendances')
       .where('id', '=', request.params.id)
-      .select('*');
-      return response.json(res[0]);
+      .select('*')
+      .first();
+    attendance = {};
+    const user = await UserHelper.getById(attendance.user);
+    const client = await ClientHelper.getById(attendance.client);
+    const attendance = {
+      ...res,
+      user_name: user ? user.name : '',
+      client_name: client ? client.name : '',
+      client_document: client ? client.document : '',
+    }
+
+    return response.json(res[0]);
   } catch (error) {
     return response.json(error);
   }
@@ -83,9 +94,9 @@ const getById = async (request, response) => {
 const findByName = async (request, response) => {
   try {
     const res = await connection('attendances')
-      .where('name', 'like', '%'+request.params.name+'%')
+      .where('name', 'like', '%' + request.params.name + '%')
       .select('*');
-      return response.json(res);
+    return response.json(res);
   } catch (error) {
     return response.json(error);
   }

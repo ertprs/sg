@@ -28,25 +28,24 @@ function Client(props) {
     //FIELDS
     const [client, setClient] = useState('');
     const [clientName, setClientName] = useState('');
-    const [dtClosure, setDtClosure] = useState('');
     const [status, setStatus] = useState('Aberto');
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
     const [account, setAccount] = useState('');
     const [document, setDocument] = useState('');
     const [dtMaturity, setDtMaturity] = useState('');
-    const [days, setDays] = useState(0);
-    const [value, setValue] = useState(0);
-    const [updatedDebt, setUpdatedDebt] = useState(0);
-    const [defaultHonorary, setDefaultHonorary] = useState(0);
-    const [defaultInterest, setDefaultInterest] = useState(0);
-    const [interestCalculed, setInterestCalculed] = useState(0);
-    const [maximumDiscount, setMaximumDiscount] = useState(0);
-    const [negotiatedValue, setNegotiatedValue] = useState(0);
-    const [defaultPenalty, setDefaultPenalty] = useState(0);
-    const [penaltyCalculed, setPenaltyCalculed] = useState(0);
-    const [honoraryCalculed, setHonoraryCalculed] = useState(0);
-    const [honoraryPer, setHonoraryPer] = useState(0);
+    const [days, setDays] = useState('');
+    const [value, setValue] = useState('');
+    const [updatedDebt, setUpdatedDebt] = useState('');
+    const [defaultHonorary, setDefaultHonorary] = useState('');
+    const [defaultInterest, setDefaultInterest] = useState('');
+    const [interestCalculed, setInterestCalculed] = useState('');
+    const [maximumDiscount, setMaximumDiscount] = useState('');
+    const [negotiatedValue, setNegotiatedValue] = useState('');
+    const [defaultPenalty, setDefaultPenalty] = useState('');
+    const [penaltyCalculed, setPenaltyCalculed] = useState('');
+    const [honoraryCalculed, setHonoraryCalculed] = useState('');
+    const [honoraryPer, setHonoraryPer] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -87,7 +86,6 @@ function Client(props) {
             value,
             account,
             days,
-            dt_closure: dtClosure,
             companie,
             updated_debt: updatedDebt,
             maximum_discount: maximumDiscount,
@@ -163,13 +161,11 @@ function Client(props) {
     }
 
     const setUpdating = async (reg) => {
-        setIsUpdating(true);
         setRegister(reg);
         setClient(reg.client);
         setClientName(reg.client_name);
         setStatus(reg.status);
         setDays(reg.days);
-        setDtClosure(reg.dt_closure)
         setCompanie(reg.companie)
         setCompanieName(reg.companie_name)
         setUpdatedDebt(reg.updated_debt)
@@ -185,6 +181,7 @@ function Client(props) {
         setValue(reg.value);
         setObs(reg.obs)
 
+        setIsUpdating(true);
         setShow(true)
     }
 
@@ -195,18 +192,17 @@ function Client(props) {
         setDocument('');
         setDtMaturity('');
         setAccount('');
-        setDtClosure('')
         setCompanie('')
-        setUpdatedDebt(0)
-        setDefaultHonorary(0)
-        setDefaultInterest(0)
-        setMaximumDiscount(0)
-        setNegotiatedValue(0)
-        setHonoraryPer(0);
+        setUpdatedDebt('')
+        setDefaultHonorary('')
+        setDefaultInterest('')
+        setMaximumDiscount('')
+        setNegotiatedValue('')
+        setHonoraryPer('');
         setObs('')
-        setDays(0);
-        setValue(0);
-        setDefaultPenalty(0)
+        setDays('');
+        setValue('');
+        setDefaultPenalty('')
         loadRegisters();
     }
 
@@ -273,7 +269,7 @@ function Client(props) {
                         <th>Cliente</th>
                         <th>Status</th>
                         <th>Dt. Venc. </th>
-                        <th>Valor </th>
+                        <th>Vlr. originário </th>
                         <th>Credor</th>
                     </tr>
                 </MDBTableHead>
@@ -286,15 +282,27 @@ function Client(props) {
                             <td>{reg.id}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
-                            <td>{reg.dt_maturity}</td>
-                            <td>{reg.value}</td>
+                            <td>
+                                <CurrencyFormat
+                                    displayType="text"
+                                    format="##/##/####"
+                                    value={reg.dt_maturity} />
+                            </td>
+                            <td>
+                                <CurrencyFormat
+                                    displayType="text"
+                                    prefix={'R$'}
+                                    decimalScale={2}
+                                    thousandSeparator=","
+                                    value={reg.value} />
+                            </td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                         </tr>
                     ))}
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={() => setShow(false)}>
+            <Modal show={show} onHide={() => console.log('Cant close')}>
                 <Modal.Header>
                     <Modal.Title>Cadastro de cobraça</Modal.Title>
                 </Modal.Header>
@@ -360,6 +368,7 @@ function Client(props) {
                             type="number"
                             placeholder="Cód."
                             value={client}
+                            onBlur={calculate}
                             onChange={async e => {
                                 setClient(e.target.value)
                                 if (!e.target.value) {
@@ -383,14 +392,15 @@ function Client(props) {
                         </button>
                         <br />
                     </div>
+
                     <div className="inline">
                         <div style={{ marginRight: 10 }}>
                             <label> Dt. Vencimento </label>
-                            <CurrencyFormat 
+                            <CurrencyFormat
                                 format="##/##/####"
                                 placeholder="Data de vencimento"
-                                value={dtMaturity?dtMaturity:''}
-                                onValueChange={e => setDtMaturity(e.target.value)}
+                                value={dtMaturity ? dtMaturity : ''}
+                                onValueChange={e => setDtMaturity(e.value)}
                                 onBlur={calculate} />
                         </div>
                         <div>
@@ -417,38 +427,34 @@ function Client(props) {
                         type="text"
                         placeholder="Nota fiscal"
                         value={document}
-                        onChange={e => setDocument(e.target.value)} />
+                        onChange={e => setDocument(e.target.value)}
+                        onBlur={calculate} />
 
-                    <label> Conta </label>
+                    <label> Modalidade de Faturamento </label>
                     <input
                         type="text"
                         placeholder="Conta"
                         value={account}
-                        onChange={e => setAccount(e.target.value)} />
-
-                    <label> Data de encerramento </label>
-                    <CurrencyFormat 
-                        format="##/##/####"
-                        placeholder="Data de encerramento"
-                        value={dtClosure?dtClosure:''}
-                        onValueChange={e => setDtClosure(e.value)} />
+                        onChange={e => setAccount(e.target.value)}
+                        onBlur={calculate} />
 
 
                     <label> R$ Valor Originário </label>
                     <CurrencyFormat
-                        readOnly={isUpdating?false:true}
+                        readOnly={isUpdating}
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
+                        thousandSeparator=","
                         placeholder="Valor originário"
                         value={value ? value : ''}
-                        onValueChange={e => setValue(e.value)} />
+                        onValueChange={e => setValue(e.value)}
+                        onBlur={calculate} />
 
                     <label> R$ Multa </label>
                     <CurrencyFormat
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
+                        thousandSeparator={','}
                         placeholder="Multa"
                         value={penaltyCalculed ? penaltyCalculed : ''}
                         readOnly />
@@ -457,7 +463,7 @@ function Client(props) {
                     <CurrencyFormat
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
+                        thousandSeparator={','}
                         placeholder="Jutos"
                         value={interestCalculed ? interestCalculed : ''}
                         readOnly />
@@ -465,50 +471,58 @@ function Client(props) {
                     <label> % Honorários </label>
                     <CurrencyFormat
                         suffix={'%'}
-                        thousandSeparator={true}
+                        thousandSeparator={','}
                         placeholder="Honarário"
                         value={honoraryPer ? honoraryPer : ''}
-                        onValueChange={e => setHonoraryPer(e.value)} />
+                        onValueChange={e => setHonoraryPer(e.value)}
+                        onBlur={calculate} />
 
                     <label> R$ Honorários </label>
                     <CurrencyFormat
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
+                        thousandSeparator={','}
                         placeholder="Honarários"
                         value={honoraryCalculed ? honoraryCalculed : ''}
                         readOnly />
 
-                    <label> R$ Débito atualizado </label>
+                    <label> R$ Débito Atualizado </label>
                     <div className="inline">
                         <CurrencyFormat
                             prefix={'R$'}
                             decimalScale={2}
-                            thousandSeparator={true}
-                            placeholder="Débito atualizado"
+                            thousandSeparator={','}
+                            placeholder="Débito Atualizado"
                             value={updatedDebt ? updatedDebt : ''}
                             readOnly />
                         <button
                             style={{ marginLeft: 5, width: 'auto' }}
                             onClick={calculate}> Atualizar </button>
                     </div>
-                    <label> R$ Desconto máximo </label>
+                    <label> R$ Desconto Máximo </label>
                     <CurrencyFormat
+                        readOnly={isUpdating}
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
-                        placeholder="Desconto máximo"
+                        thousandSeparator={','}
+                        placeholder="Desconto Máximo"
                         value={maximumDiscount ? maximumDiscount : ''}
+                        onValueChange={e => setMaximumDiscount(e.value)}
                         readOnly />
 
-                    <label> R$ Valor negociado </label>
+                    <label> R$ Valor Negociado </label>
                     <CurrencyFormat
                         prefix={'R$'}
                         decimalScale={2}
-                        thousandSeparator={true}
-                        placeholder="Desconto negociado"
+                        thousandSeparator={','}
+                        placeholder="Desconto Negociado"
                         value={negotiatedValue ? negotiatedValue : ''}
-                        onValueChange={e => setNegotiatedValue(e.value)} />
+                        onValueChange={e => setNegotiatedValue(e.value)}
+                        onBlur={() => {
+                            if (parseFloat(negotiatedValue ? negotiatedValue : '0') < parseFloat(maximumDiscount ? maximumDiscount : '0')) {
+                                setNegotiatedValue('')
+                            }
+                        }} />
 
                     <label> Observação </label>
                     <input

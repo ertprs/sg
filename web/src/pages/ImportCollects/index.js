@@ -147,7 +147,7 @@ function ImportCollects(props) {
                             <th>Doc.</th>
                             <th>Emissão</th>
                             <th>Vencimento</th>
-                            <th>Desconto máximo</th>
+                            <th>Desconto Máximo</th>
                             <th>Dias</th>
                             <th>Valor</th>
                         </tr>

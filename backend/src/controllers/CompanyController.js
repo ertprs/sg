@@ -19,10 +19,12 @@ const newRegister = async (request, response) => {
     responsible_staff: request.body.responsible_staff,
     dt_contract: request.body.dt_contract,
     dt_renovation: request.body.dt_renovation,
-    renovation_term: request.body.renovation_term,
     default_interest: request.body.default_interest,
     default_honorary: request.body.default_honorary,
     default_penalty: request.body.default_penalty,
+    monthly_value: request.body.monthly_value,
+    payday: request.body.payday,
+    payment_type: request.body.payment_type,
     obs: request.body.obs,
   };
   try {
@@ -42,10 +44,12 @@ const update = async (request, response) => {
     responsible_staff: request.body.responsible_staff,
     dt_contract: request.body.dt_contract,
     dt_renovation: request.body.dt_renovation,
-    renovation_term: request.body.renovation_term,
     default_interest: request.body.default_interest,
     default_honorary: request.body.default_honorary,
     default_penalty: request.body.default_penalty,
+    monthly_value: request.body.monthly_value,
+    payday: request.body.payday,
+    payment_type: request.body.payment_type,
     obs: request.body.obs,
  };
   try {

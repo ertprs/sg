@@ -45,7 +45,7 @@ const update = async (request, response) => {
     name: request.body.name,
     companie: request.body.companie,
     phone: request.body.phone,
-    phone_additional: request.phone_additional,
+    phone_additional: request.body.phone_additional,
     cellphone: request.body.cellphone,
     edress: request.body.edress,
     edress_additional: request.body.edress_additional,
@@ -78,7 +78,12 @@ const getById = async (request, response) => {
       .where('id', '=', request.params.id)
       .select('*')
       .first();
-    return response.json(res);
+    const companie = await CompanieHelper.getById(res.companie);
+    const client = {
+      ...res,
+      companie_name: companie ? companie.name : ''
+    }
+    return response.json(client);
   } catch (error) {
     console.log(error)
     return response.json(error);

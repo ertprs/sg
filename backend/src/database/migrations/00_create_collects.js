@@ -6,7 +6,6 @@ exports.up = function(knex) {
     table.string('status');
     table.string('document');
     table.string('dt_maturity');
-    table.string('dt_closure');
     table.decimal('client');
     table.decimal('companie');
     table.float('days');

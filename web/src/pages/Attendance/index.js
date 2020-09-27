@@ -4,6 +4,7 @@ import { Modal, Tabs, Tab, Card } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import moment from 'moment';
+import CurrencyFormat from 'react-currency-format';
 import Downshift from 'downshift'
 import './style.css';
 import api from '../../services/api';
@@ -15,6 +16,7 @@ import AppBar from '../../components/AppBar';
 
 function Attendance(props) {
     const history = useHistory();
+    let count = 0;
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -37,6 +39,10 @@ function Attendance(props) {
     //CLIENT FIELDS
     const [cliClient, setCliClient] = useState({});
     const [cliId, setCliId] = useState('');
+    const [cliCode, setCliCode] = useState('');
+    const [cliPhoneAdditional, setCliPhoneAdditional] = useState('');
+    const [cliEmailAdditional, setCliEmailAdditional] = useState('');
+    const [cliEdressAdditional, setCliEdressAdditional] = useState('');
     const [cliName, setCliName] = useState('');
     const [cliCellphone, setCliCellphone] = useState('');
     const [cliPhone, setCliPhone] = useState('');
@@ -84,8 +90,8 @@ function Attendance(props) {
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
+
         setADtEnd(moment().format('DD/mm/yyyy HH:MM'))
-        //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             client: aClient,
             dt_begin: aDtBegin,
@@ -94,11 +100,14 @@ function Attendance(props) {
             description: aDescription,
             obs: aObs
         }
+        
+
         setRegister(regTemp);
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
                 const res = await api.put(`attendances/${register.id}`, regTemp)
+                await updateClient();
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -107,6 +116,7 @@ function Attendance(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('attendances', regTemp);
+                await updateClient();
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -147,6 +157,7 @@ function Attendance(props) {
             props.dispatch(loadingActions.setLoading(false));
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
+            props.dispatch(loadingActions.setLoading(false));
         }
     }
 
@@ -171,6 +182,7 @@ function Attendance(props) {
 
     const clearValues = () => {
         setAClient('');
+        setAClientName('');
         setAUser(localStorage.getItem('@sg/user/id'));
         setAUserName(localStorage.getItem('@sg/user/name'))
         setADescription('');
@@ -186,9 +198,12 @@ function Attendance(props) {
         setCliCompanie(client.companie);
         setCliCompanieName(client.companie_name);
         setCliCellphone(client.cellphone);
+        setCliPhoneAdditional(client.phone_additional);
         setCliPhone(client.phone);
         setCliEmail(client.email);
+        setCliEmailAdditional(client.email_additional);
         setCliEdress(client.edress);
+        setCliEdressAdditional(client.edress_additional);
         setCliDocument(client.document);
         setCliObs(client.obs);
     }
@@ -198,19 +213,23 @@ function Attendance(props) {
         setIsUpdating(true);
         setRegister(reg);
         setAClient(reg.client);
+        setAClientName(reg.client_name);
         setAUser(reg.user);
         setADescription(reg.description);
         setAObs(reg.obs);
-        setShow(true);
+        setADtBegin(reg.dt_begin);
+        setADtEnd(reg.dt_end);
 
         //LOAD CLIENT
         if (reg.client) {
             const res = await api.get(`clients/find-by-id/${reg.client}`);
-            setClientValues(res.data);
-            setCliClient(res.data);
-            setAClientName(res.data.name);
-            getCollectsByClientId(res.data.id)
+            setAClientName(res.data.name)
+            setClientValues(res.data)
+            // GET COLLECTS
+            await getCollectsByClientId(res.data.id)
         }
+
+        setShow(true);
     }
 
 
@@ -225,6 +244,31 @@ function Attendance(props) {
         setIsUpdating(false);
         clearValues();
         setShow(true);
+    }
+
+
+    const updateClient = async () => {
+        try {
+            const regTemp = {
+                code: cliCode,
+                name: cliName,
+                cellphone: cliCellphone,
+                phone: cliPhone,
+                companie: cliCompanie,
+                edress_additional: cliEdressAdditional,
+                email_additional: cliEmailAdditional,
+                phone_additional: cliPhoneAdditional,
+                email: cliEmail,
+                edress: cliEdress,
+                document: cliDocument,
+                obs: cliObs
+            }
+            console.log(regTemp)
+            const res = await api.put(`clients/${cliId}`, regTemp)
+            console.log(res)
+        } catch (error) {
+            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
+        }
     }
 
 
@@ -249,24 +293,24 @@ function Attendance(props) {
                         <th>Fim</th>
                         <th>Usuário</th>
                         <th>Cliente</th>
-                        <th>Opções</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
                     {search.map(reg => (
-                        <tr key={reg.id}>
+                        <tr key={reg.id}
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setUpdating(reg)}>
                             <td>{reg.id}</td>
                             <td>{reg.dt_begin}</td>
                             <td>{reg.dt_end}</td>
                             <td>{reg.user + ' - ' + reg.user_name}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
-                            <td><button onClick={() => setUpdating(reg)}>ABRIR</button></td>
                         </tr>
                     ))}
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} >
+            <Modal show={show} onHide={() => console.log('Cant close')}>
                 <Modal.Header>
                     <Modal.Title> Atendimento </Modal.Title>
                 </Modal.Header>
@@ -321,8 +365,9 @@ function Attendance(props) {
 
                         <Tab eventKey="client" title="Cliente">
                             <label> Cliente </label>
-                            <Downshift onChange={selection => {
+                            <Downshift inputValue={aClientName} inputValue={aClientName} onChange={selection => {
                                 setAClient(selection.id)
+                                setAClientName(selection.name)
                                 setClientValues(selection)
                             }}
                                 itemToString={item => (item ? item.name : '')}>
@@ -332,10 +377,12 @@ function Attendance(props) {
                                             <input value={aClient} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
                                             <input
                                                 type="text"
-                                                value={aClientName}
                                                 placeholder="Pesquisa"
+                                                readOnly={isUpdating}
+                                                value={aClientName}
                                                 onChangeCapture={async e => {
-                                                    if (!e.target.value) return
+                                                    setAClientName(e.target.value)
+                                                    if (!e.target.value || e.target.value.length < 3) return;
                                                     const { data } = await api.get(`clients/find-by-name/${e.target.value}`);
                                                     setClients(data);
                                                 }}
@@ -360,7 +407,7 @@ function Attendance(props) {
                             <label> Credor </label>
                             <div className="inline">
                                 <input
-                                    style={{width: 80, marginRight: 5}}
+                                    style={{ width: 80, marginRight: 5 }}
                                     type="text"
                                     placeholder="Credor"
                                     value={cliCompanie}
@@ -372,6 +419,13 @@ function Attendance(props) {
                                 <br />
                             </div>
 
+                            <label> Código </label>
+                            <input
+                                type="text"
+                                placeholder="Código"
+                                readOnly
+                                value={cliCode} />
+
                             <label> Nome </label>
                             <input
                                 type="text"
@@ -380,18 +434,25 @@ function Attendance(props) {
                                 value={cliName} />
 
                             <label> Celular </label>
-                            <input
-                                type="text"
+                            <CurrencyFormat
+                                format="## (##) #####-####"
                                 placeholder="Celular"
                                 readOnly
-                                value={cliCellphone} />
+                                value={cliCellphone ? cliCellphone : ''} />
 
                             <label> Telefone </label>
-                            <input
-                                type="text"
+                            <CurrencyFormat
+                                format="## (##) #########"
                                 placeholder="Telefone"
                                 readOnly
-                                value={cliPhone} />
+                                value={cliPhone ? cliPhone : ''} />
+
+                            <label> Telefone adicional </label>
+                            <CurrencyFormat
+                                format="## (##) #########"
+                                placeholder="Telefone"
+                                value={cliPhoneAdditional ? cliPhoneAdditional : ''}
+                                onValueChange={e => setCliPhoneAdditional(e.value)} />
 
                             <label> Email </label>
                             <input
@@ -400,12 +461,19 @@ function Attendance(props) {
                                 readOnly
                                 value={cliEmail} />
 
-                            <label> Documento (CPF/CNPJ) </label>
+                            <label> Email adicional </label>
                             <input
                                 type="text"
-                                placeholder="CPF OU CNPJ"
-                                readOnly
-                                value={cliDocument} />
+                                placeholder="Email adicional"
+                                value={cliEmailAdditional}
+                                onChange={e => setCliEmailAdditional(e.target.value)} />
+
+                            <label> CPF </label>
+                            <CurrencyFormat
+                                format="###.###.###-##"
+                                placeholder="CPF"
+                                value={cliDocument ? cliDocument : ''}
+                                onValueChange={e => setCliDocument(e.value)} />
 
                             <label>  Endereço </label>
                             <input
@@ -413,6 +481,13 @@ function Attendance(props) {
                                 placeholder="Endereço"
                                 readOnly
                                 value={cliEdress} />
+
+                            <label>  Endereço adicional </label>
+                            <input
+                                type="text"
+                                placeholder="Endereço"
+                                value={cliEdressAdditional}
+                                onChange={e => setCliEdressAdditional(e.target.value)} />
 
                             <label>  Observações </label>
                             <input
@@ -435,7 +510,14 @@ function Attendance(props) {
                                     {cCollects.map(collect => (
                                         <tr key={collect.id}>
                                             <td>{collect.id}</td>
-                                            <td>{collect.value}</td>
+                                            <td>
+                                                <CurrencyFormat
+                                                    displayType="text"
+                                                    prefix={'R$'}
+                                                    decimalScale={2}
+                                                    thousandSeparator={true}
+                                                    value={collect.value ? collect.value : ''} />
+                                            </td>
                                         </tr>
                                     ))}
                                 </MDBTableBody>

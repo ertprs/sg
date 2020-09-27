@@ -8,10 +8,12 @@ exports.up = function(knex) {
     table.string('responsible_staff');
     table.string('dt_contract');
     table.string('dt_renovation');
-    table.string('renovation_term');
     table.float('default_interest');
     table.float('default_honorary');
     table.float('default_penalty');
+    table.float('monthly_value');
+    table.string('payday');
+    table.string('payment_type');
     
     table.string('obs');
   });

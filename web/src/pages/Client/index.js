@@ -69,7 +69,6 @@ function Client(props) {
             return 0
         }
 
-
         props.dispatch(loadingActions.setLoading(true));
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
@@ -86,8 +85,8 @@ function Client(props) {
             document,
             obs
         }
+        console.log(regTemp)
         setRegister(regTemp);
-
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
@@ -236,7 +235,7 @@ function Client(props) {
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={() => setShow(false)}>
+            <Modal show={show} onHide={()=>console.log('Cant close')}>
                 <Modal.Header>
                     <Modal.Title> Cadastro de Cliente </Modal.Title>
                 </Modal.Header>
@@ -297,7 +296,7 @@ function Client(props) {
 
                     <label> Celular </label>
                     <CurrencyFormat
-                        format="## (##) #####-####"
+                        format="## (##) #########"
                         mask=" "
                         placeholder="Celular"
                         value={cellphone?cellphone:''}
@@ -310,13 +309,12 @@ function Client(props) {
                         value={phone?phone:''}
                         onValueChange={e => setPhone(e.value)} />
 
-                    <label> Telefone adicional </label>
+                    <label> Telefone Adicional </label>
                     <CurrencyFormat
                         format="## (##) #########"
                         placeholder="Telefone"
                         value={phoneAdditional?phoneAdditional:''}
                         onValueChange={e => setPhoneAdditional(e.value)} />
-
 
 
                     <label> Email </label>
@@ -326,7 +324,7 @@ function Client(props) {
                         value={email}
                         onChange={e => setEmail(e.target.value)} />
 
-                    <label> Email adicional </label>
+                    <label> Email Adicional </label>
                     <input
                         type="text"
                         placeholder="Email"
@@ -334,10 +332,10 @@ function Client(props) {
                         onChange={e => setEmailAdditional(e.target.value)} />
 
 
-                    <label> Documento (CPF/CNPJ) </label>
+                    <label> CPF </label>
                     <CurrencyFormat
                         format="###.###.###-##"
-                        placeholder="CPF OU CNPJ"
+                        placeholder="CPF"
                         value={document ?document : ''}
                         onValueChange={e => setDocument(e.value)} />
 
@@ -348,7 +346,7 @@ function Client(props) {
                         value={edress}
                         onChange={e => setEdress(e.target.value)} />
 
-                    <label>  Endereço adicional </label>
+                    <label>  Endereço Adicional </label>
                     <input
                         type="text"
                         placeholder="Endereço"
