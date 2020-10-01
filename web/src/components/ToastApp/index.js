@@ -8,7 +8,9 @@ function ToastApp(props) {
     return (
         <div className="toast-container">
             <Toast 
-                className="toast" 
+                autohide
+                delay="5000"
+                className="toast"
                 show={props.state.toast.visible} 
                 onClose={() => props.dispatch(toastActions.setToast(false, '', ''))} >
                 <Toast.Header>

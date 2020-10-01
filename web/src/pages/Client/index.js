@@ -237,7 +237,7 @@ function Client(props) {
 
             <Modal show={show} onHide={()=>console.log('Cant close')}>
                 <Modal.Header>
-                    <Modal.Title> Cadastro de Cliente </Modal.Title>
+                    <Modal.Title> Cadastro de Devedores </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {

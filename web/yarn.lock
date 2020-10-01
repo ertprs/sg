@@ -9149,6 +9149,11 @@ react-clone-referenced-element@*:
   resolved "https://registry.yarnpkg.com/react-clone-referenced-element/-/react-clone-referenced-element-1.1.0.tgz#9cdda7f2aeb54fea791f3ab8c6ab96c7a77d0158"
   integrity sha512-FKOsfKbBkPxYE8576EM6uAfHC4rnMpLyH6/TJUL4WcHUEB3EUn8AxPjnnV/IiwSSzsClvHYK+sDELKN/EJ0WYg==
 
+react-currency-input-field@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-currency-input-field/-/react-currency-input-field-2.3.2.tgz#f9a6c0f38b9fa2f88844ae1ecca7d7683003f078"
+  integrity sha512-cShzblbN9Z95OfE7cgjHW4nk/3C1oWvCbn1Sz50xYjTqdXT298axnTap4XWJXqfAg4smk0g1rBk1lyo2/NSiNA==
+
 react-dev-utils@^10.2.1:
   version "10.2.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-10.2.1.tgz#f6de325ae25fa4d546d09df4bb1befdc6dd19c19"

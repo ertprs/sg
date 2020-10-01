@@ -1,6 +1,7 @@
 const connection = require('../database/connection');
 const ClientHelper = require('../helpers/ClientHelper');
 const CompanieHelper = require('../helpers/CompanieHelper');
+const moment = require('moment')
 
 
 const getAll = async (request, response) => {
@@ -67,7 +68,10 @@ const deleteRegister = async (request, response) => {
 const getByClient = async (request, response) => {
   try {
     const res = await connection('collects')
-      .where('client', '=', request.params.client_id)
+      .where({
+        client: request.params.client_id,
+        status: 'Aberto'
+      })
       .select('*');
     collects = [];
     for (collect of res) {
@@ -144,11 +148,83 @@ const importCollect = async (request, response) => {
   }
 }
 
+const recalc = async (request, response) => {
+  try {
+    const res = await connection('collects').select('*');
+    collects = [];
+    for (collect of res) {
+      const client = await ClientHelper.getById(collect.client);
+      const companie = await CompanieHelper.getById(collect.companie);
+      collects.push({
+        ...collect,
+        client_name: client ? client.name : '',
+        client_document: client ? client.document : '',
+        client_phoe: client ? client.phone : '',
+        client_cellphone: client ? client.cellphone : '',
+        companie_name: companie && companie ? companie.name : '',
+        default_interest: companie && companie ? companie.default_interest : 0,
+        default_honorary: companie && companie ? companie.default_honorary : 0,
+        default_penalty: companie && companie ? companie.default_penalty : 0,
+      })
+    }
+
+    for (reg of collects) {
+      if (!moment(reg.dt_maturity, "DD/MM/YYYY")._isValid)
+        reg.days = 0
+
+      const calculedDays = await moment(reg.dt_maturity, "DD/MM/YYYY").diff(moment(), 'days')
+
+      if (calculedDays > -1)
+        reg.days = 0
+
+      //DAYS
+      reg.days = (calculedDays * -1)
+
+      //INTEREST (JUROS)
+      reg.interest = await (((parseFloat(reg.default_interest) / 100) * parseFloat(reg.value)) * parseFloat(reg.days));
+
+
+      //PENALTY (MULTA)
+      reg.penalty = await ((parseFloat(reg.default_penalty) / 100) * parseFloat(reg.value));
+
+
+      //HONORARY (HONORÁRIOS)
+      reg.honorary = await ((parseFloat(reg.value) + parseFloat(reg.penalty) + parseFloat(reg.interest)) * (parseFloat(reg.default_honorary) / 100))
+
+      reg.debit = await ((parseFloat(reg.interest) + parseFloat(reg.penalty) + parseFloat(reg.honorary) + parseFloat(reg.value)))
+
+      if (reg.debit > 0) {
+        const resUpdate = await connection('collects').where('id', '=', reg.id).update({
+          days: reg.days,
+          honorary: reg.honorary,
+          updated_debt: reg.debit
+        })
+      }
+    };
+    return response.json({ data: true });;
+  } catch (error) {
+    console.log(error)
+    return response.json({ error: error.message });
+  }
+}
+
+const closeByClient = async (request, response) => {
+  try {
+    const resUpdate = await connection('collects').where('client', '=', request.params.clientId).update({ status: 'Liquidado' })
+    return response.json({ data: true });
+  } catch (error) {
+    console.log(error)
+    return response.json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAll,
   newRegister,
   importCollect,
   update,
+  recalc,
+  closeByClient,
   deleteRegister,
   getByClient
 }

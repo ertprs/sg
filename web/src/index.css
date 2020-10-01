@@ -65,6 +65,7 @@ input[type=text]:read-only, input[type=number]:read-only, input[type=password]:r
 .modal-footer-container .button-delete {
   background-color: rgb(204, 73, 73);
 }
+
 .search-field-results {
   overflow: hidden;
   font-size: 20px;

@@ -13,10 +13,10 @@ export default function AppBar() {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
                     <NavDropdown title="Cadastro" id="basic-nav-dropdown">
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('attendance')} > Atendimento </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('client')} > Clientes </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('collect')} > Cobranças </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('companie')} > Credor </NavDropdown.Item>
+                        <NavDropdown.Item id="color-item" onClick={() => history.push('attendance')} > Atendimentos </NavDropdown.Item>
+                        <NavDropdown.Item id="color-item" onClick={() => history.push('client')} > Devedores </NavDropdown.Item>
+                        <NavDropdown.Item id="color-item" onClick={() => history.push('collect')} > Débitos </NavDropdown.Item>
+                        <NavDropdown.Item id="color-item" onClick={() => history.push('companie')} > Credores </NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Importação" id="basic-nav-dropdown">
                         <NavDropdown.Item onClick={() => history.push('import-collects')}>Importar cobranças</NavDropdown.Item>

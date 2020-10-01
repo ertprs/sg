@@ -4,7 +4,9 @@ import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
+import CurrencyInput from 'react-currency-input-field';
 import './style.css';
+import myFormat from '../../helpers/myFormat';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -59,10 +61,10 @@ function Companie(props) {
             responsible_staff: responsibleStaff,
             dt_contract: dtContract,
             dt_renovation: dtRenovation,
-            default_interest: defaultInterest,
-            default_honorary: defaultHonorary,
-            default_penalty: defaultPenalty,
-            monthly_value: monthlyValue,
+            default_interest: myFormat.strValueToFloat(defaultInterest),
+            default_honorary: myFormat.strValueToFloat(defaultHonorary),
+            default_penalty: myFormat.strValueToFloat(defaultPenalty),
+            monthly_value: myFormat.strValueToFloat(monthlyValue),
             payday: payday,
             payment_type: paymentType,
             obs,
@@ -148,10 +150,10 @@ function Companie(props) {
         setResponsibleStaff(reg.responsible_staff);
         setDtContract(reg.dt_contract);
         setDtRenovation(reg.dt_renovation);
-        setDefaultInterest(reg.default_interest);
-        setDefaultHonorary(reg.default_honorary);
-        setDefaultPenalty(reg.default_penalty);
-        setMonthlyValue(reg.monthly_value);
+        setDefaultInterest(myFormat.floatValueToStr(reg.default_interest));
+        setDefaultHonorary(myFormat.floatValueToStr(reg.default_honorary));
+        setDefaultPenalty(myFormat.floatValueToStr(reg.default_penalty));
+        setMonthlyValue(myFormat.floatValueToStr(reg.monthly_value));
         setPayDay(reg.payday);
         setPaymentType(reg.payment_type);
 
@@ -246,7 +248,7 @@ function Companie(props) {
                     <CurrencyFormat
                         format="##.###.###/###-##"
                         placeholder="CNPJ"
-                        value={cnpj?cnpj:''}
+                        value={cnpj ? cnpj : ''}
                         onValueChange={e => setCnpj(e.value)} />
 
                     <label> Endereço </label>
@@ -260,7 +262,7 @@ function Companie(props) {
                     <CurrencyFormat
                         format="## (##) #########"
                         placeholder="Telefone"
-                        value={phone?phone:''}
+                        value={phone ? phone : ''}
                         onValueChange={e => setPhone(e.value)} />
 
                     <label> Pessoa Responsável </label>
@@ -271,57 +273,57 @@ function Companie(props) {
                         onChange={e => setResponsibleStaff(e.target.value)} />
 
 
-                    <label> Início de Vigência do Contrato </label>
+                    <label> Data de início de contrato </label>
                     <CurrencyFormat
                         format="##/##/####"
                         placeholder="Data do contrato"
-                        value={dtContract?dtContract:''}
+                        value={dtContract ? dtContract : ''}
                         onValueChange={e => setDtContract(e.value)} />
 
-                    <label> Data de Renovação </label>
+                    <label> Prazo para renovação </label>
                     <CurrencyFormat
                         format="##/##/####"
                         placeholder="Data de renovação"
-                        value={dtRenovation?dtRenovation:''}
+                        value={dtRenovation ? dtRenovation : ''}
                         onCValuehange={e => setDtRenovation(e.value)} />
 
-                    <label> % Juros </label>
-                    <input
-                        type="number"
-                        placeholder="Juros"
-                        value={defaultInterest}
-                        onChange={e => setDefaultInterest(e.target.value)} />
+                    <label> R$ Valor da Mensalidade </label>
+                    <CurrencyInput
+                        placeholder="Valor da Mensalidade"
+                        decimalSeparator=","
+                        groupSeparator="."
+                        value={monthlyValue?monthlyValue:''}
+                        onChange={e => setMonthlyValue(e)}/>
 
-                    <label> % Honorários </label>
-                    <CurrencyFormat
-                        suffix={'%'}
-                        thousandSeparator={','}
-                        placeholder="Honorário padrão"
+                    <label> % Juros </label>
+                    <CurrencyInput
+                        placeholder="Jutos "
+                        decimalSeparator=","
+                        groupSeparator="."
+                        value={defaultInterest?defaultInterest:''}
+                        onChange={e => setDefaultInterest(e)}/>
+
+                    <label> % Honorários padrão </label>
+                    <CurrencyInput
+                        placeholder="Honorários Padrão"
+                        decimalSeparator=","
+                        groupSeparator="."
                         value={defaultHonorary?defaultHonorary:''}
-                        onValueChange={e => setDefaultHonorary(e.value)} />
+                        onChange={e => setDefaultHonorary(e)}/>
 
                     <label> % Multa </label>
-                    <CurrencyFormat
-                        suffix={'%'}
-                        thousandSeparator={','}
-                        placeholder="Honorário padrão"
+                    <CurrencyInput
+                        placeholder="Honorários Padrão"
+                        decimalSeparator=","
+                        groupSeparator="."
                         value={defaultPenalty?defaultPenalty:''}
-                        onValueChange={e => setDefaultPenalty(e.value)} />
-
-                    <label> R$ Valor Mensal </label>
-                    <CurrencyFormat
-                        prefix={'R$'}
-                        decimalScale={2}
-                        thousandSeparator={','}
-                        placeholder="Valor Mensal"
-                        value={monthlyValue?monthlyValue:''}
-                        onValueChange={e => setMonthlyValue(e.value)} />
+                        onChange={e => setDefaultPenalty(e)}/>
 
                     <label> Data de Pagamento </label>
                     <CurrencyFormat
                         format="##/##/####"
                         placeholder="Data de Pagamento"
-                        value={payday?payday:''}
+                        value={payday ? payday : ''}
                         onValueChange={e => setPayDay(e.value)} />
 
                     <label> Modalidade de Pagamento </label>

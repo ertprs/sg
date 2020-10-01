@@ -1,8 +1,11 @@
 .toast-container {
-    z-index:9999999;
     min-height: 100px;
     top: 0;
     right: 0;
+}
+
+.toast-container, .toast {
+    z-index:99999;
 }
 
 .toast-container .toast {

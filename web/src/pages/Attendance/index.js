@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import moment from 'moment';
 import CurrencyFormat from 'react-currency-format';
+import CurrencyInput from 'react-currency-input-field';
 import Downshift from 'downshift'
 import './style.css';
 import api from '../../services/api';
@@ -16,7 +17,8 @@ import AppBar from '../../components/AppBar';
 
 function Attendance(props) {
     const history = useHistory();
-    let count = 0;
+    const [grandMaximumDiscount, setGrandMaximumDiscount] = useState(0);
+
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -33,6 +35,8 @@ function Attendance(props) {
     const [aDtBegin, setADtBegin] = useState('');
     const [aDtEnd, setADtEnd] = useState('');
     const [aDescription, setADescription] = useState('');
+    const [aNegotiatedValue, setANegotiatedValue] = useState('');
+    const [aGrandValue, setAGrandValue] = useState('');
     const [aObs, setAObs] = useState('');
 
 
@@ -83,25 +87,31 @@ function Attendance(props) {
     }, []);
 
     const handleSubmit = async () => {
+
         props.dispatch(loadingActions.setLoading(true));
         //VALIDAÇÕES
-        if (!aClient) {
+        if (aObs.length < 10) {
             props.dispatch(loadingActions.setLoading(false));
-            props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
+            props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
+            return
+        }
+        if (aNegotiatedValue < grandMaximumDiscount) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'O VALOR NEGOCIADO não pode ser maior que o DESCONTO MÁXIMO!'));
             return 0
         }
 
-        setADtEnd(moment().format('DD/mm/yyyy HH:MM'))
+        setADtEnd(moment().format('L LT'))
         const regTemp = {
             client: aClient,
             dt_begin: aDtBegin,
-            dt_end: moment().format('DD/mm/yyyy HH:MM'),
+            dt_end: moment().format('L LT'),
             user: aUser,
             description: aDescription,
+            negotiated_value: aNegotiatedValue,
+            grand_value: aGrandValue,
             obs: aObs
         }
-        
-
         setRegister(regTemp);
         try {
             if (isUpdating) {
@@ -117,6 +127,7 @@ function Attendance(props) {
                 //CADASTRO
                 const res = await api.post('attendances', regTemp);
                 await updateClient();
+                await closeCollectsByClient(aClient);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -173,6 +184,14 @@ function Attendance(props) {
     const getCollectsByClientId = async cliId => {
         try {
             const res = await api.get('/collects/find-by-client/' + cliId)
+            var tempGrandMaximumDiscount = 0;
+            var tempAGrandValue = 0;
+            res.data.map(collect => {
+                tempGrandMaximumDiscount = tempGrandMaximumDiscount + collect.maximum_discount
+                tempAGrandValue = tempAGrandValue + collect.updated_debt;
+            })
+            setGrandMaximumDiscount(tempGrandMaximumDiscount);
+            setAGrandValue(tempAGrandValue);
             setCCollects(res.data)
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
@@ -181,17 +200,36 @@ function Attendance(props) {
 
 
     const clearValues = () => {
+        //CLEAR ATTENDENCE
         setAClient('');
         setAClientName('');
         setAUser(localStorage.getItem('@sg/user/id'));
         setAUserName(localStorage.getItem('@sg/user/name'))
         setADescription('');
-        setADtBegin(moment().format('DD/mm/yyyy HH:MM'))
+        setADtBegin(moment().format('L LT'))
         setADtEnd('')
+        setANegotiatedValue('')
+        setAGrandValue('')
         setAObs('');
+
+        //CLEAR CLIENTE
+        setCliClient({});
+        setCliId('');
+        setCliName('');
+        setCliCompanie('');
+        setCliCompanieName('');
+        setCliCellphone('');
+        setCliPhoneAdditional('');
+        setCliPhone('');
+        setCliEmail('');
+        setCliEmailAdditional('');
+        setCliEdress('');
+        setCliEdressAdditional('');
+        setCliDocument('');
+        setCliObs('');
     }
 
-    const setClientValues = (client) => {
+    const setClientValues = async (client) => {
         setCliClient(client);
         setCliId(client.id);
         setCliName(client.name);
@@ -206,10 +244,14 @@ function Attendance(props) {
         setCliEdressAdditional(client.edress_additional);
         setCliDocument(client.document);
         setCliObs(client.obs);
+        setAGrandValue(0);
+        setGrandMaximumDiscount(0);
+        await getCollectsByClientId(client.id)
     }
 
 
     const setUpdating = async (reg) => {
+
         setIsUpdating(true);
         setRegister(reg);
         setAClient(reg.client);
@@ -218,6 +260,8 @@ function Attendance(props) {
         setADescription(reg.description);
         setAObs(reg.obs);
         setADtBegin(reg.dt_begin);
+        setANegotiatedValue(reg.negotiated_value)
+        setAGrandValue(reg.grand_value)
         setADtEnd(reg.dt_end);
 
         //LOAD CLIENT
@@ -263,14 +307,17 @@ function Attendance(props) {
                 document: cliDocument,
                 obs: cliObs
             }
-            console.log(regTemp)
             const res = await api.put(`clients/${cliId}`, regTemp)
-            console.log(res)
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
         }
     }
 
+
+
+    const closeCollectsByClient = async (clientId) => {
+        const res = await api.get(`collects/close-by-client/${clientId}`);
+    }
 
     return (
         <div className="attendance-container">
@@ -293,6 +340,8 @@ function Attendance(props) {
                         <th>Fim</th>
                         <th>Usuário</th>
                         <th>Cliente</th>
+                        <th>Valor Total</th>
+                        <th>Valor negociado</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
@@ -305,6 +354,8 @@ function Attendance(props) {
                             <td>{reg.dt_end}</td>
                             <td>{reg.user + ' - ' + reg.user_name}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
+                            <td>{reg.grand_value}</td>
+                            <td>{reg.negotiated_value}</td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -503,29 +554,63 @@ function Attendance(props) {
                                 <MDBTableHead>
                                     <tr>
                                         <th>Código</th>
-                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Dias em Atraso</th>
+                                        <th>Débito Atualizado</th>
+                                        <th>Desconto Máximo</th>
                                     </tr>
                                 </MDBTableHead>
                                 <MDBTableBody>
                                     {cCollects.map(collect => (
                                         <tr key={collect.id}>
                                             <td>{collect.id}</td>
-                                            <td>
-                                                <CurrencyFormat
-                                                    displayType="text"
-                                                    prefix={'R$'}
-                                                    decimalScale={2}
-                                                    thousandSeparator={true}
-                                                    value={collect.value ? collect.value : ''} />
-                                            </td>
+                                            <td>{collect.status}</td>
+                                            <td>{collect.days}</td>
+                                            <td>{collect.updated_debt?collect.updated_debt.toLocaleString():0} </td>
+                                            <td>{collect.maximum_discount?collect.maximum_discount.toLocaleString():0}</td>
                                         </tr>
                                     ))}
                                 </MDBTableBody>
                             </MDBTable>
 
+                            <div className="negotiation">
+                                <div className="inline">
+                                    <div style={{ marginRight: 5 }}>
+                                        <label> Débito Total </label>
+                                        <CurrencyInput
+                                            prefix="R$ "
+                                            placeholder="Débito total"
+                                            decimalSeparator=","
+                                            groupSeparator="."
+                                            value={aGrandValue ? aGrandValue : ''}
+                                            readOnly />
+                                    </div>
+                                    <div>
+                                        <label> Desconto Máximo Total </label>
+                                        <CurrencyInput
+                                            prefix="R$ "
+                                            placeholder="Desconto Máximo"
+                                            decimalSeparator=","
+                                            groupSeparator="."
+                                            value={grandMaximumDiscount ? grandMaximumDiscount : ''}
+                                            readOnly />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label> R$ Valor Negociado </label>
+                                    <CurrencyInput
+                                        prefix="R$ "
+                                        placeholder="Valor Negociado"
+                                        decimalSeparator=","
+                                        groupSeparator="."
+                                        value={aNegotiatedValue ? aNegotiatedValue : ''}
+                                        onChange={e => setANegotiatedValue(e)} 
+                                        readOnly={isUpdating} />
+                                </div>
+
+                            </div>
                         </Tab>
                     </Tabs>
-
                 </Modal.Body>
                 <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>

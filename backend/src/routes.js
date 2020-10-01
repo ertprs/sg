@@ -16,11 +16,14 @@ routes.post('/users/login', UserController.login);
 
 //COLETCTS
 routes.get('/collects', CollectController.getAll);
+routes.get('/collects/recalc', CollectController.recalc);
+routes.get('/collects/close-by-client/:clientId', CollectController.closeByClient);
 routes.post('/collects', CollectController.newRegister);
 routes.put('/collects/:id', CollectController.update);
 routes.get('/collects/find-by-client/:client_id', CollectController.getByClient);
 routes.delete('/collects/:id', CollectController.deleteRegister);
 routes.post('/collects/import-collect', CollectController.importCollect);
+
 
 //COMPANIES
 routes.get('/companies', CompanyController.getAll);
