@@ -8,13 +8,13 @@ exports.up = function(knex) {
     table.string('dt_maturity');
     table.decimal('client');
     table.decimal('companie');
-    table.float('days');
-    table.float('value');
-    table.float('updated_debt');
-    table.float('honorary');
-    table.float('honorary_per');
-    table.float('maximum_discount');
-    table.float('negotiated_value');
+    table.string('days');
+    table.string('value');
+    table.string('updated_debt');
+    table.string('honorary');
+    table.string('honorary_per');
+    table.string('maximum_discount');
+    table.string('negotiated_value');
     
     table.string('obs');
   });

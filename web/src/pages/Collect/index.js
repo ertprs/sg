@@ -312,9 +312,9 @@ function Client(props) {
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
                             <td>{reg.dt_maturity}</td>
-                            <td>{reg.value ? reg.value.toLocaleString() : 0}</td>
+                            <td>{reg.value ? myFormat.strValueToFloat(reg.value).toLocaleString() : 0}</td>
                             <td>{reg.days}</td>
-                            <td>{reg.updated_debt ? reg.updated_debt.toLocaleString() : 0}</td>
+                            <td>{reg.updated_debt ? myFormat.strValueToFloat(reg.updated_debt).toLocaleString() : 0}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                         </tr>
                     ))}
@@ -420,7 +420,7 @@ function Client(props) {
                                 format="##/##/####"
                                 placeholder="Data de vencimento"
                                 value={dtMaturity ? dtMaturity : ''}
-                                onValueChange={e => setDtMaturity(e.value)}
+                                onValueChange={e => setDtMaturity(e.formattedValue)}
                                 onBlur={calculate} />
                         </div>
                         <div>

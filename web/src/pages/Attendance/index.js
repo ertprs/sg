@@ -8,6 +8,7 @@ import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
 import Downshift from 'downshift'
 import './style.css';
+import myFormat from '../../helpers/myFormat';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -187,11 +188,12 @@ function Attendance(props) {
             var tempGrandMaximumDiscount = 0;
             var tempAGrandValue = 0;
             res.data.map(collect => {
-                tempGrandMaximumDiscount = tempGrandMaximumDiscount + collect.maximum_discount
-                tempAGrandValue = tempAGrandValue + collect.updated_debt;
+                tempGrandMaximumDiscount = tempGrandMaximumDiscount + myFormat.strValueToFloat(collect.maximum_discount)
+                tempAGrandValue = tempAGrandValue + myFormat.strValueToFloat(collect.updated_debt);
             })
             setGrandMaximumDiscount(tempGrandMaximumDiscount);
-            setAGrandValue(tempAGrandValue);
+            if (tempAGrandValue > 0)
+                setAGrandValue(tempAGrandValue);
             setCCollects(res.data)
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
@@ -244,8 +246,6 @@ function Attendance(props) {
         setCliEdressAdditional(client.edress_additional);
         setCliDocument(client.document);
         setCliObs(client.obs);
-        setAGrandValue(0);
-        setGrandMaximumDiscount(0);
         await getCollectsByClientId(client.id)
     }
 
@@ -354,8 +354,8 @@ function Attendance(props) {
                             <td>{reg.dt_end}</td>
                             <td>{reg.user + ' - ' + reg.user_name}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
-                            <td>{reg.grand_value}</td>
-                            <td>{reg.negotiated_value}</td>
+                            <td>{myFormat.strValueToFloat(reg.grand_value).toLocaleString()}</td>
+                            <td>{myFormat.strValueToFloat(reg.negotiated_value).toLocaleString()}</td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -566,8 +566,8 @@ function Attendance(props) {
                                             <td>{collect.id}</td>
                                             <td>{collect.status}</td>
                                             <td>{collect.days}</td>
-                                            <td>{collect.updated_debt?collect.updated_debt.toLocaleString():0} </td>
-                                            <td>{collect.maximum_discount?collect.maximum_discount.toLocaleString():0}</td>
+                                            <td>{collect.updated_debt?myFormat.strValueToFloat(collect.updated_debt).toLocaleString():0} </td>
+                                            <td>{collect.maximum_discount?myFormat.strValueToFloat(collect.maximum_discount).toLocaleString():0}</td>
                                         </tr>
                                     ))}
                                 </MDBTableBody>

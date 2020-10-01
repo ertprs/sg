@@ -1,6 +1,7 @@
 const connection = require('../database/connection');
 const ClientHelper = require('../helpers/ClientHelper');
 const CompanieHelper = require('../helpers/CompanieHelper');
+const myFormat = require('../helpers/myFormat');
 const moment = require('moment')
 
 
@@ -181,17 +182,17 @@ const recalc = async (request, response) => {
       reg.days = (calculedDays * -1)
 
       //INTEREST (JUROS)
-      reg.interest = await (((parseFloat(reg.default_interest) / 100) * parseFloat(reg.value)) * parseFloat(reg.days));
+      reg.interest = await (((myFormat.strValueToFloat(reg.default_interest) / 100) * myFormat.strValueToFloat(reg.value)) * myFormat.strValueToFloat(reg.days));
 
 
       //PENALTY (MULTA)
-      reg.penalty = await ((parseFloat(reg.default_penalty) / 100) * parseFloat(reg.value));
+      reg.penalty = await ((myFormat.strValueToFloat(reg.default_penalty) / 100) * myFormat.strValueToFloat(reg.value));
 
 
       //HONORARY (HONORÁRIOS)
-      reg.honorary = await ((parseFloat(reg.value) + parseFloat(reg.penalty) + parseFloat(reg.interest)) * (parseFloat(reg.default_honorary) / 100))
+      reg.honorary = await ((myFormat.strValueToFloat(reg.value) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.interest)) * (myFormat.strValueToFloat(reg.default_honorary) / 100))
 
-      reg.debit = await ((parseFloat(reg.interest) + parseFloat(reg.penalty) + parseFloat(reg.honorary) + parseFloat(reg.value)))
+      reg.debit = await ((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))
 
       if (reg.debit > 0) {
         const resUpdate = await connection('collects').where('id', '=', reg.id).update({
