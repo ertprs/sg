@@ -6,7 +6,7 @@ const strValueToFloat = (str) => {
 }
 
 const floatValueToStr = (flt) => {
-    var r = flt + '';
+    var r = parseFloat(flt).toFixed(2) + '';
     r = r.replace('.',',')
     return r
 }

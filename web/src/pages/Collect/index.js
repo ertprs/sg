@@ -15,7 +15,7 @@ import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import * as callbackActions from '../../store/actions/callback';
 import AppBar from '../../components/AppBar';
-import myFormat from '../../helpers/myFormat';
+import {strValueToFloat, floatValueToStr} from '../../helpers/myFormat';
 
 
 function Client(props) {
@@ -243,19 +243,19 @@ function Client(props) {
         setDays(calculedDays * -1)
 
         //INTEREST (JUROS)
-        const interest = await parseFloat((((myFormat.strValueToFloat(defaultInterest) / 100) * myFormat.strValueToFloat(value)) * myFormat.strValueToFloat(days))).toFixed(2);
-        setInterestCalculed(myFormat.floatValueToStr(interest))
+        const interest = await parseFloat((((strValueToFloat(defaultInterest) / 100) * strValueToFloat(value)) * strValueToFloat(days))).toFixed(2);
+        setInterestCalculed(floatValueToStr(interest))
 
         //PENALTY (MULTA)
-        const penalty = await parseFloat(((myFormat.strValueToFloat(defaultPenalty) / 100) * myFormat.strValueToFloat(value))).toFixed(2);
-        setPenaltyCalculed(myFormat.floatValueToStr(penalty))
+        const penalty = await parseFloat(((strValueToFloat(defaultPenalty) / 100) * strValueToFloat(value))).toFixed(2);
+        setPenaltyCalculed(floatValueToStr(penalty))
 
         //HONORARY (HONORÁRIOS)
-        const honorary = await parseFloat(((myFormat.strValueToFloat(value) + myFormat.strValueToFloat(penaltyCalculed) + myFormat.strValueToFloat(interestCalculed)) * (myFormat.strValueToFloat(honoraryPer) / 100))).toFixed(2);
-        setHonoraryCalculed(myFormat.floatValueToStr(honorary))
+        const honorary = await parseFloat(((strValueToFloat(value) + strValueToFloat(penaltyCalculed) + strValueToFloat(interestCalculed)) * (strValueToFloat(honoraryPer) / 100))).toFixed(2);
+        setHonoraryCalculed(floatValueToStr(honorary))
 
-        const debit = await parseFloat(((myFormat.strValueToFloat(interestCalculed) + myFormat.strValueToFloat(penaltyCalculed) + myFormat.strValueToFloat(honoraryCalculed) + myFormat.strValueToFloat(value)))).toFixed(2);
-        setUpdatedDebt(myFormat.floatValueToStr(debit))
+        const debit = await parseFloat(((strValueToFloat(interestCalculed) + strValueToFloat(penaltyCalculed) + strValueToFloat(honoraryCalculed) + strValueToFloat(value)))).toFixed(2);
+        setUpdatedDebt(floatValueToStr(debit))
     }
 
     const updateAllDebits = async () => {
@@ -316,9 +316,9 @@ function Client(props) {
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
                             <td>{reg.dt_maturity}</td>
-                            <td>{reg.value ? myFormat.strValueToFloat(reg.value).toLocaleString() : 0}</td>
+                            <td>{reg.value ? strValueToFloat(reg.value).toLocaleString() : 0}</td>
                             <td>{reg.days}</td>
-                            <td>{reg.updated_debt ? myFormat.strValueToFloat(reg.updated_debt).toLocaleString() : 0}</td>
+                            <td>{reg.updated_debt ? strValueToFloat(reg.updated_debt).toLocaleString() : 0}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                         </tr>
                     ))}

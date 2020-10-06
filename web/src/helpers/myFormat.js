@@ -1,5 +1,7 @@
 const strValueToFloat = (str) => {
     var r = str + '';
+    r = r.replace(' ','')
+    r = r.replace('R$','')
     r = r.replace('.','')
     r = r.replace(',','.')
     return r ? parseFloat(r) : 0
@@ -11,9 +13,20 @@ const floatValueToStr = (flt) => {
     return r ? r : '0,00'
 }
 
+const configSheetStr = (str) => {
+    var r =  str + ''
+    r =  r.replace(' ','')
+    r =  r.replace('R$','')
+    r =  r.replace('.','+')
+    r =  r.replace(',','.')
+    r =  r.replace('+',',')
+    return  r ? r : '0,00'
+}
+
 
 
 module.exports = {
     strValueToFloat,
-    floatValueToStr
+    floatValueToStr,
+    configSheetStr
 }

@@ -415,7 +415,7 @@ function Attendance(props) {
                         </Tab>
 
                         <Tab eventKey="client" title="Cliente">
-                            <label> Cliente </label>
+                            <label> Devedor </label>
                             <Downshift inputValue={aClientName} inputValue={aClientName} onChange={selection => {
                                 setAClient(selection.id)
                                 setAClientName(selection.name)

@@ -122,7 +122,6 @@ const importCollect = async (request, response) => {
   try {
     const collect = await {
       client: await ClientHelper.newIfNotExists({
-        code: request.body.code,
         name: request.body.client,
         companie: request.body.companie,
         phone: request.body.phone,
@@ -130,10 +129,7 @@ const importCollect = async (request, response) => {
       }),
       status: request.body.status,
       companie: request.body.companie,
-      account: request.body.account,
-      document: request.body.document,
       dt_maturity: request.body.dt_maturity,
-      days: request.body.days,
       value: request.body.value,
       maximum_discount: request.body.maximum_discount,
       obs: 'importado'
@@ -179,11 +175,10 @@ const recalc = async (request, response) => {
         reg.days = 0
 
       //DAYS
-      reg.days = (calculedDays * -1)
+      reg.days = calculedDays * -1
 
       //INTEREST (JUROS)
       reg.interest = await myFormat.floatValueToStr(parseFloat((((myFormat.strValueToFloat(reg.default_interest) / 100) * myFormat.strValueToFloat(reg.value)) * myFormat.strValueToFloat(reg.days))))
-
 
       //PENALTY (MULTA)
       reg.penalty = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.default_penalty) / 100) * myFormat.strValueToFloat(reg.value))))
@@ -193,14 +188,11 @@ const recalc = async (request, response) => {
 
       //DÉBITO ATUALIZADO 
       reg.debit = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))))
-
-      if (reg.debit > 0) {
-        const resUpdate = await connection('collects').where('id', '=', reg.id).update({
-          days: reg.days,
-          honorary: reg.honorary,
-          updated_debt: reg.debit
-        })
-      }
+      const resUpdate = await connection('collects').where('id', '=', reg.id).update({
+        days: reg.days,
+        honorary: reg.honorary,
+        updated_debt: reg.debit
+      })
     };
     return response.json({ data: true });;
   } catch (error) {
