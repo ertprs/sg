@@ -6,6 +6,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import { AiOutlineSearch } from 'react-icons/ai';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
+import Downshift from 'downshift';
 import moment from 'moment';
 
 import './style.css';
@@ -30,24 +31,27 @@ function Client(props) {
     //FIELDS
     const [client, setClient] = useState('');
     const [clientName, setClientName] = useState('');
+    const [clients, setClients] = useState([]);
+
     const [status, setStatus] = useState('Aberto');
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
+    const [companies, setCompanies] = useState([]);
     const [account, setAccount] = useState('');
     const [document, setDocument] = useState('');
     const [dtMaturity, setDtMaturity] = useState('');
     const [days, setDays] = useState('');
     const [value, setValue] = useState('');
     const [updatedDebt, setUpdatedDebt] = useState('');
-    const [defaultHonorary, setDefaultHonorary] = useState(0);
-    const [defaultInterest, setDefaultInterest] = useState(0);
-    const [interestCalculed, setInterestCalculed] = useState(0);
-    const [maximumDiscount, setMaximumDiscount] = useState(0);
-    const [negotiatedValue, setNegotiatedValue] = useState(0);
-    const [defaultPenalty, setDefaultPenalty] = useState(0);
-    const [penaltyCalculed, setPenaltyCalculed] = useState(0);
-    const [honoraryCalculed, setHonoraryCalculed] = useState(0);
-    const [honoraryPer, setHonoraryPer] = useState(0);
+    const [defaultHonorary, setDefaultHonorary] = useState('');
+    const [defaultInterest, setDefaultInterest] = useState('');
+    const [interestCalculed, setInterestCalculed] = useState('');
+    const [maximumDiscount, setMaximumDiscount] = useState('');
+    const [negotiatedValue, setNegotiatedValue] = useState('');
+    const [defaultPenalty, setDefaultPenalty] = useState('');
+    const [penaltyCalculed, setPenaltyCalculed] = useState('');
+    const [honoraryCalculed, setHonoraryCalculed] = useState('');
+    const [honoraryPer, setHonoraryPer] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -239,19 +243,19 @@ function Client(props) {
         setDays(calculedDays * -1)
 
         //INTEREST (JUROS)
-        const interest = await (((myFormat.strValueToFloat(defaultInterest) / 100) * myFormat.strValueToFloat(value)) * myFormat.strValueToFloat(days));
-        setInterestCalculed(interest);
+        const interest = await parseFloat((((myFormat.strValueToFloat(defaultInterest) / 100) * myFormat.strValueToFloat(value)) * myFormat.strValueToFloat(days))).toFixed(2);
+        setInterestCalculed(myFormat.floatValueToStr(interest))
 
         //PENALTY (MULTA)
-        const penalty = await ((myFormat.strValueToFloat(defaultPenalty) / 100) * myFormat.strValueToFloat(value));
-        setPenaltyCalculed(penalty);
+        const penalty = await parseFloat(((myFormat.strValueToFloat(defaultPenalty) / 100) * myFormat.strValueToFloat(value))).toFixed(2);
+        setPenaltyCalculed(myFormat.floatValueToStr(penalty))
 
         //HONORARY (HONORÁRIOS)
-        const honorary = await ((myFormat.strValueToFloat(value) + myFormat.strValueToFloat(penalty) + myFormat.strValueToFloat(interest)) * (myFormat.strValueToFloat(honoraryPer) / 100))
-        setHonoraryCalculed(honorary)
+        const honorary = await parseFloat(((myFormat.strValueToFloat(value) + myFormat.strValueToFloat(penaltyCalculed) + myFormat.strValueToFloat(interestCalculed)) * (myFormat.strValueToFloat(honoraryPer) / 100))).toFixed(2);
+        setHonoraryCalculed(myFormat.floatValueToStr(honorary))
 
-        const debit = await ((myFormat.strValueToFloat(interest) + myFormat.strValueToFloat(penalty) + myFormat.strValueToFloat(honorary) + myFormat.strValueToFloat(value)))
-        setUpdatedDebt(debit)
+        const debit = await parseFloat(((myFormat.strValueToFloat(interestCalculed) + myFormat.strValueToFloat(penaltyCalculed) + myFormat.strValueToFloat(honoraryCalculed) + myFormat.strValueToFloat(value)))).toFixed(2);
+        setUpdatedDebt(myFormat.floatValueToStr(debit))
     }
 
     const updateAllDebits = async () => {
@@ -306,7 +310,7 @@ function Client(props) {
                     {search.map(reg => (
                         <tr
                             style={{ cursor: 'pointer' }}
-                            onClick={async() => {await setUpdating(reg);calculate();}}
+                            onClick={async () => { await setUpdating(reg); calculate(); }}
                             key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
@@ -338,80 +342,84 @@ function Client(props) {
                     <br />
 
                     <label> Credor </label>
-                    <div className="inline">
-                        <input
-                            style={{ width: 80, marginRight: 5 }}
-                            type="number"
-                            placeholder="Cód."
-                            value={companie}
-                            onChange={async e => {
-                                setCompanie(e.target.value)
-                                if (!e.target.value) {
-                                    setCompanieName('')
-                                    setDefaultInterest('')
-                                    setDefaultHonorary('')
-                                    setDefaultPenalty('')
-                                    setHonoraryPer('')
-                                    return
-                                }
-                                const res = await api.get(`companies/find-by-id/${e.target.value}`)
-                                if (res.data) {
-                                    console.log(res.data)
-                                    setCompanieName(res.data.name)
-                                    setDefaultInterest(res.data.default_interest)
-                                    setHonoraryPer(res.data.default_honorary)
-                                    setDefaultPenalty(res.data.default_penalty)
-                                }
-                                else {
-                                    setCompanieName('')
-                                    setDefaultInterest('')
-                                    setHonoraryPer('')
-                                    setDefaultPenalty('')
-                                }
-                            }} />
-                        <input
-                            type="text"
-                            readOnly
-                            value={companieName} />
-                        <button
-                            style={{ width: 'auto', marginLeft: 5, padding: 10 }}
-                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}>
-                            <AiOutlineSearch size="25" />
-                        </button>
-                        <br />
-                    </div>
+                    <Downshift inputValue={companieName} onChange={selection => {
+                        setCompanies(selection)
+                        setCompanie(selection.id)
+                        setCompanieName(selection.name)
+                        setDefaultInterest(selection.default_interest)
+                        setHonoraryPer(selection.default_honorary)
+                        setDefaultPenalty(selection.default_penalty)
+                    }}
+                        itemToString={item => (item ? item.name : '')}>
+                        {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
+                            <div>
+                                <div {...getRootProps({}, { suppressRefError: true })} className="inline">
+                                    <input value={companie} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
+                                    <input
+                                        type="text"
+                                        placeholder="Pesquisa"
+                                        value={companieName}
+                                        onChangeCapture={async e => {
+                                            setCompanieName(e.target.value)
+                                            if (!e.target.value || e.target.value.length < 3) return;
+                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            setCompanies(data);
+                                        }}
+                                        {...getInputProps()} />
+                                </div>
+                                <ul {...getMenuProps({})}>
+                                    {isOpen ? companies
+                                        .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                        .map((item) => (
+                                            <li
+                                                className="search-field-results"
+                                                {...getItemProps({ key: item.id, item })}>
+                                                {`${item.id} - ${item.name}`}
+                                            </li>))
+                                        : null}
+                                </ul>
+                            </div>
+                        )}
+                    </Downshift>
+
 
                     <label> Devedor </label>
-                    <div className="inline">
-                        <input
-                            style={{ width: 80, marginRight: 5 }}
-                            type="number"
-                            placeholder="Cód."
-                            value={client}
-                            onBlur={calculate}
-                            onChange={async e => {
-                                setClient(e.target.value)
-                                if (!e.target.value) {
-                                    setClientName('')
-                                    return
-                                }
-                                const res = await api.get(`clients/find-by-id/${e.target.value}`)
-                                if (res.data)
-                                    setClientName(res.data.name)
-                                else
-                                    setClientName('')
-                            }} />
-                        <input
-                            type="text"
-                            readOnly
-                            value={clientName} />
-                        <button
-                            style={{ width: 'auto', marginLeft: 5, padding: 10 }}
-                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'clients', companie))}>
-                            <AiOutlineSearch size="25" />
-                        </button>
-                        <br />
-                    </div>
+                    <Downshift inputValue={clientName} onChange={selection => {
+                        setClient(selection.id)
+                        setClientName(selection.name)
+                        setClients(selection)
+                    }}
+                        itemToString={item => (item ? item.name : '')}>
+                        {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
+                            <div>
+                                <div {...getRootProps({}, { suppressRefError: true })} className="inline">
+                                    <input value={client} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
+                                    <input
+                                        type="text"
+                                        placeholder="Pesquisa"
+                                        value={clientName}
+                                        onChangeCapture={async e => {
+                                            setClientName(e.target.value)
+                                            if (!e.target.value || e.target.value.length < 3) return;
+                                            const { data } = await api.get(`clients/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            setClients(data);
+                                        }}
+                                        {...getInputProps()} />
+                                </div>
+                                <ul {...getMenuProps({})}>
+                                    {isOpen ? clients
+                                        .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                        .map((item) => (
+                                            <li
+                                                className="search-field-results"
+                                                {...getItemProps({ key: item.id, item })}>
+                                                {`${item.id} - ${item.name}`}
+                                            </li>))
+                                        : null}
+                                </ul>
+                            </div>
+                        )}
+                    </Downshift>
 
                     <div className="inline">
                         <div style={{ marginRight: 10 }}>
@@ -471,6 +479,7 @@ function Client(props) {
 
                     <label> R$ Multa </label>
                     <CurrencyInput
+                        prefix="R$ "
                         placeholder="Multa"
                         decimalSeparator=","
                         groupSeparator="."
@@ -480,6 +489,7 @@ function Client(props) {
 
                     <label> R$ Juros </label>
                     <CurrencyInput
+                        prefix="R$ "
                         placeholder="Juros"
                         decimalSeparator=","
                         groupSeparator="."
@@ -491,6 +501,7 @@ function Client(props) {
                         <div style={{ width: 200, marginRight: 5 }}>
                             <label> % Honorários </label>
                             <CurrencyInput
+                                prefix="% "
                                 placeholder="Honorários"
                                 decimalSeparator=","
                                 groupSeparator="."
@@ -502,6 +513,7 @@ function Client(props) {
 
                             <label> R$ Honorários </label>
                             <CurrencyInput
+                                prefix="R$ "
                                 placeholder="Honorários "
                                 decimalSeparator=","
                                 groupSeparator="."
@@ -515,6 +527,7 @@ function Client(props) {
                     <label> R$ Débito Atualizado </label>
                     <div className="inline">
                         <CurrencyInput
+                            prefix="R$ "
                             placeholder="Débito Atualizado"
                             decimalSeparator=","
                             groupSeparator="."
@@ -527,6 +540,7 @@ function Client(props) {
                     </div>
                     <label> R$ Desconto Máximo </label>
                     <CurrencyInput
+                        prefix="R$ "
                         placeholder="Desconto Máximo"
                         decimalSeparator=","
                         groupSeparator="."
@@ -536,6 +550,7 @@ function Client(props) {
 
                     <label> R$ Valor Negociado </label>
                     <CurrencyInput
+                        prefix="R$ "
                         placeholder="Valor Negociado"
                         decimalSeparator=","
                         groupSeparator="."

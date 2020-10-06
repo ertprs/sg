@@ -14,7 +14,7 @@ const getById = async (id) => {
 const newIfNotExists = async (client) => {
   try {
     var existent = [];
-    existent = await getOneByCode(client.code);
+    existent = await getOneByName(client.name);
     if (existent) {
       return existent.id
     } else {
@@ -34,6 +34,21 @@ const getOneByCode = async (code) => {
   try {
     const res = await connection('clients')
       .where('code', '=', code)
+      .select('*')
+      .first();
+    return res;
+  } catch (error) {
+    return error;
+  }
+}
+
+
+const getOneByName = async (name) => {
+  if (!name) 
+    return 
+  try {
+    const res = await connection('clients')
+      .where('name', '=', name)
       .select('*')
       .first();
     return res;

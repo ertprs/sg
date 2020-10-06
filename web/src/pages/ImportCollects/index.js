@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import moment, { now } from 'moment';
 import './style.css';
 import api from '../../services/api';
+import myFormat from '../../helpers/myFormat';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
@@ -24,7 +25,6 @@ function ImportCollects(props) {
 
     const loadCompanies = async () => {
         const res = await api.get('companies');
-        console.log(res.data)
         if (res.data.length > 0) {
             setCompanies(res.data);
             setCompanieId(res.data[0].id)
@@ -43,7 +43,7 @@ function ImportCollects(props) {
     }
 
     const insetOne = async register => {
-        await api.post('collects/import-collect', {
+        const data = {
             status: 'Aberto',
             companie: companieId,
             code: Object.values(register)[0],
@@ -60,7 +60,9 @@ function ImportCollects(props) {
             maximum_discount: register.__EMPTY_10,
             days: register.__EMPTY_11,
             value: register.__EMPTY_12,
-        });
+        }
+
+        await api.post('collects/import-collect', data);
     }
 
     const registerOnBackend = async () => {
@@ -104,8 +106,15 @@ function ImportCollects(props) {
                     json.__EMPTY_8 = moment(json.__EMPTY_8).format('DD/MM/YYYY')
                     json.__EMPTY_9 = moment(json.__EMPTY_9).format('DD/MM/YYYY')
 
+                    //MONEY
+                    json.__EMPTY_9 = myFormat.strValueToFloat(json.__EMPTY_10).toLocaleString()
+                    json.__EMPTY_9 = myFormat.strValueToFloat(json.__EMPTY_12).toLocaleString()
+
+
+
+
                     tempArray.push(json);
-                    return 
+                    return
                 }
             });
             setImportedArray(tempArray);
@@ -160,7 +169,7 @@ function ImportCollects(props) {
                                 <td>{collect.__EMPTY_1}</td>
                                 <td>{collect.__EMPTY_2}</td>
                                 <td>{collect.__EMPTY_3}</td>
-                                <td>{collect.__EMPTY_4}</td>                
+                                <td>{collect.__EMPTY_4}</td>
                                 <td>{collect.__EMPTY_6}</td>
                                 <td>{collect.__EMPTY_9}</td>
                                 <td>{collect.__EMPTY_10}</td>

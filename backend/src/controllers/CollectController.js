@@ -182,17 +182,17 @@ const recalc = async (request, response) => {
       reg.days = (calculedDays * -1)
 
       //INTEREST (JUROS)
-      reg.interest = await (((myFormat.strValueToFloat(reg.default_interest) / 100) * myFormat.strValueToFloat(reg.value)) * myFormat.strValueToFloat(reg.days));
+      reg.interest = await myFormat.floatValueToStr(parseFloat((((myFormat.strValueToFloat(reg.default_interest) / 100) * myFormat.strValueToFloat(reg.value)) * myFormat.strValueToFloat(reg.days))))
 
 
       //PENALTY (MULTA)
-      reg.penalty = await ((myFormat.strValueToFloat(reg.default_penalty) / 100) * myFormat.strValueToFloat(reg.value));
-
+      reg.penalty = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.default_penalty) / 100) * myFormat.strValueToFloat(reg.value))))
 
       //HONORARY (HONORÁRIOS)
-      reg.honorary = await ((myFormat.strValueToFloat(reg.value) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.interest)) * (myFormat.strValueToFloat(reg.default_honorary) / 100))
+      reg.honorary = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.value) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.interest)) * (myFormat.strValueToFloat(reg.default_honorary) / 100))))
 
-      reg.debit = await ((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))
+      //DÉBITO ATUALIZADO 
+      reg.debit = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))))
 
       if (reg.debit > 0) {
         const resUpdate = await connection('collects').where('id', '=', reg.id).update({

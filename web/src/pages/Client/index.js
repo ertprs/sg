@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { AiOutlineSearch } from 'react-icons/ai';
+import Downshift from 'downshift';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 
@@ -32,8 +33,11 @@ function Client(props) {
     const [phoneAdditional, setPhoneAdditional] = useState('');
     const [emailAdditional, setEmailAdditional] = useState('');
     const [edressAdditional, setEdressAdditional] = useState('');
+
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
+    const [companies, setCompanies] = useState([]);
+
     const [email, setEmail] = useState('');
     const [document, setDocument] = useState('');
     const [edress, setEdress] = useState('');
@@ -235,7 +239,7 @@ function Client(props) {
                 </MDBTableBody>
             </MDBTable>
 
-            <Modal show={show} onHide={()=>console.log('Cant close')}>
+            <Modal show={show} onHide={() => console.log('Cant close')}>
                 <Modal.Header>
                     <Modal.Title> Cadastro de Devedores </Modal.Title>
                 </Modal.Header>
@@ -251,34 +255,45 @@ function Client(props) {
                     }
 
                     <label> Credor </label>
-                    <div className="inline">
-                        <input
-                            style={{ width: 85, marginRight: 5 }}
-                            type="text"
-                            placeholder="Credor"
-                            value={companie}
-                            onChange={async e => {
-                                setCompanie(e.target.value)
-                                if (!e.target.value) {
-                                    setCompanieName('')
-                                    return
-                                }
-                                const res = await api.get(`companies/find-by-id/${e.target.value}`)
-                                if (res.data)
-                                    setCompanieName(res.data.name)
-                                else
-                                    setCompanieName('')
-                            }} />
-                        <input
-                            type="text"
-                            readOnly
-                            value={companieName} />
-                        <button
-                            style={{ width: 'auto', marginLeft: 4, padding: 10 }}
-                            onClick={() => props.dispatch(callbackActions.setCallback(true, 'companies', companie))}>
-                            <AiOutlineSearch size="25" />
-                        </button>
-                    </div>
+                    <Downshift inputValue={companieName} onChange={selection => {
+                        setCompanie(selection.id)
+                        setCompanieName(selection.name)
+                        setCompanies(selection)
+                    }}
+                        itemToString={item => (item ? item.name : '')}>
+                        {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
+                            <div>
+                                <div {...getRootProps({}, { suppressRefError: true })} className="inline">
+                                    <input value={companie} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
+                                    <input
+                                        type="text"
+                                        placeholder="Pesquisa"
+                                        value={companieName}
+                                        onChangeCapture={async e => {
+                                            setCompanieName(e.target.value)
+                                            if (!e.target.value || e.target.value.length < 3) return;
+                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            setCompanies(data);
+                                        }}
+                                        {...getInputProps()} />
+                                </div>
+                                <ul {...getMenuProps({})}>
+                                    {isOpen ? companies
+                                        .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                        .map((item) => (
+                                            <li
+                                                className="search-field-results"
+                                                {...getItemProps({ key: item.id, item })}>
+                                                {`${item.id} - ${item.name}`}
+                                            </li>))
+                                        : null}
+                                </ul>
+                            </div>
+                        )}
+                    </Downshift>
+
+
+
 
                     <label> Código </label>
                     <input
@@ -299,21 +314,21 @@ function Client(props) {
                         format="## (##) #########"
                         mask=" "
                         placeholder="Celular"
-                        value={cellphone?cellphone:''}
+                        value={cellphone ? cellphone : ''}
                         onValueChange={e => setCellphone(e.value)} />
 
                     <label> Telefone </label>
                     <CurrencyFormat
                         format="## (##) #########"
                         placeholder="Telefone"
-                        value={phone?phone:''}
+                        value={phone ? phone : ''}
                         onValueChange={e => setPhone(e.value)} />
 
                     <label> Telefone Adicional </label>
                     <CurrencyFormat
                         format="## (##) #########"
                         placeholder="Telefone"
-                        value={phoneAdditional?phoneAdditional:''}
+                        value={phoneAdditional ? phoneAdditional : ''}
                         onValueChange={e => setPhoneAdditional(e.value)} />
 
 
@@ -336,7 +351,7 @@ function Client(props) {
                     <CurrencyFormat
                         format="###.###.###-##"
                         placeholder="CPF"
-                        value={document ?document : ''}
+                        value={document ? document : ''}
                         onValueChange={e => setDocument(e.value)} />
 
                     <label>  Endereço </label>

@@ -61,10 +61,10 @@ function Companie(props) {
             responsible_staff: responsibleStaff,
             dt_contract: dtContract,
             dt_renovation: dtRenovation,
-            default_interest: myFormat.strValueToFloat(defaultInterest),
-            default_honorary: myFormat.strValueToFloat(defaultHonorary),
-            default_penalty: myFormat.strValueToFloat(defaultPenalty),
-            monthly_value: myFormat.strValueToFloat(monthlyValue),
+            default_interest: defaultInterest,
+            default_honorary: defaultHonorary,
+            default_penalty: defaultPenalty,
+            monthly_value: monthlyValue,
             payday: payday,
             payment_type: paymentType,
             obs,
@@ -150,10 +150,10 @@ function Companie(props) {
         setResponsibleStaff(reg.responsible_staff);
         setDtContract(reg.dt_contract);
         setDtRenovation(reg.dt_renovation);
-        setDefaultInterest(myFormat.floatValueToStr(reg.default_interest));
-        setDefaultHonorary(myFormat.floatValueToStr(reg.default_honorary));
-        setDefaultPenalty(myFormat.floatValueToStr(reg.default_penalty));
-        setMonthlyValue(myFormat.floatValueToStr(reg.monthly_value));
+        setDefaultInterest(reg.default_interest);
+        setDefaultHonorary(reg.default_honorary);
+        setDefaultPenalty(reg.default_penalty);
+        setMonthlyValue(reg.monthly_value);
         setPayDay(reg.payday);
         setPaymentType(reg.payment_type);
 
@@ -246,7 +246,7 @@ function Companie(props) {
 
                     <label> CNPJ </label>
                     <CurrencyFormat
-                        format="##.###.###/###-##"
+                        format="###.###.###/###-##"
                         placeholder="CNPJ"
                         value={cnpj ? cnpj : ''}
                         onValueChange={e => setCnpj(e.value)} />
@@ -297,7 +297,7 @@ function Companie(props) {
 
                     <label> % Juros </label>
                     <CurrencyInput
-                        placeholder="Jutos "
+                        placeholder="Juros "
                         decimalSeparator=","
                         groupSeparator="."
                         value={defaultInterest?defaultInterest:''}
@@ -321,10 +321,10 @@ function Companie(props) {
 
                     <label> Data de Pagamento </label>
                     <CurrencyFormat
-                        format="##/##/####"
+                        format="##/##"
                         placeholder="Data de Pagamento"
                         value={payday ? payday : ''}
-                        onValueChange={e => setPayDay(e.value)} />
+                        onValueChange={e => setPayDay(e.formattedValue)} />
 
                     <label> Modalidade de Pagamento </label>
                     <select
