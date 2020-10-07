@@ -8,7 +8,8 @@ const strValueToFloat = (str) => {
 }
 
 const floatValueToStr = (flt) => {
-    var r = flt + '';
+    r = parseFloat(flt?flt:0);
+    var r = parseFloat(r.toFixed(2)) + '';
     r = r.replace('.',',')
     return r ? r : '0,00'
 }

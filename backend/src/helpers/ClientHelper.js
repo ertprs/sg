@@ -13,10 +13,9 @@ const getById = async (id) => {
 
 const newIfNotExists = async (client) => {
   try {
-    var existent = [];
-    existent = await getOneByName(client.name);
-    if (existent) {
-      return existent.id
+    const clientId = await getOneByName(client.name);
+    if (clientId > 0) {
+      return clientId
     } else {
       const res = await connection('clients').insert(client);
       return res[0]
@@ -28,36 +27,23 @@ const newIfNotExists = async (client) => {
 }
 
 
-const getOneByCode = async (code) => {
-  if (!code) 
-    return 
-  try {
-    const res = await connection('clients')
-      .where('code', '=', code)
-      .select('*')
-      .first();
-    return res;
-  } catch (error) {
-    return error;
-  }
-}
-
-
 const getOneByName = async (name) => {
-  if (!name) 
-    return 
+  if (!name)
+    return 0
   try {
     const res = await connection('clients')
       .where('name', '=', name)
       .select('*')
       .first();
-    return res;
+    if (res)
+      return res.id
+    else
+      return 0
   } catch (error) {
     return error;
   }
 }
 module.exports = {
   getById,
-  getOneByCode,
   newIfNotExists
 }

@@ -15,8 +15,8 @@ const newIfNotExists = async (collect) => {
   try {
     var existent = [];
     existent = await findCollect(collect);
-    if (existent) {
-      return existent.id
+    if (existent  > 0) {
+      return existent
     } else {
       const res = await connection('collects').insert(collect);
       return res[0]

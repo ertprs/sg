@@ -285,7 +285,7 @@ function Companie(props) {
                         format="##/##/####"
                         placeholder="Data de renovação"
                         value={dtRenovation ? dtRenovation : ''}
-                        onCValuehange={e => setDtRenovation(e.value)} />
+                        onValueChange={e => setDtRenovation(e.value)} />
 
                     <label> R$ Valor da Mensalidade </label>
                     <CurrencyInput
@@ -295,9 +295,10 @@ function Companie(props) {
                         value={monthlyValue?monthlyValue:''}
                         onChange={e => setMonthlyValue(e)}/>
 
-                    <label> % Juros </label>
+                    <label> % Juros Diário </label>
                     <CurrencyInput
                         placeholder="Juros "
+                        decimalsLimit={3}
                         decimalSeparator=","
                         groupSeparator="."
                         value={defaultInterest?defaultInterest:''}
@@ -320,11 +321,11 @@ function Companie(props) {
                         onChange={e => setDefaultPenalty(e)}/>
 
                     <label> Data de Pagamento </label>
-                    <CurrencyFormat
-                        format="##/##"
+                    <input
+                        type="text"
                         placeholder="Data de Pagamento"
-                        value={payday ? payday : ''}
-                        onValueChange={e => setPayDay(e.formattedValue)} />
+                        value={payday}
+                        onChange={e => setPayDay(e.target.value)} />
 
                     <label> Modalidade de Pagamento </label>
                     <select

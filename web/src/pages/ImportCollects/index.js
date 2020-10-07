@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import moment, { now } from 'moment';
 import './style.css';
 import api from '../../services/api';
-import {strValueToFloat, floatValueToStr, configSheetStr} from '../../helpers/myFormat';
+import { strValueToFloat, floatValueToStr, configSheetStr } from '../../helpers/myFormat';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
@@ -53,15 +53,21 @@ function ImportCollects(props) {
             maximum_discount: register.DESC_MAX,
             value: register.VLR_ORIGINARIO,
         }
+        api.post('collects/import-collect', data);
+    }
 
-        await api.post('collects/import-collect', data);
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     const registerOnBackend = async () => {
         props.dispatch(loadingActions.setLoading(true));
-
-        await Promise.all(importedArray.map(reg => insetOne(reg)));
-
+        
+        for (var reg of importedArray) {
+            await sleep(100).then(() => {
+                insetOne(reg)
+            });
+        }
         props.dispatch(loadingActions.setLoading(false));
 
         props.dispatch(toastActions.setToast(true, 'success', 'Todos os registros foram importados!'));
@@ -87,10 +93,9 @@ function ImportCollects(props) {
             var xlsxJSON = await (XLSX.utils.sheet_to_json(worksheet, { raw: false }));
             var tempArray = [];
             for (var json of xlsxJSON) {
-                console.log(json)
-                json.FONE_1  = await configStrTelephone(json.FONE_1);
-                json.FONE_2  = await configStrTelephone(json.FONE_1);
-                json.FONE_3  = await configStrTelephone(json.FONE_1);
+                json.FONE_1 = await configStrTelephone(json.FONE_1);
+                json.FONE_2 = await configStrTelephone(json.FONE_1);
+                json.FONE_3 = await configStrTelephone(json.FONE_1);
                 json.DT_VENC = await moment(json.DT_VENC).format('DD/MM/YYYY')
                 json.VLR_ORIGINARIO = await configSheetStr(json.VLR_ORIGINARIO)
                 json.DESC_MAX = await configSheetStr(json.DESC_MAX)

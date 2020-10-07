@@ -15,7 +15,7 @@ import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import * as callbackActions from '../../store/actions/callback';
 import AppBar from '../../components/AppBar';
-import {strValueToFloat, floatValueToStr} from '../../helpers/myFormat';
+import { strValueToFloat, floatValueToStr } from '../../helpers/myFormat';
 
 
 function Client(props) {
@@ -26,7 +26,7 @@ function Client(props) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [searchField, setSearchField] = useState('');
     const [search, setSearch] = useState([]);
-    const [selectFilterField, setSelectFilterField] = useState('client_document')
+    const [selectFilterField, setSelectFilterField] = useState('client_name')
 
     //FIELDS
     const [client, setClient] = useState('');
@@ -64,8 +64,7 @@ function Client(props) {
             props.dispatch(loadingActions.setLoading(true));
             const res = await api.get('collects')
             await setRegisters(res.data);
-            await setSearch(res.data)
-            await calculate()
+            await setSearch(res.data);
             props.dispatch(loadingActions.setLoading(false));
         } catch (error) {
             props.dispatch(loadingActions.setLoading(false));
@@ -195,7 +194,6 @@ function Client(props) {
             setHonoraryPer(res.data.default_honorary)
             setDefaultPenalty(res.data.default_penalty)
         }
-        await calculate();
 
         setIsUpdating(true);
         setShow(true)
@@ -229,7 +227,6 @@ function Client(props) {
         setShow(true);
     }
 
-
     const calculate = async () => {
         if (!moment(dtMaturity, "DD/MM/YYYY")._isValid)
             setDays(0)
@@ -241,7 +238,7 @@ function Client(props) {
 
         //DAYS
         setDays(calculedDays * -1)
-
+        
         //INTEREST (JUROS)
         const interest = await parseFloat((((strValueToFloat(defaultInterest) / 100) * strValueToFloat(value)) * strValueToFloat(days))).toFixed(2);
         setInterestCalculed(floatValueToStr(interest))
@@ -310,7 +307,7 @@ function Client(props) {
                     {search.map(reg => (
                         <tr
                             style={{ cursor: 'pointer' }}
-                            onClick={async () => { await setUpdating(reg); calculate(); }}
+                            onClick={async () => { await setUpdating(reg) }}
                             key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
@@ -538,6 +535,7 @@ function Client(props) {
                             style={{ marginLeft: 5, width: 'auto' }}
                             onClick={calculate}> Atualizar </button>
                     </div>
+
                     <label> R$ Desconto Máximo </label>
                     <CurrencyInput
                         prefix="R$ "
@@ -545,8 +543,7 @@ function Client(props) {
                         decimalSeparator=","
                         groupSeparator="."
                         value={maximumDiscount ? maximumDiscount : ''}
-                        onChange={e => setMaximumDiscount(e)}
-                        readOnly={isUpdating} />
+                        onChange={e => setMaximumDiscount(e)} />
 
                     <label> R$ Valor Negociado </label>
                     <CurrencyInput
