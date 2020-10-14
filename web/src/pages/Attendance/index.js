@@ -36,6 +36,7 @@ function Attendance(props) {
     const [aDtBegin, setADtBegin] = useState('');
     const [aDtEnd, setADtEnd] = useState('');
     const [aDescription, setADescription] = useState('');
+    const [aStatus, setAStatus] = useState('Não Negociado')
     const [aNegotiatedValue, setANegotiatedValue] = useState('');
     const [aGrandValue, setAGrandValue] = useState('');
     const [aObs, setAObs] = useState('');
@@ -54,6 +55,8 @@ function Attendance(props) {
     const [cliCompanie, setCliCompanie] = useState('');
     const [cliCompanieName, setCliCompanieName] = useState('');
     const [cliEmail, setCliEmail] = useState('');
+    const [cliAttendance, setCliAttendance] = useState('');
+    const [cliDocumentType, setCliDocumentType] = useState('CPF');
     const [cliDocument, setCliDocument] = useState('');
     const [cliEdress, setCliEdress] = useState('');
     const [cliObs, setCliObs] = useState('');
@@ -90,17 +93,6 @@ function Attendance(props) {
     const handleSubmit = async () => {
 
         props.dispatch(loadingActions.setLoading(true));
-        //VALIDAÇÕES
-        if (aObs.length < 10) {
-            props.dispatch(loadingActions.setLoading(false));
-            props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
-            return
-        }
-        if (aNegotiatedValue < grandMaximumDiscount) {
-            props.dispatch(loadingActions.setLoading(false));
-            props.dispatch(toastActions.setToast(true, 'success', 'O VALOR NEGOCIADO não pode ser maior que o DESCONTO MÁXIMO!'));
-            return 0
-        }
 
         setADtEnd(moment().format('L LT'))
         const regTemp = {
@@ -111,6 +103,7 @@ function Attendance(props) {
             description: aDescription,
             negotiated_value: aNegotiatedValue,
             grand_value: aGrandValue,
+            status: aStatus,
             obs: aObs
         }
         setRegister(regTemp);
@@ -119,20 +112,48 @@ function Attendance(props) {
                 //ALTERAÇÃO
                 const res = await api.put(`attendances/${register.id}`, regTemp)
                 await updateClient();
-                setIsUpdating(false);
                 setRegister({});
                 clearValues();
                 loadRegisters();
+                setIsUpdating(false);
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
+                //VALIDAÇÕES
+                if (aObs.length < 10) {
+                    props.dispatch(loadingActions.setLoading(false));
+                    props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
+                    return
+                }
+
+                if (aStatus === 'Negociado') {
+
+                    if (grandMaximumDiscount === 0) {
+                        if (strValueToFloat(aNegotiatedValue) < aGrandValue) {
+                            props.dispatch(loadingActions.setLoading(false));
+                            props.dispatch(toastActions.setToast(true, 'success', 'O VALOR NEGOCIADO deve ser o mesmo que o DÉBITO TOTAL!'));
+                            return 0
+                        }
+                    } else {
+                        if (strValueToFloat(aNegotiatedValue) < grandMaximumDiscount) {
+                            props.dispatch(loadingActions.setLoading(false));
+                            props.dispatch(toastActions.setToast(true, 'success', 'O VALOR NEGOCIADO não pode ser menor que o DESCONTO MÁXIMO!'));
+                            return 0
+                        }
+                    }
+                } else {
+                    setANegotiatedValue('0')
+                }
+
                 //CADASTRO
                 const res = await api.post('attendances', regTemp);
-                await updateClient();
-                await closeCollectsByClient(aClient);
-                setIsUpdating(false);
+
+                if (aStatus === 'Negociado')
+                    await closeCollectsByClient(aClient, res.data[0]);
+
                 setRegister({});
                 clearValues();
                 loadRegisters();
+                setIsUpdating(false);
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro cadastrado!'));
             }
             setShow(false)
@@ -182,9 +203,28 @@ function Attendance(props) {
     }
 
 
+    const getCollectsByAttendanceId = async attendanceId => {
+        try {
+            const res = await api.get('/collects/find-by-attendance/' + attendanceId);
+            var tempGrandMaximumDiscount = 0;
+            var tempAGrandValue = 0;
+            res.data.map(collect => {
+                tempGrandMaximumDiscount = tempGrandMaximumDiscount + strValueToFloat(collect.maximum_discount)
+                tempAGrandValue = tempAGrandValue + strValueToFloat(collect.updated_debt);
+            })
+            setGrandMaximumDiscount(tempGrandMaximumDiscount);
+            if (tempAGrandValue > 0)
+                setAGrandValue(floatValueToStr(tempAGrandValue));
+
+            setCCollects(res.data)
+        } catch (error) {
+            props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
+        }
+    }
+
     const getCollectsByClientId = async cliId => {
         try {
-            const res = await api.get('/collects/find-by-client/' + cliId)
+            const res = await api.get('/collects/find-by-client/' + cliId);
             var tempGrandMaximumDiscount = 0;
             var tempAGrandValue = 0;
             res.data.map(collect => {
@@ -209,10 +249,11 @@ function Attendance(props) {
         setAUser(localStorage.getItem('@sg/user/id'));
         setAUserName(localStorage.getItem('@sg/user/name'))
         setADescription('');
-        setADtBegin(moment().format('L LT'))
-        setADtEnd('')
-        setANegotiatedValue('')
-        setAGrandValue('')
+        setAStatus('Não Negociado');
+        setADtBegin(moment().format('L LT'));
+        setADtEnd('');
+        setANegotiatedValue('');
+        setAGrandValue('');
         setAObs('');
 
         //CLEAR CLIENTE
@@ -227,7 +268,9 @@ function Attendance(props) {
         setCliEmail('');
         setCliEmailAdditional('');
         setCliEdress('');
+        setCliAttendance('');
         setCliEdressAdditional('');
+        setCliDocumentType('CPF')
         setCliDocument('');
         setCliObs('');
     }
@@ -244,7 +287,9 @@ function Attendance(props) {
         setCliEmail(client.email);
         setCliEmailAdditional(client.email_additional);
         setCliEdress(client.edress);
+        setCliAttendance(client.attendance);
         setCliEdressAdditional(client.edress_additional);
+        setCliDocumentType(client.document_type)
         setCliDocument(client.document);
         setCliObs(client.obs);
         await getCollectsByClientId(client.id)
@@ -252,13 +297,13 @@ function Attendance(props) {
 
 
     const setUpdating = async (reg) => {
-
         setIsUpdating(true);
         setRegister(reg);
         setAClient(reg.client);
         setAClientName(reg.client_name);
         setAUser(reg.user);
         setADescription(reg.description);
+        setAStatus(reg.status)
         setAObs(reg.obs);
         setADtBegin(reg.dt_begin);
         setANegotiatedValue(reg.negotiated_value)
@@ -271,7 +316,7 @@ function Attendance(props) {
             setAClientName(res.data.name)
             setClientValues(res.data)
             // GET COLLECTS
-            await getCollectsByClientId(res.data.id)
+            await getCollectsByAttendanceId(reg.id)
         }
 
         setShow(true);
@@ -305,6 +350,7 @@ function Attendance(props) {
                 phone_additional: cliPhoneAdditional,
                 email: cliEmail,
                 edress: cliEdress,
+                document_type: cliDocumentType,
                 document: cliDocument,
                 obs: cliObs
             }
@@ -316,8 +362,8 @@ function Attendance(props) {
 
 
 
-    const closeCollectsByClient = async (clientId) => {
-        const res = await api.get(`collects/close-by-client/${clientId}`);
+    const closeCollectsByClient = async (clientId, attendanceId) => {
+        const res = await api.get(`collects/close-by-client/${clientId}/${attendanceId}`);
     }
 
     return (
@@ -342,6 +388,7 @@ function Attendance(props) {
                         <th>Usuário</th>
                         <th>Cliente</th>
                         <th>Valor Total</th>
+                        <th>Status</th>
                         <th>Valor negociado</th>
                     </tr>
                 </MDBTableHead>
@@ -356,6 +403,7 @@ function Attendance(props) {
                             <td>{reg.user + ' - ' + reg.user_name}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{strValueToFloat(reg.grand_value).toLocaleString()}</td>
+                            <td>{reg.status}</td>
                             <td>{strValueToFloat(reg.negotiated_value).toLocaleString()}</td>
                         </tr>
                     ))}
@@ -520,12 +568,25 @@ function Attendance(props) {
                                 value={cliEmailAdditional}
                                 onChange={e => setCliEmailAdditional(e.target.value)} />
 
-                            <label> CPF </label>
-                            <CurrencyFormat
-                                format="###.###.###-##"
-                                placeholder="CPF"
-                                value={cliDocument ? cliDocument : ''}
-                                onValueChange={e => setCliDocument(e.value)} />
+                            <div className="inline">
+                                <div style={{ marginRight: 5 }}>
+                                    <label> Tipo de Cliente </label>
+                                    <select
+                                        className="select-search"
+                                        onChange={e => setCliDocumentType(e.target.value)}>
+                                        <option value="CPF" selected={cliDocumentType === 'CPF' ? true : false}>CPF</option>
+                                        <option value="CNPJ" selected={cliDocumentType === 'CNPJ' ? true : false}>CNPJ</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label> {cliDocumentType} </label>
+                                    <CurrencyFormat
+                                        format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/###-##"}
+                                        placeholder={cliDocumentType}
+                                        value={cliDocument ? cliDocument : ''}
+                                        onValueChange={e => setCliDocument(e.value)} />
+                                </div>
+                            </div>
 
                             <label>  Endereço </label>
                             <input
@@ -550,7 +611,6 @@ function Attendance(props) {
                         </Tab>
 
                         <Tab eventKey="collect" title="Cobranças">
-
                             <MDBTable responsive hover bordered className="table">
                                 <MDBTableHead>
                                     <tr>
@@ -573,6 +633,7 @@ function Attendance(props) {
                                     ))}
                                 </MDBTableBody>
                             </MDBTable>
+
 
                             <div className="negotiation">
                                 <div className="inline">
@@ -598,17 +659,29 @@ function Attendance(props) {
                                             readOnly />
                                     </div>
                                 </div>
-                                <div>
-                                    <label> R$ Valor Negociado </label>
-                                    <CurrencyInput
-                                        prefix="R$ "
-                                        placeholder="Valor Negociado"
-                                        decimalSeparator=","
-                                        groupSeparator="."
-                                        precision="2"
-                                        value={aNegotiatedValue ? aNegotiatedValue : ''}
-                                        onChange={e => setANegotiatedValue(e)}
-                                        readOnly={isUpdating} />
+                                <div className="inline">
+                                    <div>
+                                        <label> Status </label>
+                                        <select
+                                            className="select-search"
+                                            onChange={e => setAStatus(e.target.value)}
+                                            disabled={isUpdating}>
+                                            <option value="Não Negociado" selected={aStatus === 'Não Negociado' ? true : false}>Não Negociado</option>
+                                            <option value="Negociado" selected={aStatus === 'Negociado' ? true : false}>Negociado</option>
+                                        </select>
+                                    </div>
+                                    <div style={{ marginLeft: 5 }}>
+                                        <label> R$ Valor Negociado </label>
+                                        <CurrencyInput
+                                            prefix="R$ "
+                                            placeholder="Valor Negociado"
+                                            decimalSeparator=","
+                                            groupSeparator="."
+                                            precision="2"
+                                            value={aNegotiatedValue ? aNegotiatedValue : ''}
+                                            onChange={e => setANegotiatedValue(e)}
+                                            readOnly={((isUpdating) || (aStatus !== 'Negociado'))} />
+                                    </div>
                                 </div>
 
                             </div>

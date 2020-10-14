@@ -15,7 +15,8 @@ exports.up = function(knex) {
     table.string('honorary_per');
     table.string('maximum_discount');
     table.string('negotiated_value');
-    
+    table.decimal('attendance');
+
     table.string('obs');
   });
 };

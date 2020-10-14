@@ -9,6 +9,7 @@ exports.up = function(knex) {
       table.string('cellphone');
       table.string('email');
       table.string('email_additional');
+      table.string('document_type');
       table.string('document');
       table.string('edress');
       table.string('edress_additional');

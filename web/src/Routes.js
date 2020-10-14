@@ -9,6 +9,7 @@ import Companie from './pages/Companie';
 import Attendance from './pages/Attendance'
 import NotFound from './pages/NotFound';
 import Client from './pages/Client';
+import User from './pages/User';
 
 export default function Routes() {
     return (
@@ -21,6 +22,7 @@ export default function Routes() {
                 <Route exact path="/import-collects" component={ImportCollects} />
                 <Route exact path="/companie" component={Companie} />
                 <Route exact path="/client" component={Client} />
+                <Route exact path="/user" component={User} />
                 <Route path='*' component={NotFound} />
             </Switch>
         </BrowserRouter>

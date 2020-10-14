@@ -28,6 +28,7 @@ const newRegister = async (request, response) => {
     edress_additional: request.body.edress_additional,
     email: request.body.email,
     email_additional: request.body.email_additional,
+    document_type: request.body.document_type,
     document: request.body.document,
     obs: request.body.obs,
   };
@@ -51,6 +52,7 @@ const update = async (request, response) => {
     edress_additional: request.body.edress_additional,
     email: request.body.email,
     email_additional: request.body.email_additional,
+    document_type: request.body.document_type,
     document: request.body.document,
     obs: request.body.obs,
   };
@@ -107,6 +109,23 @@ const findByName = async (request, response) => {
   }
 }
 
+const findClient = async (request, response) => {
+  try {
+    const res = await connection('clients')
+      .select('*', connection.raw('name || cellphone || document as "to_find"'))
+      .where('to_find', 'LIKE', '%'+request.params.find+'%')
+    clients = [];
+    for (client of res) {
+      const companie = await CompanieHelper.getById(client.companie);
+      clients.push({ ...client, companie_name: companie ? companie.name : '' })
+    }
+    return response.json(clients);
+  } catch (error) {
+    console.log(error)
+    return response.json(error);
+  }
+}
+
 
 
 module.exports = {
@@ -115,5 +134,6 @@ module.exports = {
   getById,
   findByName,
   update,
+  findClient,
   deleteRegister
 }

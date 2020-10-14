@@ -13,7 +13,7 @@ import * as toastActions from '../../store/actions/toast';
 import AppBar from '../../components/AppBar';
 
 
-function Companie(props) {
+function User(props) {
     const history = useHistory();
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
@@ -23,18 +23,14 @@ function Companie(props) {
     const [isUpdating, setIsUpdating] = useState(false);
 
     const [name, setName] = useState('');
-    const [cnpj, setCnpj] = useState('');
-    const [edress, setEdress] = useState('');
+    const [userName, setUserName] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [adress, setAdress] = useState('');
+    const [document, setDocument] = useState('');
+    const [identitet, setIdentitet] = useState('');
+    const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
-    const [responsibleStaff, setResponsibleStaff] = useState('');
-    const [dtContract, setDtContract] = useState('');
-    const [dtRenovation, setDtRenovation] = useState('');
-    const [defaultInterest, setDefaultInterest] = useState('');
-    const [defaultHonorary, setDefaultHonorary] = useState('');
-    const [defaultPenalty, setDefaultPenalty] = useState('');
-    const [monthlyValue, setMonthlyValue] = useState('');
-    const [payday, setPayDay] = useState('');
-    const [paymentType, setPaymentType] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -52,22 +48,36 @@ function Companie(props) {
             return 0
         }
 
+        //VALIDAÇÕES
+        if (!userName) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
+            return 0
+        }
+        //VALIDAÇÕES
+        if (!password) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
+            return 0
+        }
+        //VALIDAÇÕES
+        if (password !== confirmPassword) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'As senhas devem ser identicas!'));
+            return 0
+        }
+
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
             name,
-            cnpj,
-            edress,
+            username: userName,
+            password,
+            adress,
+            document,
+            email,
             phone,
-            responsible_staff: responsibleStaff,
-            dt_contract: dtContract,
-            dt_renovation: dtRenovation,
-            default_interest: defaultInterest,
-            default_honorary: defaultHonorary,
-            default_penalty: defaultPenalty,
-            monthly_value: monthlyValue,
-            payday: payday,
-            payment_type: paymentType,
-            obs,
+            identitet,
+            obs
         }
 
         setRegister(regTemp);
@@ -75,7 +85,7 @@ function Companie(props) {
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
-                const res = await api.put(`companies/${register.id}`, regTemp)
+                const res = await api.put(`users/${register.id}`, regTemp)
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -83,7 +93,7 @@ function Companie(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //CADASTRO
-                const res = await api.post('companies', regTemp);
+                const res = await api.post('users', regTemp);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -101,7 +111,7 @@ function Companie(props) {
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
         try {
-            const res = await api.delete(`companies/${register.id}`);
+            const res = await api.delete(`users/${register.id}`);
             setIsUpdating(false);
             setRegister({});
             clearValues();
@@ -118,7 +128,7 @@ function Companie(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('companies')
+            const res = await api.get('users')
             setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));
@@ -136,7 +146,17 @@ function Companie(props) {
     }
 
     const clearValues = () => {
-        setName('')
+        setRegister({});
+        setName('');
+        setUserName('');
+        setPassword('');
+        setConfirmPassword('');
+        setAdress('');
+        setDocument('');
+        setIdentitet('');
+        setPhone('');
+        setEmail('');
+        setObs('');
     }
 
 
@@ -144,41 +164,21 @@ function Companie(props) {
         setIsUpdating(true);
         setRegister(reg);
         setName(reg.name);
-        setCnpj(reg.cnpj);
-        setEdress(reg.edress);
+        setUserName(reg.username);
+        setPassword(reg.password);
+        setConfirmPassword(reg.password);
+        setAdress(reg.adress);
+        setDocument(reg.document);
+        setIdentitet(reg.identitet);
         setPhone(reg.phone);
-        setResponsibleStaff(reg.responsible_staff);
-        setDtContract(reg.dt_contract);
-        setDtRenovation(reg.dt_renovation);
-        setDefaultInterest(reg.default_interest);
-        setDefaultHonorary(reg.default_honorary);
-        setDefaultPenalty(reg.default_penalty);
-        setMonthlyValue(reg.monthly_value);
-        setPayDay(reg.payday);
-        setPaymentType(reg.payment_type);
-
+        setEmail(reg.email);
         setObs(reg.obs);
         setShow(true);
     }
 
     const hide = async (reg) => {
         setShow(false);
-        setRegister({});
-        setName('');
-        setName('');
-        setCnpj('');
-        setEdress('');
-        setPhone('');
-        setResponsibleStaff('');
-        setDtContract('');
-        setDtRenovation('');
-        setDefaultInterest('');
-        setDefaultHonorary('');
-        setDefaultPenalty('');
-        setMonthlyValue('');
-        setPayDay('');
-        setPaymentType('');
-        setObs('');
+        clearValues();
         setIsUpdating(false);
     }
 
@@ -189,7 +189,7 @@ function Companie(props) {
     }
 
     return (
-        <div className="companie-container">
+        <div className="user-container">
             <AppBar />
             <div className="filters">
                 <label> Nome: </label>
@@ -205,8 +205,8 @@ function Companie(props) {
                 <MDBTableHead>
                     <tr>
                         <th>Código</th>
-                        <th>Razão Social</th>
-                        <th>Observação</th>
+                        <th>Nome</th>
+                        <th>Usuário</th>
                     </tr>
                 </MDBTableHead>
                 <MDBTableBody>
@@ -217,7 +217,7 @@ function Companie(props) {
                             key={reg.id}>
                             <td>{reg.id}</td>
                             <td>{reg.name}</td>
-                            <td>{reg.obs}</td>
+                            <td>{reg.username}</td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -225,7 +225,7 @@ function Companie(props) {
 
             <Modal show={show} onHide={() => console.log('Cant close')}>
                 <Modal.Header>
-                    <Modal.Title>Cadastro de Credor</Modal.Title>
+                    <Modal.Title>Cadastro de Usuários</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {
@@ -237,26 +237,19 @@ function Companie(props) {
                             </div>
                             : ''
                     }
-                    <label> Razão Social </label>
+                    <label> Nome </label>
                     <input
                         type="text"
-                        placeholder="Razão Social"
+                        placeholder="Nome"
                         value={name}
                         onChange={e => setName(e.target.value)} />
 
-                    <label> CNPJ </label>
-                    <CurrencyFormat
-                        format="##.###.###/####-##"
-                        placeholder="CNPJ"
-                        value={cnpj ? cnpj : ''}
-                        onValueChange={e => setCnpj(e.value)} />
-
-                    <label> Endereço </label>
+                    <label> Usuário </label>
                     <input
                         type="text"
-                        placeholder="Endereço"
-                        value={edress}
-                        onChange={e => setEdress(e.target.value)} />
+                        placeholder="Usuário"
+                        value={userName}
+                        onChange={e => setUserName(e.target.value)} />
 
                     <label> Telefone </label>
                     <CurrencyFormat
@@ -265,76 +258,48 @@ function Companie(props) {
                         value={phone ? phone : ''}
                         onValueChange={e => setPhone(e.value)} />
 
-                    <label> Pessoa Responsável </label>
+                    <label> Email </label>
                     <input
                         type="text"
-                        placeholder="Pessoa Responsável"
-                        value={responsibleStaff}
-                        onChange={e => setResponsibleStaff(e.target.value)} />
+                        placeholder="Email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)} />
 
-
-                    <label> Data de início de contrato </label>
-                    <CurrencyFormat
-                        format="##/##/####"
-                        placeholder="Data do contrato"
-                        value={dtContract ? dtContract : ''}
-                        onValueChange={e => setDtContract(e.value)} />
-
-                    <label> Prazo para renovação </label>
-                    <CurrencyFormat
-                        format="##/##/####"
-                        placeholder="Data de renovação"
-                        value={dtRenovation ? dtRenovation : ''}
-                        onValueChange={e => setDtRenovation(e.value)} />
-
-                    <label> R$ Valor da Mensalidade </label>
-                    <CurrencyInput
-                        placeholder="Valor da Mensalidade"
-                        decimalSeparator=","
-                        groupSeparator="."
-                        value={monthlyValue?monthlyValue:''}
-                        onChange={e => setMonthlyValue(e)}/>
-
-                    <label> % Juros Diário </label>
-                    <CurrencyInput
-                        placeholder="Juros "
-                        decimalsLimit={3}
-                        decimalSeparator=","
-                        groupSeparator="."
-                        value={defaultInterest?defaultInterest:''}
-                        onChange={e => setDefaultInterest(e)}/>
-
-                    <label> % Honorários padrão </label>
-                    <CurrencyInput
-                        placeholder="Honorários Padrão"
-                        decimalSeparator=","
-                        groupSeparator="."
-                        value={defaultHonorary?defaultHonorary:''}
-                        onChange={e => setDefaultHonorary(e)}/>
-
-                    <label> % Multa </label>
-                    <CurrencyInput
-                        placeholder="Honorários Padrão"
-                        decimalSeparator=","
-                        groupSeparator="."
-                        value={defaultPenalty?defaultPenalty:''}
-                        onChange={e => setDefaultPenalty(e)}/>
-
-                    <label> Data de Pagamento </label>
+                    <label>  Endereço </label>
                     <input
                         type="text"
-                        placeholder="Data de Pagamento"
-                        value={payday}
-                        onChange={e => setPayDay(e.target.value)} />
+                        placeholder="Endereço"
+                        value={adress}
+                        onChange={e => setAdress(e.target.value)} />
 
-                    <label> Modalidade de Pagamento </label>
-                    <select
-                        className="select-search"
-                        onChange={e => setPaymentType(e.target.value)}>
-                        <option value="Permuta" selected={paymentType === 'Permuta' ? true : false}>Permuta</option>
-                        <option value="Sem mensalidade" selected={paymentType === 'Sem mensalidade' ? true : false}>Sem mensalidade</option>
-                        <option value="Dinheiro" selected={paymentType === 'Dinheiro' ? true : false}>Dinheiro</option>
-                    </select>
+                    <label> CPF </label>
+                    <CurrencyFormat
+                        format="###.###.###-##"
+                        placeholder="CPF"
+                        value={document ? document : ''}
+                        onValueChange={e => setDocument(e.value)}
+                        on />
+
+                    <label> Identidade </label>
+                    <input
+                        type="text"
+                        placeholder="Identidade"
+                        value={identitet}
+                        onChange={e => setIdentitet(e.target.value)} />
+
+                    <label> Senha </label>
+                    <input
+                        type="password"
+                        placeholder="Senha"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)} />
+
+                    <label> Repita a Senha </label>
+                    <input
+                        type="password"
+                        placeholder="Repita a senha"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)} />
 
                     <label> Obs </label>
                     <input
@@ -358,4 +323,4 @@ function Companie(props) {
     );
 }
 
-export default connect(state => ({ state }))(Companie);
+export default connect(state => ({ state }))(User);

@@ -13,18 +13,43 @@ module.exports = {
   },
 
   async newRegister(request, response) {
-    const { name, username, password } = request.body;
+    const reg =  { 
+      name: request.body.name,
+      username: request.body.username,
+      password: request.body.password,
+      adress: request.body.password,
+      document: request.body.document,
+      email: request.body.email,
+      phone: request.body.phone,
+      identitet: request.body.identitet,
+      obs: request.body.obs 
+    };
     try {
-      await connection('users').insert({
-        name,
-        username,
-        password,
-      });
+      await connection('users').insert(reg);
       return response.json({ id });
     } catch (error) {
       return response.json({ error: error.message });
     }
+  },
 
+  async update (request, response) {
+    const reg =  { 
+      name: request.body.name,
+      username: request.body.username,
+      password: request.body.password,
+      adress: request.body.password,
+      document: request.body.document,
+      email: request.body.email,
+      phone: request.body.phone,
+      identitet: request.body.identitet,
+      obs: request.body.obs 
+    };
+    try {
+      const res =  await connection('users').where('id', '=', request.params.id).update(reg)
+      return response.json(res);
+    } catch (error) {
+      return response.json(error);
+    }
   },
 
   async login(request, response) {

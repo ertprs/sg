@@ -33,12 +33,11 @@ function Client(props) {
     const [phoneAdditional, setPhoneAdditional] = useState('');
     const [emailAdditional, setEmailAdditional] = useState('');
     const [edressAdditional, setEdressAdditional] = useState('');
-
     const [companie, setCompanie] = useState('');
     const [companieName, setCompanieName] = useState('');
     const [companies, setCompanies] = useState([]);
-
     const [email, setEmail] = useState('');
+    const [documentType, setDocumentType] = useState('CPF');
     const [document, setDocument] = useState('');
     const [edress, setEdress] = useState('');
     const [obs, setObs] = useState('');
@@ -86,10 +85,10 @@ function Client(props) {
             phone_additional: phoneAdditional,
             email,
             edress,
+            document_type: documentType,
             document,
             obs
         }
-        console.log(regTemp)
         setRegister(regTemp);
         try {
             if (isUpdating) {
@@ -164,6 +163,7 @@ function Client(props) {
         setEdressAdditional(reg.edress_additional)
         setEmail(reg.email)
         setEdress(reg.edress)
+        setDocumentType(reg.document_type)
         setDocument(reg.document)
         setObs(reg.obs)
         setShow(true);
@@ -180,6 +180,7 @@ function Client(props) {
         setCompanie('')
         setCompanieName('')
         setEdress('')
+        setDocumentType('CPF')
         setDocument('')
         setObs('')
         setShow(true);
@@ -346,13 +347,25 @@ function Client(props) {
                         value={emailAdditional}
                         onChange={e => setEmailAdditional(e.target.value)} />
 
-
-                    <label> CPF </label>
-                    <CurrencyFormat
-                        format="###.###.###-##"
-                        placeholder="CPF"
-                        value={document ? document : ''}
-                        onValueChange={e => setDocument(e.value)} />
+                    <div className="inline">
+                        <div style={{ marginRight: 5 }}>
+                            <label> Tipo de Cliente </label>
+                            <select
+                                className="select-search"
+                                onChange={e => setDocumentType(e.target.value)}>
+                                <option value="CPF" selected={documentType === 'CPF' ? true : false}>CPF</option>
+                                <option value="CNPJ" selected={documentType === 'CNPJ' ? true : false}>CNPJ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label> {documentType} </label>
+                            <CurrencyFormat
+                                format={documentType === 'CPF' ? "###.###.###-##" : "##.###.###/####-##"}
+                                placeholder={documentType}
+                                value={document ? document : ''}
+                                onValueChange={e => setDocument(e.value)} />
+                        </div>
+                    </div>
 
                     <label>  Endereço </label>
                     <input

@@ -6,6 +6,7 @@ exports.up = function(knex) {
       table.string('dt_begin');
       table.string('dt_end');
       table.string('grand_value');
+      table.string('status');
       table.string('negotiated_value');
       table.string('description');
       

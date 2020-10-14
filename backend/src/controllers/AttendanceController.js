@@ -34,6 +34,7 @@ const newRegister = async (request, response) => {
     description: request.body.description,
     negotiated_value: request.body.negotiated_value,
     grand_value:request.body.grand_value,
+    status: request.body.status,
     obs: request.body.obs
   };
   try {
@@ -53,6 +54,7 @@ const update = async (request, response) => {
     description: request.body.description,
     negotiated_value: request.body.negotiated_value,
     grand_value:request.body.grand_value,
+    status: request.body.status,
     obs: request.body.obs
   };
   try {

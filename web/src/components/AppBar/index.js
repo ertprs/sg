@@ -19,7 +19,10 @@ export default function AppBar() {
                         <NavDropdown.Item id="color-item" onClick={() => history.push('companie')} > Credores </NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Importação" id="basic-nav-dropdown">
-                        <NavDropdown.Item onClick={() => history.push('import-collects')}>Importar cobranças</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('import-collects')}>Importar Cobranças</NavDropdown.Item>
+                    </NavDropdown>
+                    <NavDropdown title="Controle de Usuários" id="basic-nav-dropdown">
+                        <NavDropdown.Item onClick={() => history.push('user')}>Cadastro de Usuário </NavDropdown.Item>
                     </NavDropdown>
                 </Nav>
                 <Navbar.Collapse className="justify-content-end">

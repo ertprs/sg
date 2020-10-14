@@ -12,15 +12,17 @@ const routes = express.Router();
 //USERS
 routes.get('/users', UserController.getAll);
 routes.post('/users', UserController.newRegister);
+routes.put('/users/:id', UserController.update);
 routes.post('/users/login', UserController.login);
 
 //COLETCTS
 routes.get('/collects', CollectController.getAll);
 routes.get('/collects/recalc', CollectController.recalc);
-routes.get('/collects/close-by-client/:clientId', CollectController.closeByClient);
+routes.get('/collects/close-by-client/:client/:attendance', CollectController.closeByClient);
 routes.post('/collects', CollectController.newRegister);
 routes.put('/collects/:id', CollectController.update);
 routes.get('/collects/find-by-client/:client_id', CollectController.getByClient);
+routes.get('/collects/find-by-attendance/:attendance_id', CollectController.getByAttendance);
 routes.delete('/collects/:id', CollectController.deleteRegister);
 routes.post('/collects/import-collect', CollectController.importCollect);
 
@@ -38,6 +40,7 @@ routes.delete('/companies/:id', CompanyController.deleteRegister);
 routes.get('/clients', ClientController.getAll);
 routes.get('/clients/find-by-id/:id', ClientController.getById);
 routes.get('/clients/find-by-name/:name', ClientController.findByName);
+routes.get('/clients/find-client/:find', ClientController.findClient);
 routes.post('/clients', ClientController.newRegister);
 routes.put('/clients/:id', ClientController.update);
 routes.delete('/clients/:id', ClientController.deleteRegister);

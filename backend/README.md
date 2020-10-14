@@ -7,3 +7,4 @@
  - git add .
  - git commit -m"deploy"
  - git push heroku master
+ - heroku run npx knex migrate:latest

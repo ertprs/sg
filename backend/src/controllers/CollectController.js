@@ -147,7 +147,11 @@ const importCollect = async (request, response) => {
 
 const recalc = async (request, response) => {
   try {
-    const res = await connection('collects').select('*');
+    const res = await connection('collects')
+      .select('*')
+      .where({
+        status: 'Aberto'
+      })
     collects = [];
     for (collect of res) {
       const client = await ClientHelper.getById(collect.client);
@@ -203,10 +207,41 @@ const recalc = async (request, response) => {
 
 const closeByClient = async (request, response) => {
   try {
-    const resUpdate = await connection('collects').where('client', '=', request.params.clientId).update({ status: 'Liquidado' })
+    const resUpdate = await connection('collects')
+      .where('client', '=', request.params.client)
+      .update({
+        status: 'Liquidado',
+        attendance: request.params.attendance
+      })
     return response.json({ data: true });
   } catch (error) {
     console.log(error)
+    return response.json({ error: error.message });
+  }
+}
+
+const getByAttendance = async (request, response) => {
+  try {
+    const res = await connection('collects')
+      .where({
+        attendance: request.params.attendance_id
+      })
+      .select('*');
+    collects = [];
+    for (collect of res) {
+      const client = await ClientHelper.getById(collect.client);
+      const companie = await CompanieHelper.getById(collect.companie);
+      collects.push({
+        ...collect,
+        client_name: client ? client.name : '',
+        client_document: client ? client.document : '',
+        client_phoe: client ? client.phone : '',
+        client_cellphone: client ? client.cellphone : '',
+        companie_name: companie && companie ? companie.name : '',
+      })
+    }
+    return response.json(collects);
+  } catch (error) {
     return response.json({ error: error.message });
   }
 }
@@ -219,5 +254,6 @@ module.exports = {
   recalc,
   closeByClient,
   deleteRegister,
-  getByClient
+  getByClient,
+  getByAttendance
 }

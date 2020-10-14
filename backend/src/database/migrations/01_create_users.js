@@ -4,7 +4,11 @@ exports.up = function(knex) {
     table.string('name').notNullable();
     table.string('username').notNullable();
     table.string('password').notNullable();
-    
+    table.string('adress');
+    table.string('document');
+    table.string('identitet');
+    table.string('email');
+    table.string('phone');
     table.string('obs');
   });
 };
