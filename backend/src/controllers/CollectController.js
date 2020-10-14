@@ -192,6 +192,8 @@ const recalc = async (request, response) => {
 
       //DÉBITO ATUALIZADO 
       reg.debit = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))))
+      
+      
       const resUpdate = await connection('collects').where('id', '=', reg.id).update({
         days: reg.days,
         honorary: reg.honorary,
