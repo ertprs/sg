@@ -4,4 +4,4 @@ node_modules
 
 .yarn.lock
 
-./src/database/db.sqlite
+/src/database/db.sqlite
