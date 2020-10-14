@@ -1,2 +1,2 @@
 cd C:\sg\backend
-yarn install
+npm install

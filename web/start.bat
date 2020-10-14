@@ -1,2 +1,2 @@
-cd C:\sg\web
-yarn start 
+cd C:\sg\web 
+serve -s build
