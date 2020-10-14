@@ -1,2 +1,2 @@
 cd C:\sg\web
-yarn run build
+yarn build
