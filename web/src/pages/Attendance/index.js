@@ -289,7 +289,7 @@ function Attendance(props) {
         setCliEdress(client.edress);
         setCliAttendance(client.attendance);
         setCliEdressAdditional(client.edress_additional);
-        setCliDocumentType(client.document_type)
+        setCliDocumentType(client.document_type ? client.document_type : 'CPF')
         setCliDocument(client.document);
         setCliObs(client.obs);
         await getCollectsByClientId(client.id)
@@ -616,6 +616,7 @@ function Attendance(props) {
                                     <tr>
                                         <th>Código</th>
                                         <th>Status</th>
+                                        <th>Dt. Venc.</th>
                                         <th>Dias em Atraso</th>
                                         <th>Vlr. Originário</th>
                                         <th>Débito Atualizado</th>
@@ -626,6 +627,7 @@ function Attendance(props) {
                                         <tr key={collect.id}>
                                             <td>{collect.id}</td>
                                             <td>{collect.status}</td>
+                                            <td>{collect.dt_maturity}</td>
                                             <td>{collect.days}</td>
                                             <td>{collect.value}</td>
                                             <td>{strValueToFloat(collect.updated_debt).toLocaleString()} </td>
