@@ -5,7 +5,7 @@ const CollectController = require('./controllers/CollectController');
 const CompanyController = require('./controllers/CompanyController');
 const ClientController = require('./controllers/ClientController');
 const AttendanceController = require('./controllers/AttendanceController');
-
+const BilletController = require('./controllers/BilletController');
 
 const routes = express.Router();
 
@@ -48,9 +48,18 @@ routes.delete('/clients/:id', ClientController.deleteRegister);
 
 //ATTENDENCE
 routes.get('/attendances', AttendanceController.getAll);
+routes.get('/attendances/get-by-id/:id', AttendanceController.getById);
 routes.post('/attendances', AttendanceController.newRegister);
 routes.put('/attendances/:id', AttendanceController.update);
 routes.delete('/attendances/:id', AttendanceController.deleteRegister);
+routes.get('/attendances/chart-actual-month', AttendanceController.chartActualMonth);
 
+
+//BILLET
+routes.get('/billets', BilletController.getAll);
+routes.get('/billets/find-by-id/:id', BilletController.getById);
+routes.post('/billets', BilletController.newRegister);
+routes.put('/billets/:id', BilletController.update);
+routes.delete('/billets/:id', BilletController.deleteRegister);
 
 module.exports = routes;

@@ -18,6 +18,8 @@ import AppBar from '../../components/AppBar';
 
 function Client(props) {
     const history = useHistory();
+    const header = { headers: { hash: props.state.user.hash }};
+    
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -49,7 +51,7 @@ function Client(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('clients')
+            const res = await api.get('clients', header, header)
             if (res.data.error) {
                 props.dispatch(loadingActions.setLoading(false));
                 props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + res.data.error));
@@ -93,7 +95,7 @@ function Client(props) {
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
-                const res = await api.put(`clients/${register.id}`, regTemp)
+                const res = await api.put(`clients/${register.id}`, regTemp, header)
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -101,7 +103,7 @@ function Client(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //CADASTRO
-                const res = await api.post('clients', regTemp);
+                const res = await api.post('clients', regTemp, header);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -119,7 +121,7 @@ function Client(props) {
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
         try {
-            const res = await api.delete(`clients/${register.id}`);
+            const res = await api.delete(`clients/${register.id}`, header);
             loadRegisters();
             setIsUpdating(false);
             setRegister({});
@@ -259,7 +261,7 @@ function Client(props) {
                     <Downshift inputValue={companieName} onChange={selection => {
                         setCompanie(selection.id)
                         setCompanieName(selection.name)
-                        setCompanies(selection)
+                        setCompanies([])
                     }}
                         itemToString={item => (item ? item.name : '')}>
                         {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
@@ -273,7 +275,7 @@ function Client(props) {
                                         onChangeCapture={async e => {
                                             setCompanieName(e.target.value)
                                             if (!e.target.value || e.target.value.length < 3) return;
-                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`, header);
                                             setCompanies(data);
                                         }}
                                         {...getInputProps()} />

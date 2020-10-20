@@ -6,7 +6,7 @@ var baseURL = '';
 if (userUrl === 'http://192.168')
   baseURL = 'http://192.168.1.1:3333'
 else if (userUrl === 'http://localho')
-  baseURL = 'http://177.36.223.44:3333'
+  baseURL = 'http://localhost:3333'
 else
   baseURL = 'http://177.36.223.44:3333';
 

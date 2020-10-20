@@ -20,8 +20,11 @@ import { strValueToFloat, floatValueToStr } from '../../helpers/myFormat';
 
 function Client(props) {
     const history = useHistory();
+    const header = { headers: { hash: props.state.user.hash } };
+
     const [show, setShow] = useState(false);
     const [registers, setRegisters] = useState([]);
+    const [isClosed, setIsClosed] = useState(false);
     const [register, setRegister] = useState({});
     const [isUpdating, setIsUpdating] = useState(false);
     const [searchField, setSearchField] = useState('');
@@ -62,7 +65,7 @@ function Client(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('collects')
+            const res = await api.get('collects', header)
             await setRegisters(res.data);
             await setSearch(res.data);
             props.dispatch(loadingActions.setLoading(false));
@@ -104,7 +107,7 @@ function Client(props) {
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
-                const res = await api.put(`collects/${register.id}`, regTemp)
+                const res = await api.put(`collects/${register.id}`, regTemp, header)
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -112,7 +115,7 @@ function Client(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //CADASTRO
-                const res = await api.post('collects', regTemp);
+                const res = await api.post('collects', regTemp, header);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -130,7 +133,7 @@ function Client(props) {
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
         try {
-            const res = await api.delete(`collects/${register.id}`);
+            const res = await api.delete(`collects/${register.id}`, header);
             setIsUpdating(false);
             setRegister({});
             clearValues();
@@ -185,9 +188,9 @@ function Client(props) {
         setHonoraryPer(reg.default_honorary);
         setDefaultPenalty(reg.default_penalty)
         setValue(reg.value);
-        setObs(reg.obs)
+        setObs(reg.obs);
 
-        const res = await api.get(`companies/find-by-id/${reg.companie}`)
+        const res = await api.get(`companies/find-by-id/${reg.companie}`, header)
         if (res.data) {
             setCompanieName(res.data.name)
             setDefaultInterest(res.data.default_interest)
@@ -238,7 +241,7 @@ function Client(props) {
 
         //DAYS
         setDays(calculedDays * -1)
-        
+
         //INTEREST (JUROS)
         const interest = await parseFloat((((strValueToFloat(defaultInterest) / 100) * strValueToFloat(value)) * strValueToFloat(days))).toFixed(2);
         setInterestCalculed(floatValueToStr(interest))
@@ -258,7 +261,7 @@ function Client(props) {
     const updateAllDebits = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('collects/recalc');
+            const res = await api.get('collects/recalc', header);
             await loadRegisters();
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Todos os débitos foram atualizados.'));
@@ -313,9 +316,9 @@ function Client(props) {
                             <td>{reg.client + ' - ' + reg.client_name}</td>
                             <td>{reg.status}</td>
                             <td>{reg.dt_maturity}</td>
-                            <td>{reg.value ? strValueToFloat(reg.value).toLocaleString() : 0}</td>
+                            <td>{'R$ ' + reg.value ? strValueToFloat(reg.value).toLocaleString() : 0}</td>
                             <td>{reg.days}</td>
-                            <td>{reg.updated_debt ? strValueToFloat(reg.updated_debt).toLocaleString() : 0}</td>
+                            <td>{'R$ ' + reg.updated_debt ? strValueToFloat(reg.updated_debt).toLocaleString() : 0}</td>
                             <td>{reg.companie + ' - ' + reg.companie_name}</td>
                         </tr>
                     ))}
@@ -340,7 +343,7 @@ function Client(props) {
 
                     <label> Credor </label>
                     <Downshift inputValue={companieName} onChange={selection => {
-                        setCompanies(selection)
+                        setCompanies([])
                         setCompanie(selection.id)
                         setCompanieName(selection.name)
                         setDefaultInterest(selection.default_interest)
@@ -359,7 +362,7 @@ function Client(props) {
                                         onChangeCapture={async e => {
                                             setCompanieName(e.target.value)
                                             if (!e.target.value || e.target.value.length < 3) return;
-                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`, header);
                                             setCompanies(data);
                                         }}
                                         {...getInputProps()} />
@@ -384,7 +387,7 @@ function Client(props) {
                     <Downshift inputValue={clientName} onChange={selection => {
                         setClient(selection.id)
                         setClientName(selection.name)
-                        setClients(selection)
+                        setClients([])
                     }}
                         itemToString={item => (item ? item.name : '')}>
                         {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
@@ -398,7 +401,7 @@ function Client(props) {
                                         onChangeCapture={async e => {
                                             setClientName(e.target.value)
                                             if (!e.target.value || e.target.value.length < 3) return;
-                                            const { data } = await api.get(`clients/find-by-name/${String(e.target.value).normalize("NFD")}`);
+                                            const { data } = await api.get(`clients/find-by-name/${String(e.target.value).normalize("NFD")}`, header);
                                             setClients(data);
                                         }}
                                         {...getInputProps()} />
@@ -532,8 +535,10 @@ function Client(props) {
                             onChange={e => setUpdatedDebt(e)}
                             readOnly />
                         <button
+                            disabled={status === 'Liquidado'}
                             style={{ marginLeft: 5, width: 'auto' }}
                             onClick={calculate}> Atualizar </button>
+
                     </div>
 
                     <label> R$ Desconto Máximo </label>

@@ -10,6 +10,7 @@ import imgLogin from '../../assets/login.png';
 
 function Login(props) {
     const history = useHistory();
+    
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
 
@@ -23,8 +24,12 @@ function Login(props) {
         if (!res.data)
         props.dispatch(toastActions.setToast(true, 'success', 'Usuario ou senha incorretos.'));
         else {
+            console.log(res.data)
+
+            props.dispatch(userActions.setUser(res.data.id, res.data.name, res.data.hash));
             localStorage.setItem('@sg/user/id', res.data.id);
             localStorage.setItem('@sg/user/name', res.data.name);
+            localStorage.setItem('@sg/user/hash', res.data.hash);
             history.push('dashboard');
         }
 

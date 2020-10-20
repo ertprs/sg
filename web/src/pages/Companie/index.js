@@ -15,6 +15,7 @@ import AppBar from '../../components/AppBar';
 
 function Companie(props) {
     const history = useHistory();
+    const header = { headers: { hash: props.state.user.hash }};
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -75,7 +76,7 @@ function Companie(props) {
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
-                const res = await api.put(`companies/${register.id}`, regTemp)
+                const res = await api.put(`companies/${register.id}`, regTemp, header)
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -83,7 +84,7 @@ function Companie(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //CADASTRO
-                const res = await api.post('companies', regTemp);
+                const res = await api.post('companies', regTemp, header);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
@@ -101,7 +102,7 @@ function Companie(props) {
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
         try {
-            const res = await api.delete(`companies/${register.id}`);
+            const res = await api.delete(`companies/${register.id}`, header);
             setIsUpdating(false);
             setRegister({});
             clearValues();
@@ -118,7 +119,7 @@ function Companie(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('companies')
+            const res = await api.get('companies',header)
             setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));

@@ -11,6 +11,28 @@ const getById = async (id) => {
   }
 }
 
+const validUser = async (hash) => {
+  try {
+    if (!hash)
+      return false
+
+    const res = await connection('users')
+      .where('hash', '=', 'DEFA')
+      .select('*');
+
+    if (res.length > 0)
+      return true
+    else
+      return false;
+
+  } catch (error) {
+    console.log(error)
+    return false;
+  }
+}
+
+
 module.exports = {
-  getById
+  getById,
+  validUser
 }

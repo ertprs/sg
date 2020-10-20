@@ -18,6 +18,7 @@ import AppBar from '../../components/AppBar';
 
 function Attendance(props) {
     const history = useHistory();
+    const header = { headers: { hash: props.state.user.hash }};
     const [grandMaximumDiscount, setGrandMaximumDiscount] = useState(0);
 
     const [show, setShow] = useState(false);
@@ -110,7 +111,7 @@ function Attendance(props) {
         try {
             if (isUpdating) {
                 //ALTERAÇÃO
-                const res = await api.put(`attendances/${register.id}`, regTemp)
+                const res = await api.put(`attendances/${register.id}`, regTemp, header)
                 await updateClient();
                 setRegister({});
                 clearValues();
@@ -145,7 +146,7 @@ function Attendance(props) {
                 }
 
                 //CADASTRO
-                const res = await api.post('attendances', regTemp);
+                const res = await api.post('attendances', regTemp, header);
 
                 if (aStatus === 'Negociado')
                     await closeCollectsByClient(aClient, res.data[0]);
@@ -167,7 +168,7 @@ function Attendance(props) {
     const handleDelete = async () => {
         props.dispatch(loadingActions.setLoading(true));
         try {
-            const res = await api.delete(`attendances/${register.id}`);
+            const res = await api.delete(`attendances/${register.id}`, header);
             setIsUpdating(false);
             setRegister({});
             clearValues();
@@ -184,7 +185,7 @@ function Attendance(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('attendances');
+            const res = await api.get('attendances', header);
             setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));
@@ -205,7 +206,7 @@ function Attendance(props) {
 
     const getCollectsByAttendanceId = async attendanceId => {
         try {
-            const res = await api.get('/collects/find-by-attendance/' + attendanceId);
+            const res = await api.get('/collects/find-by-attendance/' + attendanceId, header);
             var tempGrandMaximumDiscount = 0;
             var tempAGrandValue = 0;
             res.data.map(collect => {
@@ -224,7 +225,7 @@ function Attendance(props) {
 
     const getCollectsByClientId = async cliId => {
         try {
-            const res = await api.get('/collects/find-by-client/' + cliId);
+            const res = await api.get('/collects/find-by-client/' + cliId, header);
             var tempGrandMaximumDiscount = 0;
             var tempAGrandValue = 0;
             res.data.map(collect => {
@@ -312,7 +313,7 @@ function Attendance(props) {
 
         //LOAD CLIENT
         if (reg.client) {
-            const res = await api.get(`clients/find-by-id/${reg.client}`);
+            const res = await api.get(`clients/find-by-id/${reg.client}`, header);
             setAClientName(res.data.name)
             setClientValues(res.data)
             // GET COLLECTS
@@ -354,7 +355,7 @@ function Attendance(props) {
                 document: cliDocument,
                 obs: cliObs
             }
-            const res = await api.put(`clients/${cliId}`, regTemp)
+            const res = await api.put(`clients/${cliId}`, regTemp, header)
         } catch (error) {
             props.dispatch(toastActions.setToast(true, 'success', 'Houve um erro ' + error.message));
         }
@@ -363,7 +364,7 @@ function Attendance(props) {
 
 
     const closeCollectsByClient = async (clientId, attendanceId) => {
-        const res = await api.get(`collects/close-by-client/${clientId}/${attendanceId}`);
+        const res = await api.get(`collects/close-by-client/${clientId}/${attendanceId}`, header);
     }
 
     return (
@@ -402,9 +403,9 @@ function Attendance(props) {
                             <td>{reg.dt_end}</td>
                             <td>{reg.user + ' - ' + reg.user_name}</td>
                             <td>{reg.client + ' - ' + reg.client_name}</td>
-                            <td>{strValueToFloat(reg.grand_value).toLocaleString()}</td>
+                            <td>{'R$ ' + strValueToFloat(reg.grand_value).toLocaleString()}</td>
                             <td>{reg.status}</td>
-                            <td>{strValueToFloat(reg.negotiated_value).toLocaleString()}</td>
+                            <td>{'R$ ' + strValueToFloat(reg.negotiated_value).toLocaleString()}</td>
                         </tr>
                     ))}
                 </MDBTableBody>
@@ -483,7 +484,7 @@ function Attendance(props) {
                                                 onChangeCapture={async e => {
                                                     setAClientName(e.target.value)
                                                     if (!e.target.value || e.target.value.length < 3) return;
-                                                    const { data } = await api.get(`clients/find-by-name/${e.target.value}`);
+                                                    const { data } = await api.get(`clients/find-by-name/${e.target.value}`, header);
                                                     setClients(data);
                                                 }}
                                                 {...getInputProps()} />
@@ -630,7 +631,7 @@ function Attendance(props) {
                                             <td>{collect.dt_maturity}</td>
                                             <td>{collect.days}</td>
                                             <td>{collect.value}</td>
-                                            <td>{strValueToFloat(collect.updated_debt).toLocaleString()} </td>
+                                            <td>{'R$ ' + strValueToFloat(collect.updated_debt).toLocaleString()} </td>
                                         </tr>
                                     ))}
                                 </MDBTableBody>

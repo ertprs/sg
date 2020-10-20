@@ -3,10 +3,13 @@ const ClientHelper = require('../helpers/ClientHelper');
 const CompanieHelper = require('../helpers/CompanieHelper');
 const myFormat = require('../helpers/myFormat');
 const moment = require('moment')
-
+const UserHelper = require('../helpers/UserHelper');
 
 const getAll = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('collects').select('*');
     collects = [];
     for (collect of res) {
@@ -31,24 +34,27 @@ const getAll = async (request, response) => {
 }
 
 const update = async (request, response) => {
-  const register = {
-    code: request.body.code,
-    client: request.body.client,
-    status: request.body.status,
-    companie: request.body.companie,
-    account: request.body.account,
-    document: request.body.document,
-    dt_maturity: request.body.dt_maturity,
-    days: request.body.days,
-    value: request.body.value,
-    updated_debt: request.body.updated_debt,
-    honorary: request.body.honorary,
-    honorary_per: request.body.honorary_per,
-    maximum_discount: request.body.maximum_discount,
-    negotiated_value: request.body.negotiated_value,
-    obs: request.body.obs
-  };
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
+    const register = {
+      code: request.body.code,
+      client: request.body.client,
+      status: request.body.status,
+      companie: request.body.companie,
+      account: request.body.account,
+      document: request.body.document,
+      dt_maturity: request.body.dt_maturity,
+      days: request.body.days,
+      value: request.body.value,
+      updated_debt: request.body.updated_debt,
+      honorary: request.body.honorary,
+      honorary_per: request.body.honorary_per,
+      maximum_discount: request.body.maximum_discount,
+      negotiated_value: request.body.negotiated_value,
+      obs: request.body.obs
+    };
     const res = await connection('collects').where('id', '=', request.params.id).update(register)
     return response.json(res);
   } catch (error) {
@@ -58,6 +64,9 @@ const update = async (request, response) => {
 
 const deleteRegister = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('collects').where('id', '=', request.params.id).del();
     return response.json(res);
   } catch (error) {
@@ -68,6 +77,9 @@ const deleteRegister = async (request, response) => {
 
 const getByClient = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('collects')
       .where({
         client: request.params.client_id,
@@ -94,22 +106,25 @@ const getByClient = async (request, response) => {
 }
 
 const newRegister = async (request, response) => {
-  const register = {
-    client: request.body.client,
-    status: request.body.status,
-    companie: request.body.companie,
-    account: request.body.account,
-    document: request.body.document,
-    dt_maturity: request.body.dt_maturity,
-    days: request.body.days,
-    value: request.body.value,
-    updated_debt: request.body.updated_debt,
-    honorary: request.body.honorary,
-    maximum_discount: request.body.maximum_discount,
-    negotiated_value: request.body.negotiated_value,
-    obs: request.body.obs
-  };
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
+    const register = {
+      client: request.body.client,
+      status: request.body.status,
+      companie: request.body.companie,
+      account: request.body.account,
+      document: request.body.document,
+      dt_maturity: request.body.dt_maturity,
+      days: request.body.days,
+      value: request.body.value,
+      updated_debt: request.body.updated_debt,
+      honorary: request.body.honorary,
+      maximum_discount: request.body.maximum_discount,
+      negotiated_value: request.body.negotiated_value,
+      obs: request.body.obs
+    };
     const res = await connection('collects').insert(register);
     return response.json(res[0]);
   } catch (error) {
@@ -120,6 +135,9 @@ const newRegister = async (request, response) => {
 
 const importCollect = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const collect = await {
       client: await ClientHelper.newIfNotExists({
         name: request.body.client,
@@ -147,6 +165,9 @@ const importCollect = async (request, response) => {
 
 const recalc = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('collects')
       .select('*')
       .where({
@@ -192,8 +213,8 @@ const recalc = async (request, response) => {
 
       //DÉBITO ATUALIZADO 
       reg.debit = await myFormat.floatValueToStr(parseFloat(((myFormat.strValueToFloat(reg.interest) + myFormat.strValueToFloat(reg.penalty) + myFormat.strValueToFloat(reg.honorary) + myFormat.strValueToFloat(reg.value)))))
-      
-      
+
+
       const resUpdate = await connection('collects').where('id', '=', reg.id).update({
         days: reg.days,
         honorary: reg.honorary,
@@ -209,6 +230,9 @@ const recalc = async (request, response) => {
 
 const closeByClient = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const resUpdate = await connection('collects')
       .where('client', '=', request.params.client)
       .update({
@@ -224,6 +248,9 @@ const closeByClient = async (request, response) => {
 
 const getByAttendance = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+      
     const res = await connection('collects')
       .where({
         attendance: request.params.attendance_id

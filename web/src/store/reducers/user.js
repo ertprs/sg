@@ -1,6 +1,7 @@
 const INITIAL_STATE = {
     id: 0,
-    name: ''
+    name: '',
+    hash: ''
 }
 
 export default function userValue(state = INITIAL_STATE, action) {
@@ -8,7 +9,8 @@ export default function userValue(state = INITIAL_STATE, action) {
         return {
             ...state, 
             id: action.id,
-            name: action.name
+            name: action.name,
+            hash: action.hash,
         }
     }
     return state;

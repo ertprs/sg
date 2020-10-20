@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import * as XLSX from 'xlsx';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
@@ -13,7 +13,9 @@ import AppBar from '../../components/AppBar';
 
 function ImportCollects(props) {
     const history = useHistory();
-    const sheetFile = React.useRef()
+    const header = { headers: { hash: props.state.user.hash }};
+
+    const sheetFile = useRef()
     const [importedArray, setImportedArray] = useState([])
     const [companies, setCompanies] = useState([]);
     const [companieId, setCompanieId] = useState(0);
@@ -24,7 +26,7 @@ function ImportCollects(props) {
     }, []);
 
     const loadCompanies = async () => {
-        const res = await api.get('companies');
+        const res = await api.get('companies', header, header);
         if (res.data.length > 0) {
             setCompanies(res.data);
             setCompanieId(res.data[0].id)
@@ -53,7 +55,7 @@ function ImportCollects(props) {
             maximum_discount: register.DESC_MAX,
             value: register.VLR_ORIGINARIO,
         }
-        api.post('collects/import-collect', data);
+        api.post('collects/import-collect', data, header);
     }
 
     function sleep(ms) {
@@ -149,8 +151,8 @@ function ImportCollects(props) {
                                 <td>{collect.FONE_2}</td>
                                 <td>{collect.FONE_3}</td>
                                 <td>{collect.DT_VENC}</td>
-                                <td>{collect.VLR_ORIGINARIO}</td>
-                                <td>{collect.DESC_MAX}</td>
+                                <td>{'R$ ' + collect.VLR_ORIGINARIO}</td>
+                                <td>{'R$ ' + collect.DESC_MAX}</td>
                             </tr>
                         ))}
                     </MDBTableBody>

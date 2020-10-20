@@ -1,9 +1,14 @@
 const connection = require('../database/connection');
 const CompanieHelper = require('../helpers/CompanieHelper');
+const UserHelper = require('../helpers/UserHelper');
 
 
 const getAll = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
+
     const res = await connection('clients').select('*');
     clients = [];
     for (client of res) {
@@ -17,22 +22,26 @@ const getAll = async (request, response) => {
 }
 
 const newRegister = async (request, response) => {
-  const register = {
-    code: request.body.code,
-    name: request.body.name,
-    companie: request.body.companie,
-    phone: request.body.phone,
-    phone_additional: request.body.phone_additional,
-    cellphone: request.body.cellphone,
-    edress: request.body.edress,
-    edress_additional: request.body.edress_additional,
-    email: request.body.email,
-    email_additional: request.body.email_additional,
-    document_type: request.body.document_type,
-    document: request.body.document,
-    obs: request.body.obs,
-  };
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
+    const register = {
+      code: request.body.code,
+      name: request.body.name,
+      companie: request.body.companie,
+      phone: request.body.phone,
+      phone_additional: request.body.phone_additional,
+      cellphone: request.body.cellphone,
+      edress: request.body.edress,
+      edress_additional: request.body.edress_additional,
+      email: request.body.email,
+      email_additional: request.body.email_additional,
+      document_type: request.body.document_type,
+      document: request.body.document,
+      obs: request.body.obs,
+    };
+
     const res = await connection('clients').insert(register);
     return response.json(res);
   } catch (error) {
@@ -41,22 +50,25 @@ const newRegister = async (request, response) => {
 }
 
 const update = async (request, response) => {
-  const register = {
-    code: request.body.code,
-    name: request.body.name,
-    companie: request.body.companie,
-    phone: request.body.phone,
-    phone_additional: request.body.phone_additional,
-    cellphone: request.body.cellphone,
-    edress: request.body.edress,
-    edress_additional: request.body.edress_additional,
-    email: request.body.email,
-    email_additional: request.body.email_additional,
-    document_type: request.body.document_type,
-    document: request.body.document,
-    obs: request.body.obs,
-  };
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
+    const register = {
+      code: request.body.code,
+      name: request.body.name,
+      companie: request.body.companie,
+      phone: request.body.phone,
+      phone_additional: request.body.phone_additional,
+      cellphone: request.body.cellphone,
+      edress: request.body.edress,
+      edress_additional: request.body.edress_additional,
+      email: request.body.email,
+      email_additional: request.body.email_additional,
+      document_type: request.body.document_type,
+      document: request.body.document,
+      obs: request.body.obs,
+    };
     const res = await connection('clients').where('id', '=', request.params.id).update(register)
     return response.json(res);
   } catch (error) {
@@ -67,6 +79,9 @@ const update = async (request, response) => {
 
 const deleteRegister = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('clients').where('id', '=', request.params.id).del();
     return response.json(res);
   } catch (error) {
@@ -76,6 +91,9 @@ const deleteRegister = async (request, response) => {
 
 const getById = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('clients')
       .where('id', '=', request.params.id)
       .select('*')
@@ -95,6 +113,9 @@ const getById = async (request, response) => {
 
 const findByName = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('clients')
       .where('name', 'like', '%' + request.params.name + '%')
       .select('*');
@@ -111,9 +132,12 @@ const findByName = async (request, response) => {
 
 const findClient = async (request, response) => {
   try {
+    if (! await UserHelper.validUser(request.headers.hash))
+      return response.json({ error: 'Access denied' });
+
     const res = await connection('clients')
       .select('*', connection.raw('name || cellphone || document as "to_find"'))
-      .where('to_find', 'LIKE', '%'+request.params.find+'%')
+      .where('to_find', 'LIKE', '%' + request.params.find + '%')
     clients = [];
     for (client of res) {
       const companie = await CompanieHelper.getById(client.companie);
