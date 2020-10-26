@@ -14,8 +14,8 @@ const emitBillet = async (id) => {
     const asaasBody = {
       "customer": "16317475",
       "billingType": "BOLETO",
-      "dueDate": "2017-06-10",
-      "value": 1,
+      "dueDate": "2020-26-10",
+      "value": 5,
       "description": "Pedido 056984",
       "externalReference": "056984", //campo para busca
       "postalService": false
