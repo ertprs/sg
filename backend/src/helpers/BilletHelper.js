@@ -4,11 +4,9 @@ const asaas = require('../services/asaas');
 
 const emitBillet = async (id) => {
   try {
-
     const asaasHeader = {
       headers: {
-        'Content-Type': 'application/json',
-        'access_token': '97e802fc8baf605139013c728b6178ff5ff2c007fcac83305a442b9431ff57fb'
+        access_token: '97e802fc8baf605139013c728b6178ff5ff2c007fcac83305a442b9431ff57fb'
       }
     };
 
@@ -22,7 +20,7 @@ const emitBillet = async (id) => {
       postalService: false
     }
 
-    const res = await asaas.api.post('billet/emit', asaasBody, asaasHeader);
+    const res = await asaas.api.post('payments', asaasBody, asaasHeader);
 
     console.log(res)
 
