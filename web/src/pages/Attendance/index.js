@@ -198,7 +198,7 @@ function Attendance(props) {
     const handleSearch = async () => {
         var tempSearch = [];
         tempSearch = registers.filter(find =>
-            find.client.toLowerCase().indexOf(String(searchField).toLowerCase()) > -1
+            find.client_name.toLowerCase().indexOf(String(searchField).toLowerCase()) > -1
         )
         setSearch(tempSearch)
     }
@@ -371,7 +371,7 @@ function Attendance(props) {
         <div className="attendance-container">
             <AppBar />
             <div className="filters">
-                <label> Cliente: </label>
+                <label> Devedor: </label>
                 <input
                     className="field-search"
                     value={searchField}
@@ -618,7 +618,6 @@ function Attendance(props) {
                                         <th>Código</th>
                                         <th>Status</th>
                                         <th>Dt. Venc.</th>
-                                        <th>Dias em Atraso</th>
                                         <th>Vlr. Originário</th>
                                         <th>Débito Atualizado</th>
                                     </tr>
@@ -629,7 +628,6 @@ function Attendance(props) {
                                             <td>{collect.id}</td>
                                             <td>{collect.status}</td>
                                             <td>{collect.dt_maturity}</td>
-                                            <td>{collect.days}</td>
                                             <td>{collect.value}</td>
                                             <td>{'R$ ' + strValueToFloat(collect.updated_debt).toLocaleString()} </td>
                                         </tr>
