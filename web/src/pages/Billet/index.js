@@ -20,7 +20,7 @@ import AppBar from '../../components/AppBar';
 
 function Billet(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
+    const header = { headers: { hash: props.state.user.hash } };
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -66,6 +66,13 @@ function Billet(props) {
     }
 
     const handleSubmit = async () => {
+        const res = await api.post('billets', {}, header);
+        console.log(res)
+        return 0
+
+
+
+
         //VALIDAÇÕES
         if (!attendance || !client) {
             props.dispatch(loadingActions.setLoading(false));

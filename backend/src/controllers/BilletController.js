@@ -2,7 +2,7 @@ const connection = require('../database/connection');
 const CompanieHelper = require('../helpers/CompanieHelper');
 const ClientHelper = require('../helpers/ClientHelper');
 const UserHelper = require('../helpers/UserHelper');
-
+const BilletHelper = require('../helpers/BilletHelper');
 
 const getAll = async (request, response) => {
   try {
@@ -31,6 +31,11 @@ const newRegister = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
+
+
+    const asaasRes = await BilletHelper.emitBillet();
+    console.log(asaasRes);
+    return response.json(asaasRes);
 
     const register = {
       attendance: request.body.attendance,
@@ -85,7 +90,7 @@ const deleteRegister = async (request, response) => {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
 
-    
+
     const res = await connection('billets').where('id', '=', request.params.id).del();
     return response.json(res);
   } catch (error) {
