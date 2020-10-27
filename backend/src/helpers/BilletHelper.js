@@ -40,7 +40,6 @@ const getAsaasCodeByClientId = async clientId => {
     if (clientRes.asaas_code)
       return clientRes.asaas_code;
 
-    console.log('não existe')
     const asaasHeader = {
       headers: {
         "Content-Type": "application/json",
