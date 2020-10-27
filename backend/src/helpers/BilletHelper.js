@@ -13,11 +13,10 @@ const emitBillet = async (billetId, client, billetTotal, attendance, dtDue) => {
         "access_token": '97e802fc8baf605139013c728b6178ff5ff2c007fcac83305a442b9431ff57fb'
       }
     };
-
     const asaasBody = {
-      "customer": getAsaasCodeByClientId(client),
+      "customer": await getAsaasCodeByClientId(client),
       "billingType": "BOLETO",
-      "dueDate": moment(dtDue, 'DD/MM/YYYY').format('yyyy-DD-mm'),
+      "dueDate": moment(dtDue, 'DD/MM/YYYY').format('YYYY-DD-MM'),
       "value": myFormat.strValueToFloat(billetTotal),
       "description": "Atendimento " + String(attendance),
       "externalReference": String(billetId), //campo para busca

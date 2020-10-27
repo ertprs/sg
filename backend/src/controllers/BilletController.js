@@ -47,7 +47,7 @@ const newRegister = async (request, response) => {
     };
 
     const res = await connection('billets').insert(register);
-    const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.billet_total, register.attendance, register.dt_due);
+    const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.attendance, register.dt_due);
 
     return response.json(asaasRes);
   } catch (error) {
