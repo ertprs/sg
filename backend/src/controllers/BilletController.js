@@ -31,12 +31,7 @@ const newRegister = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
-
-
-    const asaasRes = await BilletHelper.emitBillet();
-    console.log(asaasRes);
-    return response.json(asaasRes);
-
+    
     const register = {
       attendance: request.body.attendance,
       companie: request.body.companie,
@@ -52,7 +47,9 @@ const newRegister = async (request, response) => {
     };
 
     const res = await connection('billets').insert(register);
-    return response.json(res);
+    const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.billet_total, register.attendance, register.dt_due);
+
+    return response.json(asaasRes);
   } catch (error) {
     return response.json(error);
   }

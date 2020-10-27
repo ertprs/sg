@@ -1,8 +1,11 @@
 const connection = require('../database/connection');
 const asaas = require('../services/asaas');
+const myFormat = require('../helpers/myFormat');
+const moment = require('moment');
 
 
-const emitBillet = async (id) => {
+
+const emitBillet = async (billetId, client, billetTotal, attendance, dtDue) => {
   try {
     const asaasHeader = {
       headers: {
@@ -12,20 +15,20 @@ const emitBillet = async (id) => {
     };
 
     const asaasBody = {
-      "customer": "16317475",
+      "customer": "16317475", //generate or create Assas code by client id
       "billingType": "BOLETO",
-      "dueDate": "2020-26-10",
-      "value": 5,
-      "description": "Pedido 056984",
-      "externalReference": "056984", //campo para busca
+      "dueDate": moment(dtDue).format('yyyy-DD-mm'),
+      "value": myFormat.strValueToFloat(billetTotal),
+      "description": "Cobranca " + String(attendance),
+      "externalReference": String(billetId), //campo para busca
       "postalService": false
     }
 
-    const res = await asaas.api.post('payments', asaasBody, asaasHeader);
+    console.log(asaasBody)
 
-    console.log(res)
+    const res = {}//await asaas.api.post('payments', asaasBody, asaasHeader);
 
-    return res;
+    return res.data;
   } catch (error) {
     return error.message;
   }
