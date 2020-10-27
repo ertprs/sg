@@ -67,7 +67,7 @@ function Billet(props) {
 
     const handleSubmit = async () => {
         //VALIDAÇÕES
-        if (!attendance || !client) {
+        if (!attendance || !client || !dtDue) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
@@ -101,6 +101,7 @@ function Billet(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('billets', regTemp, header);
+                console.log(res)
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();
