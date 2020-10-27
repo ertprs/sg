@@ -66,13 +66,6 @@ function Billet(props) {
     }
 
     const handleSubmit = async () => {
-        const res = await api.post('billets', {}, header);
-        console.log(res)
-        return 0
-
-
-
-
         //VALIDAÇÕES
         if (!attendance || !client) {
             props.dispatch(loadingActions.setLoading(false));
