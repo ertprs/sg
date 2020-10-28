@@ -41,6 +41,7 @@ function Billet(props) {
     const [status, setStatus] = useState('');
     const [billetTotal, setBilletTotal] = useState('');
     const [negotiatedValue, setNegotiatedValue] = useState('');
+    const [asaasUrl, setAsaasUrl] = useState('');
     const [obs, setObs] = useState('');
 
     useEffect(() => {
@@ -101,7 +102,6 @@ function Billet(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('billets', regTemp, header);
-                console.log(res.data.bankSlipUrl)
                 window.open(res.data.bankSlipUrl);
                 setIsUpdating(false);
                 setRegister({});

@@ -9,6 +9,7 @@ import CurrencyInput from 'react-currency-input-field';
 import Downshift from 'downshift'
 import './style.css';
 import { floatValueToStr, strValueToFloat } from '../../helpers/myFormat';
+import { TestaCPF } from '../../helpers/general';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -18,7 +19,7 @@ import AppBar from '../../components/AppBar';
 
 function Attendance(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
+    const header = { headers: { hash: props.state.user.hash } };
     const [grandMaximumDiscount, setGrandMaximumDiscount] = useState(0);
 
     const [show, setShow] = useState(false);
@@ -109,10 +110,10 @@ function Attendance(props) {
         }
         setRegister(regTemp);
         try {
+            await updateClient();
             if (isUpdating) {
                 //ALTERAÇÃO
                 const res = await api.put(`attendances/${register.id}`, regTemp, header)
-                await updateClient();
                 setRegister({});
                 clearValues();
                 loadRegisters();
@@ -125,9 +126,7 @@ function Attendance(props) {
                     props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
                     return
                 }
-
                 if (aStatus === 'Negociado') {
-
                     if (grandMaximumDiscount === 0) {
                         if (strValueToFloat(aNegotiatedValue) < aGrandValue) {
                             props.dispatch(loadingActions.setLoading(false));
@@ -140,6 +139,11 @@ function Attendance(props) {
                             props.dispatch(toastActions.setToast(true, 'success', 'O VALOR NEGOCIADO não pode ser menor que o DESCONTO MÁXIMO!'));
                             return 0
                         }
+                    }
+                    if (!cliDocument) {
+                        props.dispatch(loadingActions.setLoading(false));
+                        props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do CLIENTE é obrigatório.'));
+                        return 0
                     }
                 } else {
                     setANegotiatedValue('0')
@@ -585,7 +589,8 @@ function Attendance(props) {
                                         format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/###-##"}
                                         placeholder={cliDocumentType}
                                         value={cliDocument ? cliDocument : ''}
-                                        onValueChange={e => setCliDocument(e.value)} />
+                                        onValueChange={e => setCliDocument(e.value)}
+                                        On ={console.log('saiu')} />
                                 </div>
                             </div>
 

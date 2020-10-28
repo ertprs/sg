@@ -43,11 +43,19 @@ const newRegister = async (request, response) => {
       status: request.body.status,
       billet_total: request.body.billet_total,
       negotiated_value: request.body.negotiated_value,
+      asaas_url: request.body.asaas_url,
       obs: request.body.obs,
     };
 
     const res = await connection('billets').insert(register);
+    
     const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.attendance, register.dt_due);
+
+    console.log('url', asaasRes.bankSlipUrl);
+
+    const res = await connection('attendance')
+      .put({asaas_url: asaasRes.bankSlipUrl})
+      .where({ id: res[0]});
 
     return response.json(asaasRes);
   } catch (error) {
@@ -71,6 +79,7 @@ const update = async (request, response) => {
       status: request.body.status,
       billet_total: request.body.billet_total,
       negotiated_value: request.body.negotiated_value,
+      asaas_url: request.body.asaas_url,
       obs: request.body.obs,
     };
 
@@ -86,8 +95,6 @@ const deleteRegister = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
-
-
     const res = await connection('billets').where('id', '=', request.params.id).del();
     return response.json(res);
   } catch (error) {
