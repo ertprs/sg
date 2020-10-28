@@ -86,6 +86,7 @@ function Billet(props) {
             parcel,
             negotiated_value: negotiatedValue,
             billet_total: billetTotal,
+            asaas_url: asaasUrl,
             status,
             obs
         }
@@ -102,6 +103,7 @@ function Billet(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('billets', regTemp, header);
+                console.log(res);
                 window.open(res.data.bankSlipUrl);
                 setIsUpdating(false);
                 setRegister({});
@@ -154,6 +156,7 @@ function Billet(props) {
         setQtParcel(reg.qt_parcel);
         setParcel(reg.parcel);
         setStatus(reg.status);
+        setAsaasUrl(reg.asaas_url);
         setObs(reg.obs)
         setShow(true);
     }
@@ -170,6 +173,7 @@ function Billet(props) {
         setParcel('');
         setStatus('NÃO GERADO');
         setObs('')
+        setAsaasUrl('')
         setShow(true);
     }
 
@@ -185,7 +189,6 @@ function Billet(props) {
         const res = await api.get(`attendances/get-by-id/${attendanceId}`, header);
         if (!res.data)
             return;
-
         setCompanie(res.data.companie);
         setCompanieName(res.data.companie_name);
         setClient(res.data.client);
@@ -254,6 +257,15 @@ function Billet(props) {
                             <div>
                                 <label> Código </label>
                                 <label> {': ' + register.id} </label>
+                                <br />
+                            </div>
+                            : ''
+                    }
+                    {
+                        register.asaas_url ?
+                            <div>
+                                <label> Url do boleto </label>
+                                <label> {': ' + register.asaas_url} </label>
                                 <br />
                             </div>
                             : ''
