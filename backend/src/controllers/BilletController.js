@@ -51,12 +51,9 @@ const newRegister = async (request, response) => {
     
     const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.attendance, register.dt_due);
 
-    console.log('url', asaasRes.bankSlipUrl);
-
     const attendeRes = await connection('attendance')
       .put({asaas_url: asaasRes.bankSlipUrl})
       .where({ id: res[0]});
-
     return response.json(asaasRes);
   } catch (error) {
     return response.json(error);
