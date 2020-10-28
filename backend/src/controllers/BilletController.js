@@ -52,11 +52,10 @@ const newRegister = async (request, response) => {
     
     const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.attendance, register.dt_due);
 
-    const attendeRes = await connection('attendances')
-      .where({ id: res[0]})
+    const attendeRes = await connection('billets')
+      .where({ id : res[0] })
       .update({asaas_url: asaasRes.bankSlipUrl});
     
-
     console.log(attendeRes)
 
     return response.json(asaasRes);
