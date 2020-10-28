@@ -53,7 +53,7 @@ const newRegister = async (request, response) => {
 
     console.log('url', asaasRes.bankSlipUrl);
 
-    const res = await connection('attendance')
+    const attendeRes = await connection('attendance')
       .put({asaas_url: asaasRes.bankSlipUrl})
       .where({ id: res[0]});
 
