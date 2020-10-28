@@ -101,7 +101,8 @@ function Billet(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('billets', regTemp, header);
-                console.log(res)
+                console.log(res.data.bankSlipUrl)
+                window.open(res.data.bankSlipUrl);
                 setIsUpdating(false);
                 setRegister({});
                 clearValues();

@@ -172,6 +172,7 @@ function Client(props) {
     }
 
     const clearValues = () => {
+        setRegister({})
         setCode('')
         setName('')
         setCellphone('')
