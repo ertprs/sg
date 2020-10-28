@@ -13,10 +13,11 @@ const emitBillet = async (billetId, client, billetTotal, attendance, dtDue) => {
         "access_token": '97e802fc8baf605139013c728b6178ff5ff2c007fcac83305a442b9431ff57fb'
       }
     };
-    const asaasBody = {
+
+    const asaasBody = await {
       "customer": await getAsaasCodeByClientId(client),
       "billingType": "BOLETO",
-      "dueDate": moment(dtDue, 'DD/MM/YYYY').format('YYYY-DD-MM'),
+      "dueDate": moment(dtDue, 'DD/MM/YYYY').format('YYYY-MM-DD'),
       "value": myFormat.strValueToFloat(billetTotal),
       "description": "Atendimento " + String(attendance),
       "externalReference": String(billetId), //campo para busca
@@ -25,10 +26,10 @@ const emitBillet = async (billetId, client, billetTotal, attendance, dtDue) => {
     const res = await asaas.api.post('payments', asaasBody, asaasHeader);
     return res.data;
   } catch (error) {
+    console.log(error.message)
     return error.message;
   }
 }
-
 
 const getAsaasCodeByClientId = async clientId => {
   try {
@@ -37,8 +38,9 @@ const getAsaasCodeByClientId = async clientId => {
       .select('*')
       .first();
 
-    if (clientRes.asaas_code)
+    if (clientRes.asaas_code) {
       return clientRes.asaas_code;
+    }
 
     const asaasHeader = {
       headers: {
@@ -56,6 +58,7 @@ const getAsaasCodeByClientId = async clientId => {
     const updateClientRes = await connection('clients').where('id', '=', clientId).update({ asaas_code: asaasRes.data.id });
     return asaasRes.data.id;
   } catch (error) {
+    console.log(error.message)
     return error.message;
   }
 
