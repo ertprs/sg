@@ -98,9 +98,7 @@ const deleteRegister = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
-
     const billetsRes = await connection('billets').where('id', '=', request.params.id).select('*').first();
-    console.log(billetsRes)
     const asaasRes = await BilletHelper.deleteBillet(billetsRes.asaas_id);
     const res = await connection('billets').where('id', '=', request.params.id).del();
     return response.json(res);
