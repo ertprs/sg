@@ -57,7 +57,7 @@ const newRegister = async (request, response) => {
       .update({
         asaas_id: asaasRes.id,
         asaas_url: asaasRes.bankSlipUrl,
-        status: 'AGARDANDO PAGAMENTO'
+        status: 'AGUARDANDO PAGAMENTO'
       });
 
     return response.json(asaasRes);
