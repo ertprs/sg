@@ -15,6 +15,8 @@ import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import * as callbackActions from '../../store/actions/callback';
 import AppBar from '../../components/AppBar';
+import Billet from '../Billet';
+
 
 
 function Attendance(props) {
@@ -160,6 +162,13 @@ function Attendance(props) {
                 loadRegisters();
                 setIsUpdating(false);
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro cadastrado!'));
+
+                if (aStatus === 'Negociado')
+                    history.push({
+                        pathname: 'billet',
+                        state: { attendance: res.data[0] }
+                    })
+
             }
             setShow(false)
         } catch (error) {
@@ -589,8 +598,7 @@ function Attendance(props) {
                                         format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/###-##"}
                                         placeholder={cliDocumentType}
                                         value={cliDocument ? cliDocument : ''}
-                                        onValueChange={e => setCliDocument(e.value)}
-                                        On ={console.log('saiu')} />
+                                        onValueChange={e => setCliDocument(e.value)} />
                                 </div>
                             </div>
 

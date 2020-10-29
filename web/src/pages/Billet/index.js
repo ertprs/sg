@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { AiOutlineSearch } from 'react-icons/ai';
@@ -20,6 +20,8 @@ import AppBar from '../../components/AppBar';
 
 function Billet(props) {
     const history = useHistory();
+    var isIn = false;
+    const location = useLocation();
     const header = { headers: { hash: props.state.user.hash } };
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
@@ -45,8 +47,16 @@ function Billet(props) {
     const [obs, setObs] = useState('');
 
     useEffect(() => {
-        loadRegisters();
-    }, []);
+        if (location.state) {
+            if (location.state.attendance) {
+                setAttendance(props.location.state.attendance);
+                getByAttendance(props.location.state.attendance);
+                setIsUpdating(false);
+                setShow(true);
+            }
+        } else
+            loadRegisters();
+    }, [location]);
 
     const loadRegisters = async () => {
         try {
@@ -264,8 +274,7 @@ function Billet(props) {
                     {
                         register.asaas_url ?
                             <div>
-                                <label> Url do boleto </label>
-                                <label> {': ' + register.asaas_url} </label>
+                                <a href={register.asaas_url} target="_blank"> Vizualizar boleto </a>
                                 <br />
                             </div>
                             : ''
@@ -400,9 +409,12 @@ function Billet(props) {
 
                 </Modal.Body>
                 <div className="modal-footer-container">
-                    <button onClick={handleSubmit}> Salvar </button>
+                    {isUpdating ? <></> : <button onClick={handleSubmit}> Salvar </button>}
                     {isUpdating ? <button onClick={handleDelete} style={{ backgroundColor: '#ff6666' }} > Apagar </button> : <></>}
-                    <button onClick={() => setShow(false)} style={{ backgroundColor: '#668cff' }} > Fechar </button>
+                    <button onClick={() => {
+                        loadRegisters();
+                        setShow(false);
+                    }} style={{ backgroundColor: '#668cff' }} > Fechar </button>
                 </div>
             </Modal>
 

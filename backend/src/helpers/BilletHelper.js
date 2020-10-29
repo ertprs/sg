@@ -65,7 +65,19 @@ const getAsaasCodeByClientId = async clientId => {
 }
 
 
+const deleteBillet = async assasId => {
+  const asaasHeader = {
+    headers: {
+      "Content-Type": "application/json",
+      "access_token": '97e802fc8baf605139013c728b6178ff5ff2c007fcac83305a442b9431ff57fb'
+    }
+  };
+  const asaasRes = await asaas.api.delete('payments/'+assasId, asaasHeader);
+}
+
+
 module.exports = {
   emitBillet,
-  getAsaasCodeByClientId
+  getAsaasCodeByClientId,
+  deleteBillet
 }
