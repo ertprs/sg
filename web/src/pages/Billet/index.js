@@ -7,6 +7,8 @@ import Downshift from 'downshift';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
+import { moneyToFloat, formatDate, formatMoney } from '../../helpers/myFormat';
+import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
 import './style.css';
@@ -38,8 +40,9 @@ function Billet(props) {
     const [clientName, setClientName] = useState('');
     const [dtGeneration, setDtGeneration] = useState('');
     const [dtDue, setDtDue] = useState('');
-    const [qtParcel, setQtParcel] = useState('');
+    const [qtParcel, setQtParcel] = useState(0);
     const [parcel, setParcel] = useState('');
+    const [parcels, setParcels] = useState([]);
     const [status, setStatus] = useState('');
     const [billetTotal, setBilletTotal] = useState('');
     const [negotiatedValue, setNegotiatedValue] = useState('');
@@ -78,7 +81,7 @@ function Billet(props) {
 
     const handleSubmit = async () => {
         //VALIDAÇÕES
-        if (!attendance || !client || !dtDue) {
+        if (!attendance || !client) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
@@ -97,6 +100,7 @@ function Billet(props) {
             negotiated_value: negotiatedValue,
             billet_total: billetTotal,
             asaas_url: asaasUrl,
+            parcels,
             status,
             obs
         }
@@ -113,7 +117,6 @@ function Billet(props) {
             } else {
                 //CADASTRO
                 const res = await api.post('billets', regTemp, header);
-                console.log(res);
                 window.open(res.data.bankSlipUrl);
                 setIsUpdating(false);
                 setRegister({});
@@ -172,6 +175,7 @@ function Billet(props) {
     }
 
     const clearValues = () => {
+        setRegister({})
         setCompanie('');
         setCompanieName('');
         setClient('');
@@ -184,6 +188,7 @@ function Billet(props) {
         setStatus('NÃO GERADO');
         setObs('')
         setAsaasUrl('')
+        setParcels([{dt_due: '',billet_total: '0'}])
         setShow(true);
     }
 
@@ -209,6 +214,7 @@ function Billet(props) {
         setParcel('1');
         setStatus('NÃO GERADO');
     }
+
 
     return (
         <div className="billet-container">
@@ -268,14 +274,14 @@ function Billet(props) {
                                 <label> Código </label>
                                 <label> {': ' + register.id} </label>
                                 <br />
-                            </div>
-                            : ''
-                    }
-                    {
-                        register.asaas_url ?
-                            <div>
-                                <a href={register.asaas_url} target="_blank"> Vizualizar boleto </a>
-                                <br />
+                                {
+                                    register.asaas_url ?
+                                        <div>
+                                            <a href={register.asaas_url} target="_blank"> Vizualizar boleto </a>
+                                            <br />
+                                        </div>
+                                        : ''
+                                }
                             </div>
                             : ''
                     }
@@ -287,7 +293,8 @@ function Billet(props) {
                             placeholder="Codigo"
                             value={attendance}
                             onChange={e => setAttendance(e.target.value)}
-                            onBlur={e => getByAttendance(e.target.value)} />
+                            onBlur={e => getByAttendance(e.target.value)}
+                            readOnly={isUpdating} />
                     </div>
 
                     <label> Credor </label>
@@ -321,7 +328,6 @@ function Billet(props) {
                     </div>
 
                     <div className="inline">
-
                         <div style={{ width: 150, marginRight: 5 }}>
                             <label> Dt. Geração </label>
                             <input
@@ -331,18 +337,6 @@ function Billet(props) {
                                 readOnly />
                         </div>
 
-                        <div style={{ width: 150 }}>
-                            <label> Dt. Vencimento </label>
-                            <CurrencyFormat
-                                format="##/##/####"
-                                placeholder="Dt. de vencimento"
-                                value={dtDue ? dtDue : ''}
-                                onValueChange={e => setDtDue(e.formattedValue)}
-                                readOnly={isUpdating} />
-                        </div>
-                    </div>
-
-                    <div className="inline">
                         <div style={{ width: 150, marginRight: 5 }}>
                             <label> Valor Negociado </label>
                             <CurrencyInput
@@ -354,41 +348,54 @@ function Billet(props) {
                                 value={negotiatedValue ? negotiatedValue : ''}
                                 readOnly />
                         </div>
-                        <div style={{ width: 150 }}>
-                            <label> Valor da Parcela </label>
-                            <CurrencyInput
-                                prefix="R$ "
-                                placeholder="Valor da Parcela"
-                                decimalSeparator=","
-                                groupSeparator="."
-                                precision="2"
-                                value={billetTotal ? billetTotal : ''}
-                                onChange={e => setBilletTotal(e)}
-                                readOnly={isUpdating} />
-                        </div>
                     </div>
 
-                    <div className="inline">
-                        <div style={{ width: 150, marginRight: 5 }}>
-                            <label> Qtde. Parcelas </label>
-                            <input
-                                type="text"
-                                placeholder="Qtde. Parcelas"
-                                value={qtParcel}
-                                onChange={e => setQtParcel(e.target.value)}
-                                readOnly={isUpdating} />
-                        </div>
-
-                        <div style={{ width: 150 }}>
-                            <label> Parcela </label>
-                            <input
-                                type="text"
-                                placeholder="Parcela"
-                                value={parcel}
-                                onChange={e => setParcel(e.target.value)}
-                                readOnly={isUpdating} />
-                        </div>
+                    <div style={{ width: 150, marginRight: 5 }}>
+                        <label> Qtde. Parcelas </label>
+                        <button
+                            disabled={isUpdating}
+                            onClick={e => {
+                                setParcel(parcels.length + 1)
+                                parcels.push({
+                                    dt_due: '',
+                                    billet_total: '0'
+                                })
+                            }}> Adicionar parcela </button>
                     </div>
+
+                    {parcels.map(par => (
+                        <div className="parcela" key={par.position}>
+                            <strong> Parcela: {parcels.indexOf(par) + 1} </strong>
+                            <div className="inline">
+                                <div style={{ width: 150 }}>
+                                    <label> Dt. Vencimento </label>
+                                    <CurrencyFormat
+                                        format="##/##/####"
+                                        placeholder="Data de vencimento"
+                                        onValueChange={e => par.dt_due = e.formattedValue}
+                                        readOnly={isUpdating} />
+                                </div>
+                                <div style={{ width: 150, marginLeft: 5 }}>
+                                    <label> Valor da Parcela </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Valor da Parcela"
+                                        onKeyUp={formatMoney}
+                                        onChange={e => par.billet_total = e.target.value}
+                                        readOnly={isUpdating} />
+                                </div>
+                                <div style={{ width: 50, marginLeft: 5 }} >
+                                    <label>.</label>
+                                    <button style={!isUpdating ? { backgroundColor: '#ff6666' } : {}} onClick={()=> {
+                                        const newArray = parcels.filter((value, index, arr) => { 
+                                            return index !== parcels.indexOf(par)
+                                        });
+                                        setParcels(newArray)
+                                    }}> - </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
 
                     <div style={{ width: 300 }}>
                         <label> Status </label>

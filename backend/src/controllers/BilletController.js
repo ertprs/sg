@@ -32,15 +32,17 @@ const newRegister = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
-    
+
+    var firstAsaasRes;
+
+    const parcels = request.body.parcels;
+
     const register = {
       attendance: request.body.attendance,
       companie: request.body.companie,
       client: request.body.client,
       dt_generation: request.body.dt_generation,
       dt_due: request.body.dt_due,
-      qt_parcel: request.body.qt_parcel,
-      parcel: request.body.parcel,
       status: request.body.status,
       billet_total: request.body.billet_total,
       negotiated_value: request.body.negotiated_value,
@@ -48,19 +50,38 @@ const newRegister = async (request, response) => {
       obs: request.body.obs,
     };
 
-    const res = await connection('billets').insert(register);
-    
-    const asaasRes = await BilletHelper.emitBillet(res[0], register.client, register.billet_total, register.attendance, register.dt_due);
+    for (parcel of parcels) {
+      const newRegister = {
+        attendance: request.body.attendance,
+        companie: request.body.companie,
+        client: request.body.client,
+        dt_generation: request.body.dt_generation,
+        status: request.body.status,
+        negotiated_value: request.body.negotiated_value,
+        asaas_url: request.body.asaas_url,
+        obs: request.body.obs,
+        dt_due: parcel.dt_due,
+        billet_total: parcel.billet_total,
+      }
+      const res = await connection('billets').insert(newRegister);
 
-    const billetRes = await connection('billets')
-      .where({ id : res[0] })
-      .update({
-        asaas_id: asaasRes.id,
-        asaas_url: asaasRes.bankSlipUrl,
-        status: 'AGUARDANDO PAGAMENTO'
-      });
+      const asaasRes = await BilletHelper.emitBillet(res[0], newRegister.client, newRegister.billet_total, newRegister.attendance, newRegister.dt_due);
 
-    return response.json(asaasRes);
+      if (parcels.indexOf(parcel) === 0) {
+        firstAsaasRes = asaasRes;
+      }
+
+      const billetRes = await connection('billets')
+        .where({ id: res[0] })
+        .update({
+          asaas_id: asaasRes.id,
+          asaas_url: asaasRes.bankSlipUrl,
+          status: 'AGUARDANDO PAGAMENTO'
+        });
+
+    }
+
+    return response.json(firstAsaasRes);
   } catch (error) {
     console.log(error)
     return response.json(error);

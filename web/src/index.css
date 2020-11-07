@@ -29,7 +29,7 @@ button, input[type=submit] {
   background-color: #417b5b;
 }
 
-input[type=text], input[type=number], input[type=password], textarea, select {
+input[type=text], input[type=number], input[type=password], input[type=date], textarea, select {
     width: 100%;
     padding: 10px;
     margin: 8px 0;
