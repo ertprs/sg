@@ -109,6 +109,8 @@ const getById = async (request, response) => {
       companie_name: companie ? companie.name : '',
       client_name: client ? client.name : '',
       client_document: client ? client.document : '',
+      client_document_type: client ? client.document_type : '',
+      client_email: client ? client.email : ''
     }
 
     return response.json(attendance);

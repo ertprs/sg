@@ -18,7 +18,10 @@ const getAll = async (request, response) => {
       billets.push({
         ...billet,
         companie_name: companie ? companie.name : '',
-        client_name: client ? client.name : ''
+        client_name: client ? client.name : '',
+        client_document: client ? client.document : '',
+        client_document_type: client ? client.document_type : '',
+        client_email: client ? client.email : ''
       })
     }
     return response.json(billets);
@@ -78,9 +81,8 @@ const newRegister = async (request, response) => {
           asaas_url: asaasRes.bankSlipUrl,
           status: 'AGUARDANDO PAGAMENTO'
         });
-
     }
-
+    
     return response.json(firstAsaasRes);
   } catch (error) {
     console.log(error)

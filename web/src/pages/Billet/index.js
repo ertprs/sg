@@ -7,7 +7,7 @@ import Downshift from 'downshift';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
-import { moneyToFloat, formatDate, formatMoney } from '../../helpers/myFormat';
+import { moneyToFloat, formatDate, formatMoney, strValueToFloat } from '../../helpers/myFormat';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
@@ -38,11 +38,14 @@ function Billet(props) {
     const [attendance, setAttendance] = useState('');
     const [client, setClient] = useState('');
     const [clientName, setClientName] = useState('');
+    const [clientDocumentType, setClientDocumentType] = useState('');
+    const [clientDocument, setClientDocument] = useState('');
+    const [clientEmail, setClientEmail] = useState('');
     const [dtGeneration, setDtGeneration] = useState('');
     const [dtDue, setDtDue] = useState('');
     const [qtParcel, setQtParcel] = useState(0);
     const [parcel, setParcel] = useState('');
-    const [parcels, setParcels] = useState([]);
+    const [parcels, setParcels] = useState([{ dt_due: '', billet_total: '0' }]);
     const [status, setStatus] = useState('');
     const [billetTotal, setBilletTotal] = useState('');
     const [negotiatedValue, setNegotiatedValue] = useState('');
@@ -86,6 +89,34 @@ function Billet(props) {
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
+        if (!clientDocument) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'O DOCUMENTO DO CLIENTE é obrigatório!'));
+            return 0
+        }
+
+
+        for (var parcel of parcels) {
+
+            if (strValueToFloat(parcel.billet_total) < 5) {
+                props.dispatch(loadingActions.setLoading(false));
+                props.dispatch(toastActions.setToast(true, 'success', 'As parcelas devem ter o valor mínimo de R$5,00'));
+                return 0
+            }
+
+            if (!parcel.dt_due || !parcel.billet_total) {
+                props.dispatch(loadingActions.setLoading(false));
+                props.dispatch(toastActions.setToast(true, 'success', 'Preencha as parcelas corretamente'));
+                return 0
+            }
+
+            if (moment(parcel.dt_due, "DD/MM/YYYY") < moment(dtGeneration, "DD/MM/YYYY")) {
+                props.dispatch(loadingActions.setLoading(false));
+                props.dispatch(toastActions.setToast(true, 'success', 'A data de vencimento deve ser meior que a data de geração!'));
+                return 0
+            }
+        }
+
 
         props.dispatch(loadingActions.setLoading(true));
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
@@ -162,11 +193,15 @@ function Billet(props) {
         setCompanie(reg.companie);
         setCompanieName(reg.companie_name);
         setClient(reg.client)
-        setClientName(reg.client_name)
+        setClientName(reg.client_name);
+        setClientDocumentType(reg.client_client_document_type)
+        setClientDocument(reg.client_document);
+        setClientEmail(reg.client_email);
         setAttendance(reg.attendance);
         setDtGeneration(reg.dt_generation);
         setDtDue(reg.dt_due);
         setQtParcel(reg.qt_parcel);
+        setBilletTotal(reg.billet_total)
         setParcel(reg.parcel);
         setStatus(reg.status);
         setAsaasUrl(reg.asaas_url);
@@ -180,6 +215,9 @@ function Billet(props) {
         setCompanieName('');
         setClient('');
         setClientName('');
+        setClientDocumentType('')
+        setClientDocument('');
+        setClientEmail('');
         setAttendance('');
         setDtGeneration(moment().format('L'));
         setDtDue('');
@@ -188,7 +226,7 @@ function Billet(props) {
         setStatus('NÃO GERADO');
         setObs('')
         setAsaasUrl('')
-        setParcels([{dt_due: '',billet_total: '0'}])
+        setParcels([{ dt_due: '', billet_total: '0' }])
         setShow(true);
     }
 
@@ -208,6 +246,9 @@ function Billet(props) {
         setCompanieName(res.data.companie_name);
         setClient(res.data.client);
         setClientName(res.data.client_name);
+        setClientDocument(res.data.client_document);
+        setClientDocumentType(res.data.client_document_type);
+        setClientEmail(res.data.client_email);
         setNegotiatedValue(res.data.negotiated_value);
         setBilletTotal(res.data.negotiated_value);
         setQtParcel('1');
@@ -327,6 +368,20 @@ function Billet(props) {
                             readOnly />
                     </div>
 
+                    <label> Documento </label>
+                    <input
+                        type="text"
+                        placeholder="Documento"
+                        value={clientDocument}
+                        readOnly />
+
+                    <label> Email </label>
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={clientEmail}
+                        readOnly />
+
                     <div className="inline">
                         <div style={{ width: 150, marginRight: 5 }}>
                             <label> Dt. Geração </label>
@@ -350,52 +405,74 @@ function Billet(props) {
                         </div>
                     </div>
 
-                    <div style={{ width: 150, marginRight: 5 }}>
-                        <label> Qtde. Parcelas </label>
-                        <button
-                            disabled={isUpdating}
-                            onClick={e => {
-                                setParcel(parcels.length + 1)
-                                parcels.push({
-                                    dt_due: '',
-                                    billet_total: '0'
-                                })
-                            }}> Adicionar parcela </button>
-                    </div>
 
-                    {parcels.map(par => (
-                        <div className="parcela" key={par.position}>
-                            <strong> Parcela: {parcels.indexOf(par) + 1} </strong>
-                            <div className="inline">
-                                <div style={{ width: 150 }}>
-                                    <label> Dt. Vencimento </label>
-                                    <CurrencyFormat
-                                        format="##/##/####"
-                                        placeholder="Data de vencimento"
-                                        onValueChange={e => par.dt_due = e.formattedValue}
-                                        readOnly={isUpdating} />
-                                </div>
-                                <div style={{ width: 150, marginLeft: 5 }}>
-                                    <label> Valor da Parcela </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Valor da Parcela"
-                                        onKeyUp={formatMoney}
-                                        onChange={e => par.billet_total = e.target.value}
-                                        readOnly={isUpdating} />
-                                </div>
-                                <div style={{ width: 50, marginLeft: 5 }} >
-                                    <label>.</label>
-                                    <button style={!isUpdating ? { backgroundColor: '#ff6666' } : {}} onClick={()=> {
-                                        const newArray = parcels.filter((value, index, arr) => { 
-                                            return index !== parcels.indexOf(par)
-                                        });
-                                        setParcels(newArray)
-                                    }}> - </button>
-                                </div>
+                    {isUpdating ?
+                        <div className="inline">
+                            <div style={{ width: 150, marginRight: 5 }}>
+                                <label> Dt. Vencimento </label>
+                                <input
+                                    type="text"
+                                    value={dtDue}
+                                    readOnly />
+                            </div>
+                            <div style={{ width: 150 }}>
+                                <label> Valor do boleto </label>
+                                <input
+                                    type="text"
+                                    value={billetTotal}
+                                    readOnly />
                             </div>
                         </div>
-                    ))}
+                        :
+                        <div>
+                            <div style={{ width: 150, marginRight: 5 }}>
+                                <label> Qtde. Parcelas </label>
+                                <button
+                                    disabled={isUpdating}
+                                    onClick={e => {
+                                        setParcel(parcels.length + 1)
+                                        parcels.push({
+                                            dt_due: '',
+                                            billet_total: '0'
+                                        })
+                                    }}> Adicionar parcela </button>
+                            </div>
+                            {parcels.map(par => (
+                                <div className="parcela" key={par.position}>
+                                    <strong> Parcela: {parcels.indexOf(par) + 1} </strong>
+                                    <div className="inline">
+                                        <div style={{ width: 150 }}>
+                                            <label> Dt. Vencimento </label>
+                                            <CurrencyFormat
+                                                format="##/##/####"
+                                                placeholder="Data de vencimento"
+                                                onValueChange={e => par.dt_due = e.formattedValue}
+                                                readOnly={isUpdating} />
+                                        </div>
+                                        <div style={{ width: 150, marginLeft: 5 }}>
+                                            <label> Valor da Parcela </label>
+                                            <input
+                                                type="text"
+                                                placeholder="Valor da Parcela"
+                                                onKeyUp={formatMoney}
+                                                onBlur={e => par.billet_total = e.target.value}
+                                                readOnly={isUpdating} />
+                                        </div>
+                                        <div style={{ width: 50, marginLeft: 5 }} >
+                                            <label>.</label>
+                                            <button style={!isUpdating ? { backgroundColor: '#ff6666' } : {}} onClick={() => {
+                                                const newArray = parcels.filter((value, index, arr) => {
+                                                    return index !== parcels.indexOf(par)
+                                                });
+                                                setParcels(newArray)
+                                            }}> - </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    }
+
 
                     <div style={{ width: 300 }}>
                         <label> Status </label>
