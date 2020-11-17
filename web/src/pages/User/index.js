@@ -15,8 +15,8 @@ import AppBar from '../../components/AppBar';
 
 function User(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
-    
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
+
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -33,6 +33,9 @@ function User(props) {
     const [identitet, setIdentitet] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [createdAt, setCreatedAt] = useState('');
+    const [updatedAt, setUpdatedAt] = useState('');
+    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -309,6 +312,14 @@ function User(props) {
                         placeholder="Observação"
                         value={obs}
                         onChange={e => setObs(e.target.value)} />
+
+                    {register.created_at ?
+                        <div>
+                            <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                            <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                        </div>
+                        : <></>
+                    }
                 </Modal.Body>
                 <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>

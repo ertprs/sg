@@ -1,6 +1,8 @@
 const connection = require('../database/connection');
-const crypto = require('crypto');
 const UserHelper = require('../helpers/UserHelper');
+
+const crypto = require('crypto');
+const moment = require('moment');
 
 module.exports = {
   async getAll(request, response) {
@@ -8,9 +10,17 @@ module.exports = {
       if (! await UserHelper.validUser(request.headers.hash))
         return response.json({ error: 'Access denied' });
 
-
-      const result = await connection('users').select('*');
-      return response.json(result);
+      const res = await connection('users').select('*');
+      users = [];
+      for (user of res) {
+        const lastUser = await UserHelper.getById(user.last_user);
+        users.push({
+          ...user,
+          last_user_name: lastUser ? lastUser.name : '', 
+        });
+      }
+      
+      return response.json(users);
     } catch (error) {
       return response.json({ error: error.message });
     }
@@ -23,6 +33,8 @@ module.exports = {
         return response.json({ error: 'Access denied' });
 
       const reg = {
+        last_user: request.headers.user_id,
+        created_at: moment().format('L LT'),
         hash: crypto.randomBytes(4).toString('HEX'),
         name: request.body.name,
         username: request.body.username,
@@ -48,6 +60,8 @@ module.exports = {
         return response.json({ error: 'Access denied' });
 
       const reg = {
+        last_user: request.headers.user_id,
+        updated_at: moment().format('L LT'),
         name: request.body.name,
         username: request.body.username,
         password: request.body.password,

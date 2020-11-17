@@ -11,6 +11,17 @@ const getById = async (id) => {
   }
 }
 
+const getByAttendanceId = async (attendanceId) => {
+  try {
+    const res = await connection('collects')
+      .where('attendance', '=', attendanceId)
+      .select('*');
+    return res;
+  } catch (error) {
+    return error.message;
+  }
+}
+
 const newIfNotExists = async (collect) => {
   try {
     var existent = [];
@@ -51,5 +62,6 @@ const findCollect = async (collect) => {
 
 module.exports = {
   getById,
-  newIfNotExists
+  newIfNotExists,
+  getByAttendanceId
 }

@@ -2,6 +2,7 @@ const connection = require('../database/connection');
 const CompanieHelper = require('../helpers/CompanieHelper');
 const UserHelper = require('../helpers/UserHelper');
 
+const moment = require('moment');
 
 const getAll = async (request, response) => {
   try {
@@ -13,7 +14,12 @@ const getAll = async (request, response) => {
     clients = [];
     for (client of res) {
       const companie = await CompanieHelper.getById(client.companie);
-      clients.push({ ...client, companie_name: companie ? companie.name : '' })
+      const lastUser = await UserHelper.getById(client.last_user);
+      clients.push({ 
+        ...client, 
+        last_user_name: lastUser ? lastUser.name : '',
+        companie_name: companie ? companie.name : '' 
+      })
     }
     return response.json(clients);
   } catch (error) {
@@ -27,6 +33,8 @@ const newRegister = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const register = {
+      last_user: request.headers.user_id,
+      created_at: moment().format('L LT'),
       code: request.body.code,
       name: request.body.name,
       companie: request.body.companie,
@@ -55,6 +63,8 @@ const update = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const register = {
+      last_user: request.headers.user_id,
+      updated_at: moment().format('L LT'),
       code: request.body.code,
       name: request.body.name,
       companie: request.body.companie,

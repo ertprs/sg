@@ -12,14 +12,15 @@ import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
 import * as callbackActions from '../../store/actions/callback';
+import { verifyCpfAndCnpj } from '../../helpers/general'
 
 import AppBar from '../../components/AppBar';
 
 
 function Client(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
-    
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
+
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -42,6 +43,9 @@ function Client(props) {
     const [documentType, setDocumentType] = useState('CPF');
     const [document, setDocument] = useState('');
     const [edress, setEdress] = useState('');
+    const [createdAt, setCreatedAt] = useState('');
+    const [updatedAt, setUpdatedAt] = useState('');
+    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
     useEffect(() => {
@@ -68,12 +72,19 @@ function Client(props) {
 
     const handleSubmit = async () => {
         //VALIDAÇÕES
+        
+        if (!verifyCpfAndCnpj(document)) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'CPF/CNPJ inválido!'));
+            return 0
+        }
         if (!name || !companieName) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
             return 0
         }
 
+        
         props.dispatch(loadingActions.setLoading(true));
         //CRIA OBJETO PARAR CADASTRAR/ALTERAR
         const regTemp = {
@@ -391,6 +402,13 @@ function Client(props) {
                         value={obs}
                         onChange={e => setObs(e.target.value)} />
 
+                    {register.created_at ?
+                        <div>
+                            <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                            <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                        </div>
+                        : <></>
+                    }
 
                 </Modal.Body>
                 <div className="modal-footer-container">

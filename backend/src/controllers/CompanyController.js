@@ -1,15 +1,26 @@
 const connection = require('../database/connection');
 const UserHelper = require('../helpers/UserHelper');
 
+const moment = require('moment');
 
 const getAll = async (request, response) => {
   try {
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
 
-    const result = await connection('companies').select('*');
-    return response.json(result);
+    const res = await connection('companies').select('*');
+    companies = [];
+    for (companie of res) {
+      const lastUser = await UserHelper.getById(companie.last_user);
+      companies.push({
+        ...companie,
+        last_user_name: lastUser ? lastUser.name : ''
+      })
+    }
+
+    return response.json(companies);
   } catch (error) {
+    console.log(error)
     return response.json(error);
   }
 }
@@ -20,6 +31,8 @@ const newRegister = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const reg = {
+      last_user: request.headers.user_id,
+      created_at: moment().format('L LT'),
       name: request.body.name,
       cnpj: request.body.cnpj,
       edress: request.body.edress,
@@ -39,7 +52,9 @@ const newRegister = async (request, response) => {
     const res = await connection('companies').insert(reg)
     return response.json(res);
   } catch (error) {
+    console.log(error)
     return response.json(error);
+
   }
 }
 
@@ -49,6 +64,8 @@ const update = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const reg = {
+      last_user: request.headers.user_id,
+      updated_at: moment().format('L LT'),
       name: request.body.name,
       cnpj: request.body.cnpj,
       edress: request.body.edress,
@@ -67,6 +84,7 @@ const update = async (request, response) => {
     const res = await connection('companies').where('id', '=', request.params.id).update(reg)
     return response.json(res);
   } catch (error) {
+    console.log(error)
     return response.json(error);
   }
 }
@@ -79,13 +97,14 @@ const deleteRegister = async (request, response) => {
     const res = await connection('companies').where('id', '=', request.params.id).del();
     return response.json(res);
   } catch (error) {
+    console.log(error)
     return response.json(error);
   }
 }
 
 
 const getById = async (request, response) => {
-  try {
+  try {    
     if (! await UserHelper.validUser(request.headers.hash))
       return response.json({ error: 'Access denied' });
 
@@ -95,7 +114,8 @@ const getById = async (request, response) => {
       .first();
     return response.json(res);
   } catch (error) {
-    return response.json({ error: error.message });
+    console.log(error)
+    return response.json(error);
   }
 }
 
@@ -107,6 +127,7 @@ const findByName = async (request, response) => {
       .select('*');
     return response.json(res);
   } catch (error) {
+    console.log(error)
     return response.json(error);
   }
 }

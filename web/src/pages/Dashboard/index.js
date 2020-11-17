@@ -11,7 +11,7 @@ import AppBar from '../../components/AppBar';
 
 function Dashboard(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash } };
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
     const [attendanceDataChart, setAttendanceDataChart] = useState({});
     const [attendanceMonthTotal, setAttendanceMonthTotal] = useState(0)
 

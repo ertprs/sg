@@ -1,8 +1,9 @@
-const moment = require('moment')
 const connection = require('../database/connection');
 const ClientHelper = require('../helpers/ClientHelper');
 const CompanieHelper = require('../helpers/CompanieHelper');
 const UserHelper = require('../helpers/UserHelper');
+
+const moment = require('moment');
 
 const getAll = async (request, response) => {
   try {
@@ -13,11 +14,13 @@ const getAll = async (request, response) => {
     attendances = [];
     for (attendance of res) {
       const user = await UserHelper.getById(attendance.user);
+      const lastUser = await UserHelper.getById(attendance.last_user);
       const client = await ClientHelper.getById(attendance.client);
       const companie = await CompanieHelper.getById(attendance.companie);
       attendances.push({
         ...attendance,
         user_name: user ? user.name : '',
+        last_user_name: lastUser ? lastUser.name : '',
         client_name: client ? client.name : '',
         client_document: client ? client.document : '',
         companie_name: companie && companie ? companie.name : '',
@@ -35,6 +38,8 @@ const newRegister = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const reg = {
+      last_user: request.headers.user_id,
+      created_at: moment().format('L LT'),
       client: request.body.client,
       user: request.body.user,
       dt_begin: request.body.dt_begin,
@@ -59,6 +64,8 @@ const update = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const reg = {
+      last_user: request.headers.user_id,
+      updated_at: moment().format('L LT'),
       client: request.body.client,
       user: request.body.user,
       dt_begin: request.body.dt_begin,

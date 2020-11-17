@@ -58,6 +58,8 @@ routes.get('/attendances/chart-actual-month', AttendanceController.chartActualMo
 //BILLET
 routes.get('/billets', BilletController.getAll);
 routes.get('/billets/find-by-id/:id', BilletController.getById);
+routes.get('/billets/find-by-attendance/:attendance_id', BilletController.getByAttendanceId);
+
 routes.post('/billets', BilletController.newRegister);
 routes.put('/billets/:id', BilletController.update);
 routes.delete('/billets/:id', BilletController.deleteRegister);

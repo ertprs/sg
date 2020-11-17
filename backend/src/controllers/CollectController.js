@@ -2,8 +2,9 @@ const connection = require('../database/connection');
 const ClientHelper = require('../helpers/ClientHelper');
 const CompanieHelper = require('../helpers/CompanieHelper');
 const myFormat = require('../helpers/myFormat');
-const moment = require('moment')
 const UserHelper = require('../helpers/UserHelper');
+
+const moment = require('moment');
 
 const getAll = async (request, response) => {
   try {
@@ -15,8 +16,10 @@ const getAll = async (request, response) => {
     for (collect of res) {
       const client = await ClientHelper.getById(collect.client);
       const companie = await CompanieHelper.getById(collect.companie);
+      const lastUser = await UserHelper.getById(collect.last_user);
       collects.push({
         ...collect,
+        last_user_name: lastUser ? lastUser.name : '', 
         client_name: client ? client.name : '',
         client_document: client ? client.document : '',
         client_phoe: client ? client.phone : '',
@@ -39,6 +42,8 @@ const update = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const register = {
+      last_user: request.headers.user_id,
+      updated_at: moment().format('L LT'),
       code: request.body.code,
       client: request.body.client,
       status: request.body.status,
@@ -111,6 +116,8 @@ const newRegister = async (request, response) => {
       return response.json({ error: 'Access denied' });
 
     const register = {
+      last_user: request.headers.user_id,
+      created_at: moment().format('L LT'),
       client: request.body.client,
       status: request.body.status,
       companie: request.body.companie,

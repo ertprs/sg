@@ -1,6 +1,8 @@
 const connection = require('../database/connection');
 
 const getById = async (id) => {
+  if (!id)
+    return {}
   try {
     const res = await connection('companies')
       .where('id', '=', id)

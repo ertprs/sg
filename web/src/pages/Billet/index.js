@@ -24,7 +24,7 @@ function Billet(props) {
     const history = useHistory();
     var isIn = false;
     const location = useLocation();
-    const header = { headers: { hash: props.state.user.hash } };
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -41,7 +41,7 @@ function Billet(props) {
     const [clientDocumentType, setClientDocumentType] = useState('');
     const [clientDocument, setClientDocument] = useState('');
     const [clientEmail, setClientEmail] = useState('');
-    const [dtGeneration, setDtGeneration] = useState('');
+    const [dtGeneration, setDtGeneration] = useState(moment().format('L'));
     const [dtDue, setDtDue] = useState('');
     const [qtParcel, setQtParcel] = useState(0);
     const [parcel, setParcel] = useState('');
@@ -50,6 +50,9 @@ function Billet(props) {
     const [billetTotal, setBilletTotal] = useState('');
     const [negotiatedValue, setNegotiatedValue] = useState('');
     const [asaasUrl, setAsaasUrl] = useState('');
+    const [createdAt, setCreatedAt] = useState('');
+    const [updatedAt, setUpdatedAt] = useState('');
+    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
     useEffect(() => {
@@ -84,6 +87,13 @@ function Billet(props) {
 
     const handleSubmit = async () => {
         //VALIDAÇÕES
+        const { data } = await api.get(`billets/find-by-attendance/${attendance}`, header)
+        if (data.id) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'Já exite BOLETO GERADO para este ATENDIMENTO.'));
+            return 0
+        }
+        
         if (!attendance || !client) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
@@ -95,8 +105,10 @@ function Billet(props) {
             return 0
         }
 
-
+        var total = 0;
         for (var parcel of parcels) {
+            total = total + strValueToFloat(parcel.billet_total); 
+
 
             if (strValueToFloat(parcel.billet_total) < 5) {
                 props.dispatch(loadingActions.setLoading(false));
@@ -115,6 +127,12 @@ function Billet(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'A data de vencimento deve ser meior que a data de geração!'));
                 return 0
             }
+        }
+
+        if (total > strValueToFloat(negotiatedValue)) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'A VALOR DAS PARCELAS não pode ser maior que o VALOR NEGOCIADO'));
+            return 0
         }
 
 
@@ -223,7 +241,7 @@ function Billet(props) {
         setDtDue('');
         setQtParcel('');
         setParcel('');
-        setStatus('NÃO GERADO');
+        setStatus('');
         setObs('')
         setAsaasUrl('')
         setParcels([{ dt_due: '', billet_total: '0' }])
@@ -253,7 +271,7 @@ function Billet(props) {
         setBilletTotal(res.data.negotiated_value);
         setQtParcel('1');
         setParcel('1');
-        setStatus('NÃO GERADO');
+        setStatus('');
     }
 
 
@@ -490,6 +508,13 @@ function Billet(props) {
                         value={obs}
                         onChange={e => setObs(e.target.value)} />
 
+                    {register.created_at ?
+                        <div>
+                            <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                            <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                        </div>
+                        : <></>
+                    }
 
                 </Modal.Body>
                 <div className="modal-footer-container">

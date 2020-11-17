@@ -6,7 +6,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
 import './style.css';
-import myFormat from '../../helpers/myFormat';
+import { verifyCnpj } from '../../helpers/general';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -15,7 +15,7 @@ import AppBar from '../../components/AppBar';
 
 function Companie(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
     const [show, setShow] = useState(false);
     const [search, setSearch] = useState([]);
     const [searchField, setSearchField] = useState([]);
@@ -36,6 +36,9 @@ function Companie(props) {
     const [monthlyValue, setMonthlyValue] = useState('');
     const [payday, setPayDay] = useState('');
     const [paymentType, setPaymentType] = useState('');
+    const [createdAt, setCreatedAt] = useState('');
+    const [updatedAt, setUpdatedAt] = useState('');
+    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -47,9 +50,15 @@ function Companie(props) {
         props.dispatch(loadingActions.setLoading(true));
 
         //VALIDAÇÕES
-        if (!name) {
+        if (!name | !defaultHonorary | !defaultInterest | !defaultPenalty) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
+            return 0
+        }
+
+        if (!verifyCnpj(document)) {
+            props.dispatch(loadingActions.setLoading(false));
+            props.dispatch(toastActions.setToast(true, 'success', 'CNPJ inválido.'));
             return 0
         }
 
@@ -119,7 +128,7 @@ function Companie(props) {
     const loadRegisters = async () => {
         try {
             props.dispatch(loadingActions.setLoading(true));
-            const res = await api.get('companies',header)
+            const res = await api.get('companies', header)
             setRegisters(res.data);
             setSearch(res.data)
             props.dispatch(loadingActions.setLoading(false));
@@ -293,8 +302,8 @@ function Companie(props) {
                         placeholder="Valor da Mensalidade"
                         decimalSeparator=","
                         groupSeparator="."
-                        value={monthlyValue?monthlyValue:''}
-                        onChange={e => setMonthlyValue(e)}/>
+                        value={monthlyValue ? monthlyValue : ''}
+                        onChange={e => setMonthlyValue(e)} />
 
                     <label> % Juros Diário </label>
                     <CurrencyInput
@@ -302,24 +311,24 @@ function Companie(props) {
                         decimalsLimit={3}
                         decimalSeparator=","
                         groupSeparator="."
-                        value={defaultInterest?defaultInterest:''}
-                        onChange={e => setDefaultInterest(e)}/>
+                        value={defaultInterest ? defaultInterest : ''}
+                        onChange={e => setDefaultInterest(e)} />
 
                     <label> % Honorários padrão </label>
                     <CurrencyInput
                         placeholder="Honorários Padrão"
                         decimalSeparator=","
                         groupSeparator="."
-                        value={defaultHonorary?defaultHonorary:''}
-                        onChange={e => setDefaultHonorary(e)}/>
+                        value={defaultHonorary ? defaultHonorary : ''}
+                        onChange={e => setDefaultHonorary(e)} />
 
                     <label> % Multa </label>
                     <CurrencyInput
                         placeholder="Honorários Padrão"
                         decimalSeparator=","
                         groupSeparator="."
-                        value={defaultPenalty?defaultPenalty:''}
-                        onChange={e => setDefaultPenalty(e)}/>
+                        value={defaultPenalty ? defaultPenalty : ''}
+                        onChange={e => setDefaultPenalty(e)} />
 
                     <label> Data de Pagamento </label>
                     <input
@@ -343,6 +352,17 @@ function Companie(props) {
                         placeholder="Observação"
                         value={obs}
                         onChange={e => setObs(e.target.value)} />
+
+
+
+                    {register.created_at ?
+                        <div>
+                            <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                            <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                        </div>
+                        : <></>
+                    }
+
                 </Modal.Body>
                 <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>

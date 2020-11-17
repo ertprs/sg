@@ -8,7 +8,7 @@ import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
 import Downshift from 'downshift'
 import './style.css';
-import { floatValueToStr, strValueToFloat } from '../../helpers/myFormat';
+import { floatValueToStr, strValueToFloat, verifyCpfAndCnpj } from '../../helpers/myFormat';
 import { TestaCPF } from '../../helpers/general';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
@@ -21,7 +21,7 @@ import Billet from '../Billet';
 
 function Attendance(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash } };
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
     const [grandMaximumDiscount, setGrandMaximumDiscount] = useState(0);
 
     const [show, setShow] = useState(false);
@@ -43,6 +43,9 @@ function Attendance(props) {
     const [aStatus, setAStatus] = useState('Não Negociado')
     const [aNegotiatedValue, setANegotiatedValue] = useState('');
     const [aGrandValue, setAGrandValue] = useState('');
+    const [aCreatedAt, setACreatedAt] = useState('');
+    const [aUpdatedAt, setAUpdatedAt] = useState('');
+    const [aLastUser, setALastUser] = useState('');
     const [aObs, setAObs] = useState('');
 
 
@@ -123,6 +126,18 @@ function Attendance(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //VALIDAÇÕES
+                if (cliDocument && verifyCpfAndCnpj(cliDocument)) {
+                    props.dispatch(loadingActions.setLoading(false));
+                    props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
+                    return
+                }
+
+                if (verifyCpfAndCnpj(cliDocument)) {
+                    props.dispatch(loadingActions.setLoading(false));
+                    props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
+                    return
+                }
+
                 if (aObs.length < 10) {
                     props.dispatch(loadingActions.setLoading(false));
                     props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
@@ -142,10 +157,10 @@ function Attendance(props) {
                             return 0
                         }
                     }
-                    if (!cliDocument) {
+                    if (verifyCpfAndCnpj(cliDocument)) {
                         props.dispatch(loadingActions.setLoading(false));
-                        props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do CLIENTE é obrigatório.'));
-                        return 0
+                        props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
+                        return
                     }
                 } else {
                     setANegotiatedValue('0')
@@ -475,6 +490,13 @@ function Attendance(props) {
                                 onChange={e => setAObs(e.target.value)}>
                                 {aObs}
                             </textarea>
+                            {register.created_at ?
+                                <div>
+                                    <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                                    <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                                </div>
+                                : <></>
+                            }
                         </Tab>
 
                         <Tab eventKey="client" title="Cliente">
@@ -566,7 +588,8 @@ function Attendance(props) {
                                 format="## (##) #########"
                                 placeholder="Telefone"
                                 value={cliPhoneAdditional ? cliPhoneAdditional : ''}
-                                onValueChange={e => setCliPhoneAdditional(e.value)} />
+                                onValueChange={e => setCliPhoneAdditional(e.value)}
+                                readOnly={isUpdating} />
 
                             <label> Email </label>
                             <input
@@ -580,12 +603,14 @@ function Attendance(props) {
                                 type="text"
                                 placeholder="Email adicional"
                                 value={cliEmailAdditional}
-                                onChange={e => setCliEmailAdditional(e.target.value)} />
+                                onChange={e => setCliEmailAdditional(e.target.value)}
+                                readOnly={isUpdating} />
 
                             <div className="inline">
                                 <div style={{ marginRight: 5 }}>
                                     <label> Tipo de Cliente </label>
                                     <select
+                                        disabled={isUpdating}
                                         className="select-search"
                                         onChange={e => setCliDocumentType(e.target.value)}>
                                         <option value="CPF" selected={cliDocumentType === 'CPF' ? true : false}>CPF</option>
@@ -598,7 +623,8 @@ function Attendance(props) {
                                         format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/###-##"}
                                         placeholder={cliDocumentType}
                                         value={cliDocument ? cliDocument : ''}
-                                        onValueChange={e => setCliDocument(e.value)} />
+                                        onValueChange={e => setCliDocument(e.value)}
+                                        readOnly={isUpdating} />
                                 </div>
                             </div>
 
@@ -614,7 +640,8 @@ function Attendance(props) {
                                 type="text"
                                 placeholder="Endereço"
                                 value={cliEdressAdditional}
-                                onChange={e => setCliEdressAdditional(e.target.value)} />
+                                onChange={e => setCliEdressAdditional(e.target.value)}
+                                readOnly={isUpdating} />
 
                             <label>  Observações </label>
                             <input

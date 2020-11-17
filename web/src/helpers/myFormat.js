@@ -1,4 +1,6 @@
 const strValueToFloat = (str) => {
+    if (!str)
+        return 0
     var r = str + '';
     r = r.replace(' ', '')
     r = r.replace('R$', '')
@@ -47,10 +49,12 @@ const moneyToFloat = value => {
 
 
 const floatValueToStr = (flt) => {
+    if (!flt)
+        return '0'
     r = parseFloat(flt ? flt : 0);
     var r = parseFloat(r.toFixed(2)) + '';
     r = r.replace('.', ',')
-    return r ? r : '0,00'
+    return r ? r : '0'
 }
 
 const configSheetStr = (str) => {

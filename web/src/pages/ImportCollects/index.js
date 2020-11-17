@@ -13,7 +13,7 @@ import AppBar from '../../components/AppBar';
 
 function ImportCollects(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash }};
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
 
     const sheetFile = useRef()
     const [importedArray, setImportedArray] = useState([])

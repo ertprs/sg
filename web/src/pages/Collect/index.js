@@ -20,7 +20,7 @@ import { strValueToFloat, floatValueToStr } from '../../helpers/myFormat';
 
 function Client(props) {
     const history = useHistory();
-    const header = { headers: { hash: props.state.user.hash } };
+    const header = { headers: { hash: props.state.user.hash, user_id: props.state.user.id } };
 
     const [show, setShow] = useState(false);
     const [registers, setRegisters] = useState([]);
@@ -44,17 +44,17 @@ function Client(props) {
     const [document, setDocument] = useState('');
     const [dtMaturity, setDtMaturity] = useState('');
     const [days, setDays] = useState('');
-    const [value, setValue] = useState('');
-    const [updatedDebt, setUpdatedDebt] = useState('');
-    const [defaultHonorary, setDefaultHonorary] = useState('');
-    const [defaultInterest, setDefaultInterest] = useState('');
-    const [interestCalculed, setInterestCalculed] = useState('');
-    const [maximumDiscount, setMaximumDiscount] = useState('');
-    const [negotiatedValue, setNegotiatedValue] = useState('');
-    const [defaultPenalty, setDefaultPenalty] = useState('');
-    const [penaltyCalculed, setPenaltyCalculed] = useState('');
-    const [honoraryCalculed, setHonoraryCalculed] = useState('');
-    const [honoraryPer, setHonoraryPer] = useState('');
+    const [value, setValue] = useState('0');
+    const [updatedDebt, setUpdatedDebt] = useState('0');
+    const [defaultHonorary, setDefaultHonorary] = useState('0');
+    const [defaultInterest, setDefaultInterest] = useState('0');
+    const [interestCalculed, setInterestCalculed] = useState('0');
+    const [maximumDiscount, setMaximumDiscount] = useState('0');
+    const [negotiatedValue, setNegotiatedValue] = useState('0');
+    const [defaultPenalty, setDefaultPenalty] = useState('0');
+    const [penaltyCalculed, setPenaltyCalculed] = useState('0');
+    const [honoraryCalculed, setHonoraryCalculed] = useState('0');
+    const [honoraryPer, setHonoraryPer] = useState('0');
     const [obs, setObs] = useState('');
 
 
@@ -211,16 +211,16 @@ function Client(props) {
         setAccount('');
         setCompanie('')
         setCompanieName('')
-        setUpdatedDebt('')
-        setDefaultHonorary('')
-        setDefaultInterest('')
-        setMaximumDiscount('')
-        setNegotiatedValue('')
-        setHonoraryPer('');
+        setUpdatedDebt('0')
+        setDefaultHonorary('0')
+        setDefaultInterest('0')
+        setMaximumDiscount('0')
+        setNegotiatedValue('0')
+        setHonoraryPer('0');
         setObs('')
         setDays('');
-        setValue('');
-        setDefaultPenalty('')
+        setValue('0');
+        setDefaultPenalty('0')
         loadRegisters();
     }
 
@@ -341,53 +341,22 @@ function Client(props) {
                     }
                     <br />
 
-                    <label> Credor </label>
-                    <Downshift inputValue={companieName} onChange={selection => {
-                        setCompanies([])
-                        setCompanie(selection.id)
-                        setCompanieName(selection.name)
-                        setDefaultInterest(selection.default_interest)
-                        setHonoraryPer(selection.default_honorary)
-                        setDefaultPenalty(selection.default_penalty)
-                    }}
-                        itemToString={item => (item ? item.name : '')}>
-                        {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
-                            <div>
-                                <div {...getRootProps({}, { suppressRefError: true })} className="inline">
-                                    <input value={companie} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
-                                    <input
-                                        type="text"
-                                        placeholder="Pesquisa"
-                                        value={companieName}
-                                        onChangeCapture={async e => {
-                                            setCompanieName(e.target.value)
-                                            if (!e.target.value || e.target.value.length < 3) return;
-                                            const { data } = await api.get(`companies/find-by-name/${String(e.target.value).normalize("NFD")}`, header);
-                                            setCompanies(data);
-                                        }}
-                                        {...getInputProps()} />
-                                </div>
-                                <ul {...getMenuProps({})}>
-                                    {isOpen ? companies
-                                        .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
-                                        .map((item) => (
-                                            <li
-                                                className="search-field-results"
-                                                {...getItemProps({ key: item.id, item })}>
-                                                {`${item.id} - ${item.name}`}
-                                            </li>))
-                                        : null}
-                                </ul>
-                            </div>
-                        )}
-                    </Downshift>
-
-
                     <label> Devedor </label>
-                    <Downshift inputValue={clientName} onChange={selection => {
+                    <Downshift inputValue={clientName} onChange={async selection => {
+                        //Set Companies fieds
+                        const {data} = await api.get(`companies/find-by-id/${selection.companie}`, header);
+                        if (!data)
+                            props.dispatch(toastActions.setToast(true, 'success', 'Cliente inválido'));
+
                         setClient(selection.id)
                         setClientName(selection.name)
                         setClients([])
+                        setCompanie(data.id)
+                        setCompanieName(data.name)
+                        setDefaultInterest(data.default_interest)
+                        setHonoraryPer(data.default_honorary)
+                        setDefaultPenalty(data.default_penalty)
+
                     }}
                         itemToString={item => (item ? item.name : '')}>
                         {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
@@ -420,6 +389,12 @@ function Client(props) {
                             </div>
                         )}
                     </Downshift>
+
+                    <label> Credor </label>
+                    <div className="inline">
+                        <input type="text" value={companie} readOnly style={{width: 80, marginRight: 5}}/>
+                        <input type="text" value={companieName} readOnly />
+                    </div>
 
                     <div className="inline">
                         <div style={{ marginRight: 10 }}>
@@ -572,6 +547,14 @@ function Client(props) {
                         value={obs}
                         onChange={e => setObs(e.target.value)} />
 
+
+                    {register.created_at ?
+                        <div>
+                            <p> Criado em {register.created_at} {!register.updated_at ? ' por ' + register.last_user + ' - ' + register.last_user_name : ''} </p>
+                            <p>{register.updated_at ? 'Ultima alteração feita em ' + register.updated_at + ' por ' + register.last_user + ' - ' + register.last_user_name : 'Registro ainda não foi alterado.'}</p>
+                        </div>
+                        : <></>
+                    }
                 </Modal.Body>
                 <div className="modal-footer-container">
                     <button onClick={handleSubmit}> Salvar </button>
