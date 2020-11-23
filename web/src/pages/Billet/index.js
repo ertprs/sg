@@ -50,9 +50,6 @@ function Billet(props) {
     const [billetTotal, setBilletTotal] = useState('');
     const [negotiatedValue, setNegotiatedValue] = useState('');
     const [asaasUrl, setAsaasUrl] = useState('');
-    const [createdAt, setCreatedAt] = useState('');
-    const [updatedAt, setUpdatedAt] = useState('');
-    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
     useEffect(() => {
@@ -476,9 +473,9 @@ function Billet(props) {
                                                 onBlur={e => par.billet_total = e.target.value}
                                                 readOnly={isUpdating} />
                                         </div>
-                                        <div style={{ width: 50, marginLeft: 5 }} >
-                                            <label>.</label>
-                                            <button style={!isUpdating ? { backgroundColor: '#ff6666' } : {}} onClick={() => {
+                                        <div style={{ display: 'flex', flexDirection: 'column' }} >
+                                            <label> . </label>
+                                            <button style={{ backgroundColor: '#ff6666', width: 50 }}  onClick={() => {
                                                 const newArray = parcels.filter((value, index, arr) => {
                                                     return index !== parcels.indexOf(par)
                                                 });

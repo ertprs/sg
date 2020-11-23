@@ -620,7 +620,7 @@ function Attendance(props) {
                                 <div>
                                     <label> {cliDocumentType} </label>
                                     <CurrencyFormat
-                                        format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/###-##"}
+                                        format={cliDocumentType === 'CPF' ? "###.###.###-##" : "###.###.###/####-##"}
                                         placeholder={cliDocumentType}
                                         value={cliDocument ? cliDocument : ''}
                                         onValueChange={e => setCliDocument(e.value)}

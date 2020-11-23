@@ -15,16 +15,17 @@ function AppBar(props) {
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
                     <NavDropdown title="Cadastro" id="basic-nav-dropdown">
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('attendance')} > Atendimentos </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('client')} > Devedores </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('collect')} > Débitos </NavDropdown.Item>
-                        <NavDropdown.Item id="color-item" onClick={() => history.push('companie')} > Credores </NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('attendance')} > Atendimentos </NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('client')} > Devedores </NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('collect')} > Débitos </NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('companie')} > Credores </NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Importação" id="basic-nav-dropdown">
                         <NavDropdown.Item onClick={() => history.push('import-collects')}>Importar Cobranças</NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Boletos" id="basic-nav-dropdown">
                         <NavDropdown.Item onClick={() => history.push('billet')}>Boletos</NavDropdown.Item>
+                        <NavDropdown.Item onClick={() => history.push('report-billet')}>Relatório de Boletos</NavDropdown.Item>
                     </NavDropdown>
                     <NavDropdown title="Controle de Usuários" id="basic-nav-dropdown">
                         <NavDropdown.Item onClick={() => history.push('user')}>Cadastro de Usuário </NavDropdown.Item>

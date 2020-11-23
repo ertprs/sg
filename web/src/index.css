@@ -44,7 +44,11 @@ input[type=text], input[type=number], input[type=password], input[type=date], te
     background-color: whitesmoke;
 }
 select {
-  padding: 11.2px;
+  padding: 10px;
+  display: inline-block;
+}
+select:disabled {
+  background-color: #b5ccbf;
 }
 
 input[type=submit]:hover, button:hover {
@@ -55,9 +59,7 @@ input[type=text]:read-only, input[type=number]:read-only, input[type=password]:r
   background-color: #b5ccbf;
 }
 
-select:disabled {
-  background-color: #b5ccbf;
-}
+
 
 .react-bootstrap-table table {
   table-layout: auto;

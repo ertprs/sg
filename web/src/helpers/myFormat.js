@@ -9,6 +9,15 @@ const strValueToFloat = (str) => {
     return r ? parseFloat(r) : 0
 }
 
+const floatValueToStr = (flt) => {
+    if (!flt)
+        return '0'
+    r = parseFloat(flt ? flt : 0);
+    var r = parseFloat(r.toFixed(2)) + '';
+    r = r.replace('.', ',')
+    return r ? r : '0'
+}
+
 const formatCep = e => {
     e.currentTarget.maxLength = 9;
     let value = e.target.value;
@@ -48,14 +57,7 @@ const moneyToFloat = value => {
 }
 
 
-const floatValueToStr = (flt) => {
-    if (!flt)
-        return '0'
-    r = parseFloat(flt ? flt : 0);
-    var r = parseFloat(r.toFixed(2)) + '';
-    r = r.replace('.', ',')
-    return r ? r : '0'
-}
+
 
 const configSheetStr = (str) => {
     var r = str + ''

@@ -54,7 +54,7 @@ const getAsaasCodeByClientId = async clientId => {
       "name": clientRes.name,
       "cpfCnpj": clientRes.document,
       "email": clientRes.email_additional ? clientRes.email_additional : clientRes.email,
-      "mobilePhone": clientRes.phone_additional ? phone_additional : clientRes.cellphone,
+      "mobilePhone": clientRes.phone_additional ? clientRes.phone_additional : clientRes.cellphone,
     }
     const asaasRes = await asaas.api.post('customers', asaasBody, asaasHeader);
     const updateClientRes = await connection('clients').where('id', '=', clientId).update({ asaas_code: asaasRes.data.id });
@@ -90,17 +90,17 @@ const getAtAssasById = async assasId => {
   const asaasRes = await asaas.api.get('payments/' + assasId, asaasHeader);
   const status = asaasRes.data.status;
   if (status === 'PENDING') return 'Aguardando pagamento'
-  else if (status === 'RECEIVED') return 'Recebida (saldo já creditado na conta)'
+  else if (status === 'RECEIVED') return 'Recebida'
   else if (status === 'CONFIRMED') return 'Pagamento confirmado (saldo ainda não creditado)'
   else if (status === 'OVERDUE') return 'Vencida'
   else if (status === 'REFUNDED') return 'Estornada'
-  else if (status === 'RECEIVED_IN_CASH') return 'Recebida em dinheiro (não gera saldo na conta)'
+  else if (status === 'RECEIVED_IN_CASH') return 'Recebida'
   else if (status === 'REFUND_REQUESTED') return 'Estorno Solicitado'
   else if (status === 'CHARGEBACK_REQUESTED') return 'Recebido chargeback'
   else if (status === 'CHARGEBACK_DISPUTE') return 'Em disputa de chargeback (caso sejam apresentados documentos para contestação)'
   else if (status === 'AWAITING_CHARGEBACK_REVERSAL') return 'Disputa vencida, aguardando repasse da adquirente'
   else if (status === 'DUNNING_REQUESTED') return 'Em processo de recuperação'
-  else if (status === 'DUNNING_RECEIVED') return 'Recuperada'
+  else if (status === 'DUNNING_RECEIVED') return 'Recebida'
   else if (status === 'AWAITING_RISK_ANALYSIS') return 'Pagamento em análise'
   else return 'Status não identificado.'
 }

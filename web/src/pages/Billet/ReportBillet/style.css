@@ -1,0 +1,39 @@
+.sale-report-container {
+ 
+}
+
+.sale-report-container .filters-container {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sale-report-container .filters-container .filter-fields {
+    margin-right: 5px;
+    align-content: center;
+}
+
+.sale-report-container .filters-container .filter-fields select {
+    margin-bottom: 15px;
+}
+
+.sale-report-container .filters-container button {
+    width: auto;
+    margin-bottom: -15px;
+}
+
+.sale-report-container .print-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+.sale-report-container .print-container button {
+    width: auto;
+}
+
+.sale-report-container h7 {
+    margin-left: 10px;
+}

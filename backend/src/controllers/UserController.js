@@ -11,6 +11,7 @@ module.exports = {
         return response.json({ error: 'Access denied' });
 
       const res = await connection('users').select('*');
+      
       users = [];
       for (user of res) {
         const lastUser = await UserHelper.getById(user.last_user);

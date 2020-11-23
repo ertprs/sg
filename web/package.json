@@ -13,6 +13,8 @@
     "downshift": "^6.0.6",
     "express": "^4.17.1",
     "express-favicon": "^2.0.1",
+    "jspdf": "^2.1.1",
+    "jspdf-autotable": "^3.5.13",
     "mdbreact": "^4.27.0",
     "moment": "^2.27.0",
     "path": "^0.12.7",

@@ -14,6 +14,8 @@ import NotFound from './pages/NotFound';
 import Client from './pages/Client';
 import User from './pages/User';
 import Billet from './pages/Billet';
+import ReportBillet from './pages/Billet/ReportBillet';
+
 
 function Routes(props) {
 
@@ -39,6 +41,7 @@ function Routes(props) {
                     <Route exact path="/client" component={Client} />
                     <Route exact path="/user" component={User} />
                     <Route exact path="/billet" component={Billet} />
+                    <Route exact path="/report-billet" component={ReportBillet} />
                 </Switch>
             }
         </BrowserRouter>
