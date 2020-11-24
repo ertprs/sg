@@ -5,6 +5,7 @@ import { Doughnut } from 'react-chartjs-2';
 
 import './style.css';
 import api from '../../services/api';
+
 import { getRandomColor } from '../../helpers/general';
 import CurrencyInput from 'react-currency-input-field';
 import AppBar from '../../components/AppBar';
