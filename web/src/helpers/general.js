@@ -1,4 +1,4 @@
-const getRandomColor = () => {
+export const getRandomColor = () => {
   var letters = '0123456789ABCDEF';
   var color = '#';
   for (var i = 0; i < 6; i++) {
@@ -8,12 +8,12 @@ const getRandomColor = () => {
 }
 
 
-function sleep(ms) {
+export const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
-const verifyCpf = cpf => {
+export const verifyCpf = cpf => {
   try {
     var soma;
     var resto;
@@ -45,7 +45,7 @@ const verifyCpf = cpf => {
 }
 
 
-const verifyCnpj = cnpj => {
+export const verifyCnpj = cnpj => {
   try {
     cnpj = cnpj.replace(/[^\d]+/g, '');
 
@@ -104,18 +104,9 @@ const verifyCnpj = cnpj => {
   }
 }
 
-const verifyCpfAndCnpj = async value => {
+export const verifyCpfAndCnpj = async value => {
   if (verifyCnpj(value) || verifyCpf(value))
     return true
   else
     return false;
-}
-
-
-module.exports = {
-  getRandomColor,
-  sleep,
-  verifyCpf,
-  verifyCnpj,
-  verifyCpfAndCnpj
 }

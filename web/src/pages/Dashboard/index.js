@@ -6,7 +6,7 @@ import { Doughnut } from 'react-chartjs-2';
 import './style.css';
 import api from '../../services/api';
 
-import { getRandomColor } from '../../helpers/general';
+import {getRandomColor} from '../../helpers/general';
 import CurrencyInput from 'react-currency-input-field';
 import AppBar from '../../components/AppBar';
 
@@ -27,7 +27,8 @@ function Dashboard(props) {
         res.data.map(values => {
             negotiatedValues.push(values.negotiated_value)
             dataValues.push(values.date)
-            colorsValues.push(getRandomColor())
+            const color = getRandomColor();
+            colorsValues.push(color)
             attendanceMonthTotal = attendanceMonthTotal + values.negotiated_value
         });
 
