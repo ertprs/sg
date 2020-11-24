@@ -6,7 +6,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
 import './style.css';
-import { verifyCnpj } from '../../helpers/general';
+import { verifyCpfAndCnpj } from '../../helpers/general';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -36,9 +36,6 @@ function Companie(props) {
     const [monthlyValue, setMonthlyValue] = useState('');
     const [payday, setPayDay] = useState('');
     const [paymentType, setPaymentType] = useState('');
-    const [createdAt, setCreatedAt] = useState('');
-    const [updatedAt, setUpdatedAt] = useState('');
-    const [lastUser, setLastUser] = useState('');
     const [obs, setObs] = useState('');
 
 
@@ -56,7 +53,7 @@ function Companie(props) {
             return 0
         }
 
-        if (!verifyCnpj(document)) {
+        if (!verifyCpfAndCnpj(cnpj)) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'CNPJ inválido.'));
             return 0
