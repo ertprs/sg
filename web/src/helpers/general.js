@@ -1,4 +1,3 @@
-
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
@@ -105,15 +104,10 @@ const verifyCnpj = cnpj => {
 }
 
 const verifyCpfAndCnpj = async value => {
-  const cpfIsValid = verifyCpf(value);
-  const cnpjIsValid = verifyCnpj(value);
-
-  console.log(verifyCnpj(value), verifyCpf(value))
   if (verifyCnpj(value) || verifyCpf(value))
     return true
   else
     return false;
-
 }
 
 
