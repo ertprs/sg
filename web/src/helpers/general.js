@@ -1,4 +1,4 @@
-function getRandomColor() {
+const getRandomColor = () => {
   var letters = '0123456789ABCDEF';
   var color = '#';
   for (var i = 0; i < 6; i++) {
@@ -6,6 +6,7 @@ function getRandomColor() {
   }
   return color;
 }
+
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
