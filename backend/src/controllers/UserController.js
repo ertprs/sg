@@ -37,6 +37,7 @@ module.exports = {
         last_user: request.headers.user_id,
         created_at: moment().format('L LT'),
         hash: crypto.randomBytes(4).toString('HEX'),
+        user_type: request.body.user_type, 
         name: request.body.name,
         username: request.body.username,
         password: request.body.password,
@@ -51,7 +52,8 @@ module.exports = {
       await connection('users').insert(reg);
       return response.json({ id });
     } catch (error) {
-      return response.json({ error: error.message });
+      console.log(error.message)
+      return response.json(error);
     }
   },
 
@@ -59,11 +61,12 @@ module.exports = {
     try {
       if (! await UserHelper.validUser(request.headers.hash))
         return response.json({ error: 'Access denied' });
-
+      
       const reg = {
         last_user: request.headers.user_id,
         updated_at: moment().format('L LT'),
         name: request.body.name,
+        user_type: request.body.user_type, 
         username: request.body.username,
         password: request.body.password,
         adress: request.body.password,
@@ -74,8 +77,12 @@ module.exports = {
         obs: request.body.obs
       };
       const res = await connection('users').where('id', '=', request.params.id).update(reg)
+
+      
       return response.json(res);
+    
     } catch (error) {
+      console.log(error.message)
       return response.json(error);
     }
   },

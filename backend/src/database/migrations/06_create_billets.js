@@ -1,7 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.createTable('billets', function (table) {
     table.increments();
-    table.timestamps();
     table.decimal('attendance');
     table.decimal('companie');
     table.decimal('client');

@@ -24,13 +24,12 @@ function Login(props) {
         if (!res.data)
         props.dispatch(toastActions.setToast(true, 'success', 'Usuario ou senha incorretos.'));
         else {
-            console.log(res.data)
-
-            props.dispatch(userActions.setUser(res.data.id, res.data.name, res.data.hash));
+            props.dispatch(userActions.setUser(res.data.id, res.data.name, res.data.user_type, res.data.hash));
             localStorage.setItem('@sg/user/id', res.data.id);
             localStorage.setItem('@sg/user/name', res.data.name);
+            localStorage.setItem('@sg/user/user_type', res.data.user_type);
             localStorage.setItem('@sg/user/hash', res.data.hash);
-            history.push('dashboard');
+            history.push('/');
         }
 
             props.dispatch(loadingActions.setLoading(false));

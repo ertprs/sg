@@ -26,6 +26,8 @@ function User(props) {
 
     const [name, setName] = useState('');
     const [userName, setUserName] = useState('');
+    const [userType, setUserType] = useState(1);
+
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [adress, setAdress] = useState('');
@@ -77,6 +79,7 @@ function User(props) {
             name,
             username: userName,
             password,
+            user_type: userType,
             adress,
             document,
             email,
@@ -155,6 +158,7 @@ function User(props) {
         setName('');
         setUserName('');
         setPassword('');
+        setUserType(1)
         setConfirmPassword('');
         setAdress('');
         setDocument('');
@@ -166,9 +170,11 @@ function User(props) {
 
 
     const setUpdating = (reg) => {
+        console.log(reg.user_type)
         setIsUpdating(true);
         setRegister(reg);
         setName(reg.name);
+        setUserType(reg.user_type);
         setUserName(reg.username);
         setPassword(reg.password);
         setConfirmPassword(reg.password);
@@ -242,6 +248,16 @@ function User(props) {
                             </div>
                             : ''
                     }
+
+                    <label> Tipo de Usuário </label>
+                    <select
+                        onChange={e => {setUserType(parseInt(e.target.value)); console.log(e.target.value)}}>
+                        <option value={1} selected={userType === 1 ? true : false} >ATENDENTE</option>
+                        <option value={2} selected={userType === 2 ? true : false} >ADMINISTRADOR</option>
+                        <option value={0} selected={userType === 0 ? true : false} >CREDOR</option>
+                    </select>
+
+
                     <label> Nome </label>
                     <input
                         type="text"

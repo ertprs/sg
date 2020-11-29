@@ -1,7 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.createTable('collects', function (table) {
     table.increments();
-    table.timestamps();
     table.string('account');
     table.string('status');
     table.string('document');

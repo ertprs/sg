@@ -15,25 +15,30 @@ import Client from './pages/Client';
 import User from './pages/User';
 import Billet from './pages/Billet';
 import ReportBillet from './pages/Billet/ReportBillet';
+import CompanieArea from './pages/CompanieArea';
 
 
 function Routes(props) {
 
     useEffect(() => {
-        props.dispatch(userActions.setUser(localStorage.getItem('@sg/user/id'), localStorage.getItem('@sg/user/name'), localStorage.getItem('@sg/user/hash')));
+        props.dispatch(userActions.setUser(localStorage.getItem('@sg/user/id'), localStorage.getItem('@sg/user/name'), localStorage.getItem('@sg/user/user_type'), localStorage.getItem('@sg/user/hash')));
     }, []);
 
-    return (
-        <BrowserRouter>
-            {props.state.user.id < 1 ?
+    if (props.state.user.userType < 0) {
+        return (
+            <BrowserRouter>
                 <Switch>
                     <Route exact path="/" component={Login} />
                     <Route path='*' component={NotFound} />
                 </Switch>
-                :
+            </BrowserRouter>
+        )
+    }
+    else if (props.state.user.userType > 0) {
+        return (
+            <BrowserRouter>
                 <Switch>
                     <Route exact path="/" component={Dashboard} />
-                    <Route exact path="/dashboard" component={Dashboard} />
                     <Route exact path="/attendance" component={Attendance} />
                     <Route exact path="/collect" component={Collect} />
                     <Route exact path="/import-collects" component={ImportCollects} />
@@ -42,9 +47,18 @@ function Routes(props) {
                     <Route exact path="/user" component={User} />
                     <Route exact path="/billet" component={Billet} />
                     <Route exact path="/report-billet" component={ReportBillet} />
+                </Switch >
+            </BrowserRouter >
+        )
+    } else {
+        return (
+            <BrowserRouter>
+                <Switch>
+                    <Route exact path="/" component={CompanieArea} />
                 </Switch>
-            }
-        </BrowserRouter>
-    );
+            </BrowserRouter>
+        )
+    }
+
 }
 export default connect(state => ({ state }))(Routes);
