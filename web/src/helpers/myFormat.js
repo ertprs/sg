@@ -57,8 +57,6 @@ const moneyToFloat = value => {
 }
 
 
-
-
 const configSheetStr = (str) => {
     var r = str + ''
     r = r.replace(' ', '')

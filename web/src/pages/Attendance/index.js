@@ -8,8 +8,8 @@ import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
 import Downshift from 'downshift'
 import './style.css';
-import { floatValueToStr, strValueToFloat, verifyCpfAndCnpj } from '../../helpers/myFormat';
-import { TestaCPF } from '../../helpers/general';
+import { floatValueToStr, strValueToFloat } from '../../helpers/myFormat';
+import { TestaCPF, verifyCpfAndCnpj } from '../../helpers/general';
 import api from '../../services/api';
 import * as loadingActions from '../../store/actions/loading';
 import * as toastActions from '../../store/actions/toast';
@@ -101,7 +101,6 @@ function Attendance(props) {
 
         props.dispatch(loadingActions.setLoading(true));
 
-        setADtEnd(moment().format('L LT'))
         const regTemp = {
             client: aClient,
             dt_begin: aDtBegin,
@@ -115,7 +114,6 @@ function Attendance(props) {
         }
         setRegister(regTemp);
         try {
-            await updateClient();
             if (isUpdating) {
                 //ALTERAÇÃO
                 const res = await api.put(`attendances/${register.id}`, regTemp, header)
@@ -126,18 +124,11 @@ function Attendance(props) {
                 props.dispatch(toastActions.setToast(true, 'success', 'Registro alterado!'));
             } else {
                 //VALIDAÇÕES
-                if (cliDocument && verifyCpfAndCnpj(cliDocument)) {
+                if (!verifyCpfAndCnpj(cliDocument)) {
                     props.dispatch(loadingActions.setLoading(false));
                     props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
                     return
                 }
-
-                if (verifyCpfAndCnpj(cliDocument)) {
-                    props.dispatch(loadingActions.setLoading(false));
-                    props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
-                    return
-                }
-
                 if (aObs.length < 10) {
                     props.dispatch(loadingActions.setLoading(false));
                     props.dispatch(toastActions.setToast(true, 'success', 'O campo OBSERVAÇÃO é obrigatório.'));
@@ -157,16 +148,12 @@ function Attendance(props) {
                             return 0
                         }
                     }
-                    if (verifyCpfAndCnpj(cliDocument)) {
-                        props.dispatch(loadingActions.setLoading(false));
-                        props.dispatch(toastActions.setToast(true, 'success', 'O CPF/CNPJ do cliente é inválido.'));
-                        return
-                    }
                 } else {
                     setANegotiatedValue('0')
                 }
 
                 //CADASTRO
+                await updateClient();
                 const res = await api.post('attendances', regTemp, header);
 
                 if (aStatus === 'Negociado')

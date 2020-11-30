@@ -56,6 +56,7 @@ const newRegister = async (request, response) => {
         status: request.body.status,
         negotiated_value: request.body.negotiated_value,
         asaas_url: request.body.asaas_url,
+        asaas_id: request.body.asaas_id,
         obs: request.body.obs,
         dt_due: parcel.dt_due,
         billet_total: parcel.billet_total,

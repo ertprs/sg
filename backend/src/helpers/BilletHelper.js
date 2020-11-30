@@ -111,9 +111,8 @@ const getBilletDetail = async attendeceId => {
   const res = await CollectHelper.getByAttendanceId(attendeceId);
   textDetail = 'Referente à: \n';
   for (collect of res) {
-    textDetail = textDetail + 'Documento ' + collect.document + ' com vencimento em ' + collect.dt_maturity + ' no valor de  R$ ' + collect.updated_debt + 'c';
+    textDetail = textDetail + 'Documento ' + collect.document + ' com vencimento em ' + collect.dt_maturity + ' no valor de  R$ ' + collect.updated_debt + '\n';
   }
-  console.log(textDetail);
   return textDetail;
 }
 

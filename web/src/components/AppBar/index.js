@@ -10,7 +10,7 @@ function AppBar(props) {
 
     return (
         <Navbar expand="lg" className="navbar" >
-            <Navbar.Brand id="basic-nav-dropdown" onClick={() => history.push('dashboard')}>Dashboard</Navbar.Brand>
+            <Navbar.Brand id="basic-nav-dropdown" onClick={() => history.push('/')}>Dashboard</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
@@ -49,7 +49,7 @@ function AppBar(props) {
                     }
                 </Nav>
                 <Navbar.Collapse className="justify-content-end">
-                    <Navbar.Text style={{ color: '#fff' }}> {'Usuário Atual: ' + props.state.user.name + ' - ' + props.state.user.userType} </Navbar.Text>
+                    <Navbar.Text style={{ color: '#fff' }}> {'Usuário Atual: ' + props.state.user.name} </Navbar.Text>
                     <Navbar.Text>
                         <Nav.Link id="basic-nav-dropdown" onClick={() => {
                             props.dispatch(userActions.setUser(0, '', -1, ''));

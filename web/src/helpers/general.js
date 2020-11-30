@@ -38,8 +38,8 @@ export const verifyCpf = cpf => {
 
     return true;
 
-  } catch (e) {
-
+  } catch (error) {
+    console.log(error)
     return false;
   }
 }
@@ -98,15 +98,15 @@ export const verifyCnpj = cnpj => {
       return false;
 
     return true;
-  } catch (e) {
-
+  } catch (error) {
+    console.log(error)
     return false;
   }
 }
 
-export const verifyCpfAndCnpj = async value => {
-  if (verifyCnpj(value) || verifyCpf(value))
-    return true
-  else
-    return false;
+export const verifyCpfAndCnpj = value => {
+  const cpf = verifyCpf(value);
+  const cnpj = verifyCnpj(value); 
+  console.log(cpf, cnpj)
+  return (cpf || cnpj)
 }

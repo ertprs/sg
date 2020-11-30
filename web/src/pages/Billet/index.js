@@ -90,7 +90,7 @@ function Billet(props) {
             props.dispatch(toastActions.setToast(true, 'success', 'Já exite BOLETO GERADO para este ATENDIMENTO.'));
             return 0
         }
-        
+
         if (!attendance || !client) {
             props.dispatch(loadingActions.setLoading(false));
             props.dispatch(toastActions.setToast(true, 'success', 'Preencha os campos obrigatórios!'));
@@ -104,7 +104,7 @@ function Billet(props) {
 
         var total = 0;
         for (var parcel of parcels) {
-            total = total + strValueToFloat(parcel.billet_total); 
+            total = total + strValueToFloat(parcel.billet_total);
 
 
             if (strValueToFloat(parcel.billet_total) < 5) {
@@ -466,22 +466,23 @@ function Billet(props) {
                                         </div>
                                         <div style={{ width: 150, marginLeft: 5 }}>
                                             <label> Valor da Parcela </label>
-                                            <input
-                                                type="text"
-                                                placeholder="Valor da Parcela"
-                                                onKeyUp={formatMoney}
-                                                onBlur={e => par.billet_total = e.target.value}
-                                                readOnly={isUpdating} />
+                                            <div className="inline">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Valor da Parcela"
+                                                    onKeyUp={formatMoney}
+                                                    onBlur={e => par.billet_total = e.target.value}
+                                                    readOnly={isUpdating} />
+
+                                                <button style={{ backgroundColor: '#ff6666', width: 50, marginLeft: 5 }} onClick={() => {
+                                                    const newArray = parcels.filter((value, index, arr) => {
+                                                        return index !== parcels.indexOf(par)
+                                                    });
+                                                    setParcels(newArray)
+                                                }}> - </button>
+                                            </div>
                                         </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column' }} >
-                                            <label> . </label>
-                                            <button style={{ backgroundColor: '#ff6666', width: 50 }}  onClick={() => {
-                                                const newArray = parcels.filter((value, index, arr) => {
-                                                    return index !== parcels.indexOf(par)
-                                                });
-                                                setParcels(newArray)
-                                            }}> - </button>
-                                        </div>
+
                                     </div>
                                 </div>
                             ))}
