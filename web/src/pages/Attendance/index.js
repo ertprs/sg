@@ -6,7 +6,7 @@ import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import moment from 'moment';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
-import Downshift from 'downshift'
+import Downshift from 'downshift';
 import './style.css';
 import { floatValueToStr, strValueToFloat } from '../../helpers/myFormat';
 import { TestaCPF, verifyCpfAndCnpj } from '../../helpers/general';

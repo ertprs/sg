@@ -1,5 +1,6 @@
 const connection = require('../database/connection');
 const UserHelper = require('../helpers/UserHelper');
+const CompanieHelper = require('../helpers/CompanieHelper');
 
 const crypto = require('crypto');
 const moment = require('moment');
@@ -15,9 +16,11 @@ module.exports = {
       users = [];
       for (user of res) {
         const lastUser = await UserHelper.getById(user.last_user);
+        const companie = await CompanieHelper.getById(user.companie);
         users.push({
           ...user,
           last_user_name: lastUser ? lastUser.name : '', 
+          companie_name: companie ? companie.name : '',
         });
       }
       
@@ -41,7 +44,8 @@ module.exports = {
         name: request.body.name,
         username: request.body.username,
         password: request.body.password,
-        adress: request.body.password,
+        companie: request.body.companie,
+        adress: request.body.adress,
         document: request.body.document,
         email: request.body.email,
         phone: request.body.phone,
@@ -69,7 +73,8 @@ module.exports = {
         user_type: request.body.user_type, 
         username: request.body.username,
         password: request.body.password,
-        adress: request.body.password,
+        companie: request.body.companie,
+        adress: request.body.adress,
         document: request.body.document,
         email: request.body.email,
         phone: request.body.phone,

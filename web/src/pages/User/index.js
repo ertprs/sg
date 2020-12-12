@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { MDBTable, MDBTableBody, MDBTableHead } from 'mdbreact';
 import CurrencyFormat from 'react-currency-format';
 import CurrencyInput from 'react-currency-input-field';
+import Downshift from 'downshift';
 import './style.css';
 import myFormat from '../../helpers/myFormat';
 import api from '../../services/api';
@@ -30,6 +31,9 @@ function User(props) {
 
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [companie, setCompanie] = useState('');
+    const [companieName, setCompanieName] = useState('');
+    const [companies, setCompanies] = useState([]);
     const [adress, setAdress] = useState('');
     const [document, setDocument] = useState('');
     const [identitet, setIdentitet] = useState('');
@@ -82,6 +86,7 @@ function User(props) {
             user_type: userType,
             adress,
             document,
+            companie,
             email,
             phone,
             identitet,
@@ -162,6 +167,8 @@ function User(props) {
         setConfirmPassword('');
         setAdress('');
         setDocument('');
+        setCompanie('');
+        setCompanieName('');
         setIdentitet('');
         setPhone('');
         setEmail('');
@@ -178,6 +185,8 @@ function User(props) {
         setUserName(reg.username);
         setPassword(reg.password);
         setConfirmPassword(reg.password);
+        setCompanie(reg.companie)
+        setCompanieName(reg.companie_name)
         setAdress(reg.adress);
         setDocument(reg.document);
         setIdentitet(reg.identitet);
@@ -251,12 +260,54 @@ function User(props) {
 
                     <label> Tipo de Usuário </label>
                     <select
-                        onChange={e => {setUserType(parseInt(e.target.value)); console.log(e.target.value)}}>
+                        onChange={e => { setUserType(parseInt(e.target.value)); console.log(e.target.value) }}>
                         <option value={1} selected={userType === 1 ? true : false} >ATENDENTE</option>
                         <option value={2} selected={userType === 2 ? true : false} >ADMINISTRADOR</option>
                         <option value={0} selected={userType === 0 ? true : false} >CREDOR</option>
                     </select>
 
+                    {userType === 0 ?
+                        <div>
+                            <label> Credor </label>
+                            <Downshift inputValue={companieName} inputValue={companieName} onChange={selection => {
+                                setCompanie(selection.id)
+                                setCompanieName(selection.name)
+                                setCompanies(selection)
+                            }}
+                                itemToString={item => (item ? item.name : '')}>
+                                {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
+                                    <div>
+                                        <div {...getRootProps({}, { suppressRefError: true })} className="inline">
+                                            <input value={companie} type="number" readOnly style={{ width: 80, marginRight: 5 }} />
+                                            <input
+                                                type="text"
+                                                placeholder="Pesquisa"
+                                                value={companieName}
+                                                onChangeCapture={async e => {
+                                                    setCompanieName(e.target.value)
+                                                    if (!e.target.value || e.target.value.length < 3) return;
+                                                    const { data } = await api.get(`companies/find-by-name/${e.target.value}`, header);
+                                                    setCompanies(data);
+                                                }}
+                                                {...getInputProps()} />
+                                        </div>
+                                        <ul {...getMenuProps({})}>
+                                            {isOpen ? companies
+                                                .filter(item => !inputValue || item.name.toLowerCase().includes(inputValue.toLowerCase()))
+                                                .map((item) => (
+                                                    <li
+                                                        className="search-field-results"
+                                                        {...getItemProps({ key: item.id, item })}>
+                                                        {`${item.id} - ${item.name}`}
+                                                    </li>))
+                                                : null}
+                                        </ul>
+                                    </div>
+                                )}
+                            </Downshift>
+                        </div>
+                        : <></>
+                    }
 
                     <label> Nome </label>
                     <input

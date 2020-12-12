@@ -466,7 +466,7 @@ function Billet(props) {
                                         </div>
                                         <div style={{ width: 150, marginLeft: 5 }}>
                                             <label> Valor da Parcela </label>
-                                            <div className="inline">
+                                            <div className="inline" style={{margin: 0, padding: 0}}>
                                                 <input
                                                     type="text"
                                                     placeholder="Valor da Parcela"
